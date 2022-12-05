@@ -1,9 +1,10 @@
 import Phaser from 'phaser'
-import { WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
-import { CourtPlayer } from '~/core/CourtPlayer'
 import { createPlayerAnims } from '~/core/CourtPlayerAnims'
+import { Player } from '~/core/Player'
 
 export default class Game extends Phaser.Scene {
+  public player!: Player
+
   constructor() {
     super('game')
   }
@@ -12,11 +13,10 @@ export default class Game extends Phaser.Scene {
     createPlayerAnims(this.anims)
 
     this.cameras.main.setBackgroundColor('#fff8dc')
-    const courtPlayer = new CourtPlayer(this, {
-      position: {
-        x: WINDOW_WIDTH / 2,
-        y: WINDOW_HEIGHT / 2,
-      },
-    })
+    this.player = new Player(this)
+  }
+
+  update() {
+    this.player.update()
   }
 }
