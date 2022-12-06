@@ -7,3 +7,5 @@ export enum Direction {
   LEFT = 'left',
   RIGHt = 'right',
 }
+
+export const PLAYER_SPEED = 150

@@ -5,7 +5,7 @@ export class Preload extends Phaser.Scene {
 
   preload() {
     this.load.image('ball', 'ball.png')
-    this.load.image('shoot', 'shoot.png')
+    this.load.image('shoot', 'animations/shoot.png')
     this.load.atlas(
       'dribble-front',
       'animations/dribble-front.png',

@@ -1,5 +1,5 @@
 import Game from '~/scenes/Game'
-import { WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
+import { PLAYER_SPEED, WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
 import { CourtPlayer } from './CourtPlayer'
 
 export class Player {
@@ -19,10 +19,19 @@ export class Player {
         y: WINDOW_HEIGHT / 2,
       },
     })
-    this.setupKeyboardKeys()
+    this.setupMovementKeys()
+    this.setupKeyboardPressListener()
   }
 
-  setupKeyboardKeys() {
+  setupKeyboardPressListener() {
+    this.game.input.keyboard.on('keydown', (e) => {
+      if (e.code === 'Space') {
+        this.selectedCourtPlayer.shoot()
+      }
+    })
+  }
+
+  setupMovementKeys() {
     this.keyArrowLeft = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT)
     this.keyArrowRight = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT)
     this.keyArrowUp = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP)
@@ -38,7 +47,7 @@ export class Player {
     const upDown = this.keyArrowUp.isDown
     const downDown = this.keyArrowDown.isDown
 
-    const speed = 50
+    const speed = PLAYER_SPEED
     let velocityX = 0
     let velocityY = 0
     if (leftDown || rightDown) {
