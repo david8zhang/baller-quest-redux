@@ -1,4 +1,5 @@
 import Game from '~/scenes/Game'
+import { createArc } from './Constants'
 
 export interface CourtPlayerConfig {
   position: {
@@ -27,14 +28,11 @@ export class CourtPlayer {
 
   shoot() {
     if (!this.isMoving()) {
-      const jumpTime = 1
-      const xPosToLand = this.sprite.x
-      const yPosToLand = this.sprite.y
-      const xVelocity = (xPosToLand - this.sprite.x) / jumpTime
-      const yVelocity = (yPosToLand - this.sprite.y - 490 * Math.pow(jumpTime, 2)) / jumpTime
+      const jumpTime = 0.7
+      const initialX = this.sprite.x
+      const initialY = this.sprite.y
+      createArc(this.sprite, { x: initialX, y: initialY }, jumpTime)
       this.isShooting = true
-      this.sprite.setGravityY(980)
-      this.sprite.setVelocity(xVelocity, yVelocity)
       this.game.time.delayedCall(jumpTime * 975, () => {
         this.sprite.setGravityY(0)
         this.idleAnimKey = 'idle'
