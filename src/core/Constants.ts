@@ -1,5 +1,5 @@
-export const WINDOW_WIDTH = 800
-export const WINDOW_HEIGHT = 600
+export const WINDOW_WIDTH = 864
+export const WINDOW_HEIGHT = 640
 
 export enum Direction {
   UP = 'up',
@@ -19,4 +19,14 @@ export const createArc = (
   const yVelocity = (landingPosition.y - sprite.y - 490 * Math.pow(duration, 2)) / duration
   sprite.setVelocity(xVelocity, yVelocity)
   sprite.setGravityY(980)
+}
+
+export const OFFBALL_ANIMS = {
+  idle: 'idle',
+  run: 'run',
+}
+
+export const ONBALL_ANIMS = {
+  idle: 'dribble-front',
+  run: 'run-with-ball',
 }
