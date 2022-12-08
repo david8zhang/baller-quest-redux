@@ -21,6 +21,12 @@ export const createArc = (
   sprite.setGravityY(980)
 }
 
+export const SORT_ORDER = {
+  rim: 10,
+  ball: 5,
+  stand: 1,
+}
+
 export const OFFBALL_ANIMS = {
   idle: 'idle',
   run: 'run',

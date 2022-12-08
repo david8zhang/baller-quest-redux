@@ -19,16 +19,20 @@ export class Player {
         y: WINDOW_HEIGHT / 2,
       },
     })
+    this.selectedCourtPlayer.getPossessionOfBall()
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
   }
-
   setupKeyboardPressListener() {
     this.game.input.keyboard.on('keydown', (e) => {
       if (e.code === 'Space') {
         this.selectedCourtPlayer.shoot()
       }
     })
+  }
+
+  getSelectedCourtPlayer() {
+    return this.selectedCourtPlayer
   }
 
   setupMovementKeys() {
