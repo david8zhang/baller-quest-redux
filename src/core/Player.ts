@@ -5,6 +5,7 @@ import { CourtPlayer } from './CourtPlayer'
 export class Player {
   private game: Game
   private selectedCourtPlayer: CourtPlayer
+  private players: CourtPlayer[] = []
 
   private keyArrowLeft!: Phaser.Input.Keyboard.Key
   private keyArrowRight!: Phaser.Input.Keyboard.Key
