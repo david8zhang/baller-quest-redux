@@ -1,11 +1,14 @@
 import Game from '~/scenes/Game'
-import { PLAYER_SPEED, WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
+import { getClosestPlayer, INITIAL_PLAYER_POSITIONS, PLAYER_SPEED } from './Constants'
 import { CourtPlayer } from './CourtPlayer'
+import { Cursor } from './Cursor'
 
 export class Player {
   private game: Game
-  private selectedCourtPlayer: CourtPlayer
+  private selectedCourtPlayer!: CourtPlayer
   private players: CourtPlayer[] = []
+  private selectedCourtPlayerCursor: Cursor
+  private passCursor: Cursor
 
   private keyArrowLeft!: Phaser.Input.Keyboard.Key
   private keyArrowRight!: Phaser.Input.Keyboard.Key
@@ -14,21 +17,53 @@ export class Player {
 
   constructor(game: Game) {
     this.game = game
-    this.selectedCourtPlayer = new CourtPlayer(this.game, {
-      position: {
-        x: WINDOW_WIDTH / 2,
-        y: WINDOW_HEIGHT / 2,
+    this.selectedCourtPlayerCursor = new Cursor(
+      {
+        position: { x: 0, y: 0 },
       },
-    })
-    this.selectedCourtPlayer.getPossessionOfBall()
+      this.game
+    )
+    this.passCursor = new Cursor(
+      {
+        position: { x: 0, y: 0 },
+        alpha: 0.5,
+      },
+      this.game
+    )
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
+    this.setupPlayers()
   }
   setupKeyboardPressListener() {
     this.game.input.keyboard.on('keydown', (e) => {
-      if (e.code === 'Space') {
+      if (e.code === 'KeyS') {
         this.selectedCourtPlayer.shoot()
       }
+      if (e.code === 'Space') {
+        if (this.passCursor.selectedCourtPlayer) {
+          this.selectedCourtPlayer.passBall(this.passCursor.selectedCourtPlayer)
+        }
+      }
+    })
+  }
+
+  setupPlayers() {
+    Object.keys(INITIAL_PLAYER_POSITIONS).forEach((playerId: string, index: number) => {
+      const gridPos = INITIAL_PLAYER_POSITIONS[playerId]
+      const worldPosForRowCol = this.game.court.getWorldPositionForCoordinates(
+        gridPos.row,
+        gridPos.col
+      )
+      const newPlayer = new CourtPlayer(this.game, {
+        position: worldPosForRowCol,
+      })
+      if (index === 0) {
+        this.selectedCourtPlayer = newPlayer
+        this.selectedCourtPlayer.getPossessionOfBall()
+        this.selectedCourtPlayerCursor.selectCourtPlayer(this.selectedCourtPlayer)
+      }
+      this.players.push(newPlayer)
+      this.game.playerCourtPlayers.add(newPlayer.sprite)
     })
   }
 
@@ -43,7 +78,7 @@ export class Player {
     this.keyArrowDown = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN)
   }
 
-  update() {
+  handleCourtPlayerMovement() {
     if (!this.keyArrowLeft || !this.keyArrowRight || !this.keyArrowUp || !this.keyArrowDown) {
       return
     }
@@ -77,5 +112,16 @@ export class Player {
       this.selectedCourtPlayer.setVelocityX(velocityX)
       this.selectedCourtPlayer.setVelocityY(velocityY)
     }
+  }
+
+  updatePassCursor() {
+    const closestPlayer = getClosestPlayer(this.selectedCourtPlayer, this.players)
+    this.passCursor.selectCourtPlayer(closestPlayer)
+  }
+
+  update() {
+    this.selectedCourtPlayerCursor.follow()
+    this.updatePassCursor()
+    this.handleCourtPlayerMovement()
   }
 }
