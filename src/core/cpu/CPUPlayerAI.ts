@@ -2,7 +2,9 @@ import Game from '~/scenes/Game'
 import { CourtPlayer } from '../CourtPlayer'
 import { BehaviorTreeNode } from './behavior-tree/BehaviorTreeNode'
 import { Blackboard } from './behavior-tree/Blackboard'
+import { SelectorNode } from './behavior-tree/SelectorNode'
 import { SequenceNode } from './behavior-tree/SequenceNode'
+import { ContestPlayerShot } from './behaviors/defense/ContestPlayerShot'
 import { GetManToDefend } from './behaviors/defense/GetManToDefend'
 import { StayInFrontOfMan } from './behaviors/defense/StayInFrontOfMan'
 import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
@@ -38,7 +40,12 @@ export class CPUPlayerAI {
     this.behaviorTree = new SequenceNode('DefenseSequence', this.blackboard, [
       new PopulateBlackboard(this.blackboard, this),
       new GetManToDefend(this.blackboard),
-      new StayInFrontOfMan(this.blackboard),
+      new SelectorNode(
+        'StayWithDefenderOrContest',
+        this.blackboard,
+        new ContestPlayerShot(this.blackboard),
+        new StayInFrontOfMan(this.blackboard)
+      ),
     ])
   }
 

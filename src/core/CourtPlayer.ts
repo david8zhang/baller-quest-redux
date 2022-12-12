@@ -9,6 +9,14 @@ import {
   Side,
 } from './Constants'
 
+export enum CourtPlayerState {
+  SHOOTING = 'SHOOTING',
+  DRIBBLING = 'DRIBBLING',
+  PASSING = 'PASSING',
+  CONTESTING = 'CONTESTING',
+  IDLE = 'IDLE',
+}
+
 export interface CourtPlayerConfig {
   position: {
     x: number
@@ -24,8 +32,8 @@ export class CourtPlayer {
   public side: Side
   public sprite: Phaser.Physics.Arcade.Sprite
   public hasPossession: boolean = false
-  public isShooting: boolean = false
-  public isPassing: boolean = false
+
+  public state: CourtPlayerState = CourtPlayerState.IDLE
   public playerId: string
 
   constructor(game: Game, config: CourtPlayerConfig) {
@@ -48,7 +56,7 @@ export class CourtPlayer {
   }
 
   canPassBall() {
-    return this.hasPossession && !this.isShooting
+    return this.hasPossession && this.state !== CourtPlayerState.SHOOTING
   }
 
   isMoving() {
@@ -60,14 +68,22 @@ export class CourtPlayer {
     this.playJumpAnimation()
   }
 
+  getState() {
+    return this.state
+  }
+
+  setState(state: CourtPlayerState) {
+    this.state = state
+  }
+
   canShootBall() {
-    return !this.isShooting && this.hasPossession
+    return this.state !== CourtPlayerState.SHOOTING && this.hasPossession
   }
 
   handleBallCollision() {
     if (this.game.ball.ballState === BallState.LOOSE) {
       // Make sure that the player who is passing can't regain posssession of the ball mid-pass
-      if (!this.isPassing) {
+      if (this.state !== CourtPlayerState.PASSING) {
         this.getPossessionOfBall()
         if (this.side === Side.PLAYER) {
           this.game.player.setSelectedCourtPlayer(this)
@@ -103,20 +119,20 @@ export class CourtPlayer {
     this.sprite.setTexture('shoot-jump')
 
     createArc(this.sprite, { x: initialX, y: initialY }, jumpTime)
-    this.isShooting = true
+    this.setState(CourtPlayerState.SHOOTING)
     this.game.time.delayedCall(jumpTime * 975 * 0.45, () => {
       this.sprite.setTexture('shoot-flick')
       this.game.ball.playerWithBall = null
       this.launchBallTowardsHoop()
     })
     this.game.time.delayedCall(jumpTime * 975, () => {
-      this.onShootingCompleted()
+      this.landAfterJumping()
     })
   }
 
-  onShootingCompleted() {
+  landAfterJumping() {
     this.sprite.body.checkCollision.none = false
-    this.isShooting = false
+    this.setState(CourtPlayerState.IDLE)
     this.sprite.setVelocity(0, 0)
     this.sprite.setGravityY(0)
     this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
@@ -131,7 +147,7 @@ export class CourtPlayer {
   }
 
   canMove() {
-    return !this.isShooting
+    return this.state !== CourtPlayerState.SHOOTING
   }
 
   passBall(receiver: CourtPlayer) {
@@ -164,9 +180,9 @@ export class CourtPlayer {
     this.game.physics.velocityFromRotation(angle, distance * (1 / timeToPass), velocityVector)
     this.hasPossession = false
     this.game.ball.playerWithBall = null
-    this.isPassing = true
+    this.setState(CourtPlayerState.PASSING)
     this.game.time.delayedCall(timeToPass * 1000, () => {
-      this.isPassing = false
+      this.setState(CourtPlayerState.PASSING)
     })
 
     // Apply ball changes
@@ -174,6 +190,26 @@ export class CourtPlayer {
     this.game.ball.sprite.setVisible(true)
     this.game.ball.sprite.setGravity(0)
     this.game.ball.sprite.setVelocity(velocityVector.x, velocityVector.y)
+  }
+
+  contestShot() {
+    this.stop()
+    const jumpTime = 0.7
+    const initialX = this.sprite.x
+    const initialY = this.sprite.y
+    this.setState(CourtPlayerState.CONTESTING)
+    createArc(
+      this.sprite,
+      {
+        x: initialX,
+        y: initialY,
+      },
+      jumpTime
+    )
+    this.game.time.delayedCall(jumpTime * 975, () => {
+      this.setState(CourtPlayerState.IDLE)
+      this.landAfterJumping()
+    })
   }
 
   losePossessionOfBall() {
@@ -194,7 +230,7 @@ export class CourtPlayer {
   stop() {
     this.sprite.setFlipX(false)
     // if the player is currently in their shooting motion
-    if (!this.isShooting) {
+    if (this.state !== CourtPlayerState.SHOOTING) {
       this.sprite.setVelocity(0, 0)
       this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
     }

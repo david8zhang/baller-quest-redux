@@ -1,4 +1,4 @@
-import { CourtPlayer } from '~/core/CourtPlayer'
+import { CourtPlayer, CourtPlayerState } from '~/core/CourtPlayer'
 import Game from '~/scenes/Game'
 import { BehaviorStatus } from '../../behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
@@ -13,6 +13,10 @@ export class StayInFrontOfMan extends BehaviorTreeNode {
   }
 
   public process(): BehaviorStatus {
+    const currPlayer = this.blackboard.getData(BlackboardKeys.CURR_COURT_PLAYER) as CourtPlayer
+    if (currPlayer.state !== CourtPlayerState.IDLE) {
+      return BehaviorStatus.FAILURE
+    }
     const hoop = Game.instance.hoop
     const defensiveAssignment = this.blackboard.getData(
       BlackboardKeys.CURR_DEFENSIVE_ASSIGNMENT
@@ -23,10 +27,12 @@ export class StayInFrontOfMan extends BehaviorTreeNode {
       hoop.standSprite.x,
       hoop.standSprite.y
     )
-    const currPlayer = this.blackboard.getData(BlackboardKeys.CURR_COURT_PLAYER) as CourtPlayer
     const pointToMoveTo = line.getPoint(StayInFrontOfMan.DEFENSIVE_SPACING_PERCENTAGE)
     currPlayer.moveTowards(pointToMoveTo)
-    if (currPlayer.isAtPoint(pointToMoveTo)) {
+    if (
+      currPlayer.isAtPoint(pointToMoveTo) ||
+      defensiveAssignment.state === CourtPlayerState.SHOOTING
+    ) {
       currPlayer.stop()
       return BehaviorStatus.SUCCESS
     }
