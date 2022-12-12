@@ -1,5 +1,5 @@
 import Game from '~/scenes/Game'
-import { getClosestPlayer, INITIAL_PLAYER_POSITIONS, PLAYER_SPEED } from './Constants'
+import { getClosestPlayer, INITIAL_PLAYER_POSITIONS, PLAYER_SPEED, Side } from './Constants'
 import { CourtPlayer } from './CourtPlayer'
 import { Cursor } from './Cursor'
 
@@ -37,11 +37,18 @@ export class Player {
   setupKeyboardPressListener() {
     this.game.input.keyboard.on('keydown', (e) => {
       if (e.code === 'KeyS') {
-        this.selectedCourtPlayer.shoot()
+        if (this.selectedCourtPlayer.canShootBall()) {
+          this.selectedCourtPlayer.shoot()
+        }
       }
       if (e.code === 'Space') {
         if (this.passCursor.selectedCourtPlayer) {
-          this.selectedCourtPlayer.passBall(this.passCursor.selectedCourtPlayer)
+          // If the currently selected player has the ball, pass it. Otherwise, switch player
+          if (this.selectedCourtPlayer.canPassBall()) {
+            this.selectedCourtPlayer.passBall(this.passCursor.selectedCourtPlayer)
+          } else {
+            this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
+          }
         }
       }
     })
@@ -56,6 +63,8 @@ export class Player {
       )
       const newPlayer = new CourtPlayer(this.game, {
         position: worldPosForRowCol,
+        side: Side.PLAYER,
+        tint: 0x00ff00,
       })
       if (index === 0) {
         this.selectedCourtPlayer = newPlayer
@@ -65,6 +74,12 @@ export class Player {
       this.players.push(newPlayer)
       this.game.playerCourtPlayers.add(newPlayer.sprite)
     })
+  }
+
+  setSelectedCourtPlayer(courtPlayer: CourtPlayer) {
+    this.selectedCourtPlayer.stop()
+    this.selectedCourtPlayerCursor.selectCourtPlayer(courtPlayer)
+    this.selectedCourtPlayer = courtPlayer
   }
 
   getSelectedCourtPlayer() {
@@ -79,7 +94,13 @@ export class Player {
   }
 
   handleCourtPlayerMovement() {
-    if (!this.keyArrowLeft || !this.keyArrowRight || !this.keyArrowUp || !this.keyArrowDown) {
+    if (
+      !this.keyArrowLeft ||
+      !this.keyArrowRight ||
+      !this.keyArrowUp ||
+      !this.keyArrowDown ||
+      !this.selectedCourtPlayer.canMove()
+    ) {
       return
     }
     const leftDown = this.keyArrowLeft.isDown

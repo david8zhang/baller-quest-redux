@@ -43,10 +43,23 @@ export class Cursor {
     this.highlightCourtPlayer(courtPlayer)
   }
 
+  canFollow() {
+    const player = this.selectedCourtPlayer!
+    return (
+      !player.sprite.body.blocked.left &&
+      !player.sprite.body.blocked.right &&
+      !player.sprite.body.blocked.down &&
+      !player.sprite.body.blocked.up
+    )
+  }
+
   follow() {
-    if (this.selectedCourtPlayer) {
-      const selectedCourtPlayerVelocity = this.selectedCourtPlayer.sprite.body.velocity
-      this.highlight.setVelocity(selectedCourtPlayerVelocity.x, selectedCourtPlayerVelocity.y)
+    if (!this.selectedCourtPlayer) {
+      return
     }
+    this.highlight.setPosition(
+      this.selectedCourtPlayer.sprite.x,
+      this.selectedCourtPlayer.sprite.y + this.selectedCourtPlayer.sprite.displayHeight / 2
+    )
   }
 }

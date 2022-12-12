@@ -1,5 +1,5 @@
 import Game from '~/scenes/Game'
-import { createArc, SORT_ORDER } from './Constants'
+import { createArc, Side, SORT_ORDER } from './Constants'
 import { CourtPlayer } from './CourtPlayer'
 
 export interface BallConfig {
@@ -33,21 +33,11 @@ export class Ball {
       .setBounce(0.8)
     this.sprite.body.setSize(5, 5)
     this.setupHoopCollider()
-    this.setupPlayerCollider()
+    this.sprite.setCollideWorldBounds(true)
   }
 
-  setupPlayerCollider() {
-    this.game.physics.add.overlap(this.game.playerCourtPlayers, this.sprite, (obj1, obj2) => {
-      if (this.ballState === BallState.LOOSE) {
-        this.floorCollider.active = false
-        const player = obj1.getData('ref') as CourtPlayer
-
-        // Make sure that the player who is passing can't regain posssession of the ball mid-pass
-        if (!player.isPassing) {
-          player.getPossessionOfBall()
-        }
-      }
-    })
+  handlePlayerCollision() {
+    this.floorCollider.active = false
   }
 
   setupHoopCollider() {
@@ -78,10 +68,7 @@ export class Ball {
 
   update() {
     if (this.playerWithBall) {
-      this.sprite.setVelocity(
-        this.playerWithBall.sprite.body.velocity.x,
-        this.playerWithBall.sprite.body.velocity.y
-      )
+      this.sprite.setPosition(this.playerWithBall.sprite.x, this.playerWithBall.sprite.y)
     }
   }
 }

@@ -3,6 +3,11 @@ import { CourtPlayer } from './CourtPlayer'
 export const WINDOW_WIDTH = 864
 export const WINDOW_HEIGHT = 640
 
+export enum Side {
+  PLAYER = 'PLAYER',
+  CPU = 'CPU',
+}
+
 export enum Direction {
   UP = 'up',
   DOWN = 'down',
@@ -50,6 +55,21 @@ export const INITIAL_PLAYER_POSITIONS = {
   },
   player3: {
     row: 16,
+    col: 6,
+  },
+}
+
+export const INITIAL_PLAYER_POSITIONS_CPU = {
+  player1: {
+    row: 14,
+    col: 13,
+  },
+  player2: {
+    row: 13,
+    col: 20,
+  },
+  player3: {
+    row: 13,
     col: 6,
   },
 }

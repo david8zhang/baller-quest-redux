@@ -1,32 +1,44 @@
 import Game from '~/scenes/Game'
 import { BallState } from './Ball'
-import { createArc, getDistanceBetween, OFFBALL_ANIMS, ONBALL_ANIMS } from './Constants'
+import { createArc, getDistanceBetween, OFFBALL_ANIMS, ONBALL_ANIMS, Side } from './Constants'
 
 export interface CourtPlayerConfig {
   position: {
     x: number
     y: number
   }
+  side: Side
+  tint?: number
 }
 
 export class CourtPlayer {
   private game: Game
+  public side: Side
   public sprite: Phaser.Physics.Arcade.Sprite
-  private isShooting: boolean = false
-  private hasPossession: boolean = false
+  public hasPossession: boolean = false
+  public isShooting: boolean = false
   public isPassing: boolean = false
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
-    const { position } = config
+    const { position, side, tint } = config
+    this.side = side
     this.sprite = this.game.physics.add
       .sprite(position.x, position.y, 'idle')
       .setScale(3)
       .setDebug(true, true, 0x00ff00)
-    this.sprite.body.setSize(16, 24)
+    if (tint) {
+      this.sprite.setTintFill(tint)
+    }
+    this.sprite.body.setSize(16, 20)
     this.sprite.body.offset.y = 10
     this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle)
     this.sprite.setData('ref', this)
+    this.sprite.setCollideWorldBounds(true)
+  }
+
+  canPassBall() {
+    return this.hasPossession && !this.isShooting
   }
 
   isMoving() {
@@ -35,8 +47,22 @@ export class CourtPlayer {
   }
 
   shoot() {
-    if (!this.isMoving()) {
-      this.playJumpAnimation()
+    this.playJumpAnimation()
+  }
+
+  canShootBall() {
+    return !this.isShooting && this.hasPossession
+  }
+
+  handleBallCollision() {
+    if (this.game.ball.ballState === BallState.LOOSE) {
+      // Make sure that the player who is passing can't regain posssession of the ball mid-pass
+      if (!this.isPassing) {
+        this.getPossessionOfBall()
+        if (this.side === Side.PLAYER) {
+          this.game.player.setSelectedCourtPlayer(this)
+        }
+      }
     }
   }
 
@@ -56,6 +82,9 @@ export class CourtPlayer {
   }
 
   playJumpAnimation() {
+    this.stop()
+    this.sprite.body.checkCollision.none = true
+    this.hasPossession = false
     this.sprite.setFlipX(false)
     const jumpTime = 0.7
     const initialX = this.sprite.x
@@ -66,15 +95,21 @@ export class CourtPlayer {
     createArc(this.sprite, { x: initialX, y: initialY }, jumpTime)
     this.isShooting = true
     this.game.time.delayedCall(jumpTime * 975 * 0.45, () => {
-      this.hasPossession = false
       this.sprite.setTexture('shoot-flick')
       this.game.ball.playerWithBall = null
       this.launchBallTowardsHoop()
     })
     this.game.time.delayedCall(jumpTime * 975, () => {
-      this.sprite.setGravityY(0)
-      this.isShooting = false
+      this.onShootingCompleted()
     })
+  }
+
+  onShootingCompleted() {
+    this.sprite.body.checkCollision.none = false
+    this.isShooting = false
+    this.sprite.setVelocity(0, 0)
+    this.sprite.setGravityY(0)
+    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
   }
 
   get x() {
@@ -85,7 +120,14 @@ export class CourtPlayer {
     return this.sprite.y
   }
 
+  canMove() {
+    return !this.isShooting
+  }
+
   passBall(receiver: CourtPlayer) {
+    if (!this.hasPossession) {
+      return
+    }
     const timeToPass = 0.25
     const angle = Phaser.Math.Angle.BetweenPoints(
       {
@@ -141,6 +183,7 @@ export class CourtPlayer {
 
   stop() {
     this.sprite.setFlipX(false)
+    // if the player is currently in their shooting motion
     if (!this.isShooting) {
       this.sprite.setVelocity(0, 0)
       this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
