@@ -44,36 +44,6 @@ export const ONBALL_ANIMS = {
   run: 'run-with-ball',
 }
 
-export const INITIAL_PLAYER_POSITIONS = {
-  player1: {
-    row: 17,
-    col: 13,
-  },
-  player2: {
-    row: 16,
-    col: 20,
-  },
-  player3: {
-    row: 16,
-    col: 6,
-  },
-}
-
-export const INITIAL_PLAYER_POSITIONS_CPU = {
-  player1: {
-    row: 14,
-    col: 13,
-  },
-  player2: {
-    row: 13,
-    col: 20,
-  },
-  player3: {
-    row: 13,
-    col: 6,
-  },
-}
-
 export const getClosestPlayer = (src: CourtPlayer, courtPlayers: CourtPlayer[]) => {
   let closestPlayer: any = null
   const velocityVector = src.sprite.body.velocity

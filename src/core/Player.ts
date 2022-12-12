@@ -1,9 +1,24 @@
 import Game from '~/scenes/Game'
-import { getClosestPlayer, INITIAL_PLAYER_POSITIONS, PLAYER_SPEED, Side } from './Constants'
+import { getClosestPlayer, PLAYER_SPEED, Side } from './Constants'
 import { CourtPlayer } from './CourtPlayer'
 import { Cursor } from './Cursor'
 
 export class Player {
+  public static INITIAL_PLAYER_POSITIONS = {
+    player1: {
+      row: 17,
+      col: 13,
+    },
+    player2: {
+      row: 16,
+      col: 20,
+    },
+    player3: {
+      row: 16,
+      col: 6,
+    },
+  }
+
   private game: Game
   private selectedCourtPlayer!: CourtPlayer
   private players: CourtPlayer[] = []
@@ -54,9 +69,13 @@ export class Player {
     })
   }
 
+  getCourtPlayers() {
+    return this.players
+  }
+
   setupPlayers() {
-    Object.keys(INITIAL_PLAYER_POSITIONS).forEach((playerId: string, index: number) => {
-      const gridPos = INITIAL_PLAYER_POSITIONS[playerId]
+    Object.keys(Player.INITIAL_PLAYER_POSITIONS).forEach((playerId: string, index: number) => {
+      const gridPos = Player.INITIAL_PLAYER_POSITIONS[playerId]
       const worldPosForRowCol = this.game.court.getWorldPositionForCoordinates(
         gridPos.row,
         gridPos.col
@@ -65,6 +84,7 @@ export class Player {
         position: worldPosForRowCol,
         side: Side.PLAYER,
         tint: 0x00ff00,
+        playerId,
       })
       if (index === 0) {
         this.selectedCourtPlayer = newPlayer

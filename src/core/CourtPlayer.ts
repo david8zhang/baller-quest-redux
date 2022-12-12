@@ -1,6 +1,13 @@
 import Game from '~/scenes/Game'
 import { BallState } from './Ball'
-import { createArc, getDistanceBetween, OFFBALL_ANIMS, ONBALL_ANIMS, Side } from './Constants'
+import {
+  createArc,
+  getDistanceBetween,
+  OFFBALL_ANIMS,
+  ONBALL_ANIMS,
+  PLAYER_SPEED,
+  Side,
+} from './Constants'
 
 export interface CourtPlayerConfig {
   position: {
@@ -8,6 +15,7 @@ export interface CourtPlayerConfig {
     y: number
   }
   side: Side
+  playerId: string
   tint?: number
 }
 
@@ -18,10 +26,12 @@ export class CourtPlayer {
   public hasPossession: boolean = false
   public isShooting: boolean = false
   public isPassing: boolean = false
+  public playerId: string
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
-    const { position, side, tint } = config
+    const { position, side, tint, playerId } = config
+    this.playerId = playerId
     this.side = side
     this.sprite = this.game.physics.add
       .sprite(position.x, position.y, 'idle')
@@ -199,5 +209,45 @@ export class CourtPlayer {
   setVelocityY(yVelocity: number) {
     this.sprite.setVelocityY(yVelocity)
     this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.run : OFFBALL_ANIMS.run, true)
+  }
+
+  isAtPoint(moveTarget: { x: number; y: number }) {
+    const distance = Phaser.Math.Distance.Between(
+      this.sprite.x,
+      this.sprite.y,
+      moveTarget.x,
+      moveTarget.y
+    )
+    return distance <= 5
+  }
+
+  moveTowards(target: { x: number; y: number }) {
+    const distance = getDistanceBetween(
+      {
+        x: this.sprite.x,
+        y: this.sprite.y,
+      },
+      {
+        x: target.x,
+        y: target.y,
+      }
+    )
+    if (Math.abs(distance) < 5) {
+      this.sprite.setVelocity(0, 0)
+    } else {
+      let angle = Phaser.Math.Angle.BetweenPoints(
+        {
+          x: this.sprite.x,
+          y: this.sprite.y,
+        },
+        {
+          x: target.x,
+          y: target.y,
+        }
+      )
+      const velocityVector = new Phaser.Math.Vector2()
+      this.game.physics.velocityFromRotation(angle, PLAYER_SPEED, velocityVector)
+      this.sprite.setVelocity(velocityVector.x, velocityVector.y)
+    }
   }
 }

@@ -4,7 +4,7 @@ import { WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
 import { Court } from '~/core/Court'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { createPlayerAnims } from '~/core/CourtPlayerAnims'
-import { CPU } from '~/core/CPU'
+import { CPU } from '~/core/cpu/CPU'
 import { Cursor } from '~/core/Cursor'
 import { Hoop } from '~/core/Hoop'
 import { Player } from '~/core/Player'
@@ -19,9 +19,15 @@ export default class Game extends Phaser.Scene {
 
   public playerCourtPlayers!: Phaser.GameObjects.Group
   public cpuCourtPlayers!: Phaser.GameObjects.Group
+  private static _instance: Game
 
   constructor() {
     super('game')
+    Game._instance = this
+  }
+
+  public static get instance() {
+    return Game._instance
   }
 
   create() {
@@ -53,13 +59,12 @@ export default class Game extends Phaser.Scene {
       this.ball.handlePlayerCollision()
     })
 
-    this.physics.add.collider(this.playerCourtPlayers, this.cpuCourtPlayers, (obj1, obj2) => {
-      // console.log(obj1, obj2)
-    })
+    this.physics.add.collider(this.playerCourtPlayers, this.cpuCourtPlayers)
   }
 
   update() {
     this.player.update()
     this.ball.update()
+    this.cpu.update()
   }
 }

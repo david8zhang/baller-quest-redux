@@ -47,8 +47,8 @@ export class Ball {
       // Check if ball is falling downward
       if (this.sprite.body.velocity.y > 0 && this.ballState === BallState.SHOOTING) {
         this.ballState = BallState.LOOSE
-        this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.7)
-        this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.9)
+        this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.5)
+        this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.5)
         this.floorCollider.active = true
       }
     })
