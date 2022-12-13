@@ -47,24 +47,24 @@ export default class Game extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#fff8dc')
     this.player = new Player(this)
     this.cpu = new CPU(this)
-
     this.setupColliders()
   }
 
   setupColliders() {
     this.physics.world.checkCollision.up = false
-    this.physics.add.overlap(this.ball.sprite, this.playerCourtPlayers, (obj1, obj2) => {
+    const playerBallCollisionHandler = (obj1, obj2) => {
       const player = obj2.getData('ref') as CourtPlayer
       player.handleBallCollision()
       this.ball.handlePlayerCollision()
-    })
-
+    }
+    this.physics.add.overlap(this.ball.sprite, this.playerCourtPlayers, playerBallCollisionHandler)
+    this.physics.add.overlap(this.ball.sprite, this.cpuCourtPlayers, playerBallCollisionHandler)
     this.physics.add.collider(this.playerCourtPlayers, this.cpuCourtPlayers)
   }
 
   update() {
-    this.player.update()
     this.ball.update()
+    this.player.update()
     this.cpu.update()
   }
 }

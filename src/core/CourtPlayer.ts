@@ -95,12 +95,21 @@ export class CourtPlayer {
   launchBallTowardsHoop() {
     const ball = this.game.ball
     ball.show()
-    ball.ballState = BallState.SHOOTING
     this.game.ball.setPosition(this.sprite.x + 5, this.sprite.y - 28)
+
+    const isMiss = Phaser.Math.Between(0, 100) > 0
+    let posToLandX = this.game.hoop.rimSprite.x
+    if (isMiss) {
+      ball.ballState = BallState.MISSED_SHOT
+      const missOffset = Phaser.Math.Between(0, 1) ? -10 : 10
+      posToLandX = this.game.hoop.rimSprite.x + missOffset
+    } else {
+      ball.ballState = BallState.MADE_SHOT
+    }
     createArc(
       ball.sprite,
       {
-        x: this.game.hoop.rimSprite.x,
+        x: posToLandX,
         y: this.game.hoop.rimSprite.y - 20,
       },
       1.5

@@ -4,4 +4,5 @@ export enum BlackboardKeys {
   FRIENDLY_COURT_PLAYERS = 'friendlyCourtPlayers',
   ENEMY_COURT_PLAYERS = 'enemyCourtPlayers',
   MAN_TO_DEFEND = 'manToDefend',
+  BALL = 'ball',
 }

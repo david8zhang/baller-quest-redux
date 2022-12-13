@@ -10,7 +10,8 @@ export interface BallConfig {
 }
 
 export enum BallState {
-  SHOOTING = 'SHOOTING',
+  MADE_SHOT = 'MADE_SHOT',
+  MISSED_SHOT = 'MISSED_SHOT',
   LOOSE = 'LOOSE',
   DRIBBLING = 'DRIBBLING',
   PASS = 'PASS',
@@ -45,10 +46,24 @@ export class Ball {
     this.floorCollider.active = false
     this.game.physics.add.overlap(this.sprite, this.game.hoop.rimSprite, (obj1, obj2) => {
       // Check if ball is falling downward
-      if (this.sprite.body.velocity.y > 0 && this.ballState === BallState.SHOOTING) {
-        this.ballState = BallState.LOOSE
-        this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.5)
-        this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.5)
+      if (this.sprite.body.velocity.y > 0) {
+        if (this.ballState === BallState.MADE_SHOT) {
+          this.ballState = BallState.LOOSE
+          this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.5)
+          this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.5)
+        } else if (this.ballState === BallState.MISSED_SHOT) {
+          // Rebound
+          this.ballState = BallState.LOOSE
+          const missOffset = Phaser.Math.Between(0, 1) > 0 ? -50 : 50
+          createArc(
+            this.sprite,
+            {
+              x: this.game.hoop.standSprite.x + missOffset,
+              y: this.game.hoop.standSprite.y - 50,
+            },
+            0.5
+          )
+        }
         this.floorCollider.active = true
       }
     })

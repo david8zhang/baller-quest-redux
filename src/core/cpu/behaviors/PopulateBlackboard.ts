@@ -19,6 +19,7 @@ export class PopulateBlackboard extends BehaviorTreeNode {
     this.blackboard.setData(BlackboardKeys.ENEMY_COURT_PLAYERS, allEnemyPlayers)
     this.blackboard.setData(BlackboardKeys.FRIENDLY_COURT_PLAYERS, allFriendlyPlayers)
     this.blackboard.setData(BlackboardKeys.CURR_COURT_PLAYER, this.cpuPlayerAI.courtPlayer)
+    this.blackboard.setData(BlackboardKeys.BALL, this.cpuPlayerAI.ball)
     return BehaviorStatus.SUCCESS
   }
 }
