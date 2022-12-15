@@ -1,7 +1,7 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { BehaviorStatus } from '../../behavior-tree/BehaviorStatus'
-import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
-import { Blackboard } from '../../behavior-tree/Blackboard'
+import { BehaviorStatus } from '../../../behavior-tree/BehaviorStatus'
+import { BehaviorTreeNode } from '../../../behavior-tree/BehaviorTreeNode'
+import { Blackboard } from '../../../behavior-tree/Blackboard'
 import { DEFENSIVE_ASSIGNMENTS } from '../../CPUConstants'
 import { BlackboardKeys } from '../BlackboardKeys'
 

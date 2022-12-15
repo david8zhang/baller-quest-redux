@@ -7,7 +7,7 @@ import { createPlayerAnims } from '~/core/CourtPlayerAnims'
 import { CPU } from '~/core/cpu/CPU'
 import { Cursor } from '~/core/Cursor'
 import { Hoop } from '~/core/Hoop'
-import { Player } from '~/core/Player'
+import { Player } from '~/core/player/Player'
 
 export default class Game extends Phaser.Scene {
   public player!: Player

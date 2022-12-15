@@ -1,7 +1,8 @@
 import Game from '~/scenes/Game'
-import { getClosestPlayer, PLAYER_SPEED, Side } from './Constants'
-import { CourtPlayer } from './CourtPlayer'
-import { Cursor } from './Cursor'
+import { getClosestPlayer, PLAYER_SPEED, Side } from '../Constants'
+import { CourtPlayer } from '../CourtPlayer'
+import { Cursor } from '../Cursor'
+import { FriendlyPlayerAI } from './FriendlyPlayerAI'
 
 export class Player {
   public static INITIAL_PLAYER_POSITIONS = {
@@ -21,7 +22,7 @@ export class Player {
 
   private game: Game
   private selectedCourtPlayer!: CourtPlayer
-  private players: CourtPlayer[] = []
+  private players: FriendlyPlayerAI[] = []
   private selectedCourtPlayerCursor: Cursor
   private passCursor: Cursor
 
@@ -69,8 +70,12 @@ export class Player {
     })
   }
 
+  getOtherTeamCourtPlayers() {
+    return this.game.cpu.getCourtPlayers()
+  }
+
   getCourtPlayers() {
-    return this.players
+    return this.players.map((p) => p.courtPlayer)
   }
 
   setupPlayers() {
@@ -91,7 +96,8 @@ export class Player {
         this.selectedCourtPlayer.getPossessionOfBall()
         this.selectedCourtPlayerCursor.selectCourtPlayer(this.selectedCourtPlayer)
       }
-      this.players.push(newPlayer)
+      const friendlyPlayerAI = new FriendlyPlayerAI(newPlayer, this)
+      this.players.push(friendlyPlayerAI)
       this.game.playerCourtPlayers.add(newPlayer.sprite)
     })
   }
@@ -156,13 +162,18 @@ export class Player {
   }
 
   updatePassCursor() {
-    const closestPlayer = getClosestPlayer(this.selectedCourtPlayer, this.players)
+    const closestPlayer = getClosestPlayer(this.selectedCourtPlayer, this.getCourtPlayers())
     this.passCursor.selectCourtPlayer(closestPlayer)
+  }
+
+  getHighlightedPlayer() {
+    return this.passCursor.selectedCourtPlayer
   }
 
   update() {
     this.selectedCourtPlayerCursor.follow()
     this.updatePassCursor()
     this.handleCourtPlayerMovement()
+    this.players.forEach((p) => p.update())
   }
 }
