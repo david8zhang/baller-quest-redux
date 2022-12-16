@@ -1,3 +1,16 @@
 # Baller Quest Redux
 
-- A redo of the Baller Quest game
+- A 3 vs 3 basketball minigame
+
+## TODO:
+
+- Sprinting past defenders
+- Layups
+- Setting screens and rolling
+- Blocking shots
+- Cutting to the basket
+- Reset positions when possession changes
+- AI offense behaviors
+- Steals
+- Rebounding
+- Dunks

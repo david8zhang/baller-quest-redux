@@ -1,6 +1,7 @@
 import { BehaviorStatus } from '~/core/behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '~/core/behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '~/core/behavior-tree/Blackboard'
+import Game from '~/scenes/Game'
 import { FriendlyPlayerAI } from '../FriendlyPlayerAI'
 import { BlackboardKeys } from './BlackboardKeys'
 
@@ -18,6 +19,7 @@ export class PopulateBlackboard extends BehaviorTreeNode {
       BlackboardKeys.HIGHLIGHTED_PLAYER,
       this.friendlyPlayerAI.getHighlightedPlayer()
     )
+    this.blackboard.setData(BlackboardKeys.BALL, Game.instance.ball)
     return BehaviorStatus.SUCCESS
   }
 }

@@ -3,12 +3,15 @@ import { Blackboard } from '../behavior-tree/Blackboard'
 import { SelectorNode } from '../behavior-tree/SelectorNode'
 import { SequenceNode } from '../behavior-tree/SequenceNode'
 import { CourtPlayer } from '../CourtPlayer'
+import { IsBallLoose } from '../cpu/behaviors/defense/IsBallLoose'
+import { ChaseRebound } from './behaviors/offense/ChaseRebound'
 import { IsPlayerCommand } from './behaviors/offense/IsPlayerCommand'
 import { IsPlayerHighlighted } from './behaviors/offense/IsPlayerHighlighted'
 import { PlayerCommandSelector } from './behaviors/offense/PlayerCommandSelector'
 import { RandomBehaviorSelector } from './behaviors/offense/RandomBehaviorSelector'
 import { ScreenBehavior } from './behaviors/offense/ScreenBehavior'
 import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
+import { Stop } from './behaviors/Stop'
 import { Player } from './Player'
 
 export class FriendlyPlayerAI {
@@ -50,14 +53,27 @@ export class FriendlyPlayerAI {
     this.behaviorTree = new SequenceNode('FriendlyPlayerAI', blackboard, [
       new PopulateBlackboard(blackboard, this),
       new SelectorNode(
-        'RootSelector',
+        'PlayerCommandOrAIControl',
         blackboard,
         new SequenceNode('PlayerCommandSequence', blackboard, [
           new IsPlayerHighlighted(blackboard),
           new IsPlayerCommand(blackboard),
           new PlayerCommandSelector(blackboard),
         ]),
-        new RandomBehaviorSelector(blackboard, [])
+        new SelectorNode(
+          'OffenseOrDefense',
+          blackboard,
+          new SequenceNode('OffenseSequence', blackboard, []),
+          new SelectorNode(
+            'DefenseSelector',
+            blackboard,
+            new SequenceNode('ReboundSequence', blackboard, [
+              new IsBallLoose(blackboard),
+              new ChaseRebound(blackboard),
+            ]),
+            new SequenceNode('DefendSequence', blackboard, [])
+          )
+        )
       ),
     ])
   }

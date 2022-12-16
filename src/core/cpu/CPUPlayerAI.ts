@@ -7,10 +7,12 @@ import { SequenceNode } from '../behavior-tree/SequenceNode'
 import { ContestPlayerShot } from './behaviors/defense/ContestPlayerShot'
 import { GetManToDefend } from './behaviors/defense/GetManToDefend'
 import { StayInFrontOfMan } from './behaviors/defense/StayInFrontOfMan'
-import { ChaseRebound } from './behaviors/offense/ChaseRebound'
-import { IsBallLoose } from './behaviors/offense/IsBallLoose'
+import { ChaseRebound } from './behaviors/defense/ChaseRebound'
+import { IsBallLoose } from './behaviors/defense/IsBallLoose'
 import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
 import { CPU } from './CPU'
+import { Stop } from './behaviors/Stop'
+import { HasPossession } from './behaviors/offense/HasPossession'
 
 export class CPUPlayerAI {
   private game: Game
@@ -48,17 +50,24 @@ export class CPUPlayerAI {
       new SelectorNode(
         'OffenseOrDefense',
         this.blackboard,
-        new SequenceNode('OffenseSequence', this.blackboard, [
-          new IsBallLoose(this.blackboard),
-          new ChaseRebound(this.blackboard),
-        ]),
+        new SequenceNode('OffenseSequence', this.blackboard, [new HasPossession(this.blackboard)]),
         new SequenceNode('DefenseSequence', this.blackboard, [
-          new GetManToDefend(this.blackboard),
           new SelectorNode(
-            'StayWithDefenderOrContest',
+            'ReboundOrDefend',
             this.blackboard,
-            new ContestPlayerShot(this.blackboard),
-            new StayInFrontOfMan(this.blackboard)
+            new SequenceNode('ReboundSequence', this.blackboard, [
+              new IsBallLoose(this.blackboard),
+              new ChaseRebound(this.blackboard),
+            ]),
+            new SequenceNode('DefenseSequence', this.blackboard, [
+              new GetManToDefend(this.blackboard),
+              new SelectorNode(
+                'StayWithDefenderOrContest',
+                this.blackboard,
+                new ContestPlayerShot(this.blackboard),
+                new StayInFrontOfMan(this.blackboard)
+              ),
+            ])
           ),
         ])
       ),
