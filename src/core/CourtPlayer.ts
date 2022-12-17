@@ -81,13 +81,18 @@ export class CourtPlayer {
   }
 
   handleBallCollision() {
-    if (this.game.ball.ballState === BallState.LOOSE) {
-      // Make sure that the player who is passing can't regain posssession of the ball mid-pass
+    if (this.game.ball.ballState === BallState.PASS) {
       if (this.state !== CourtPlayerState.PASSING) {
+        // Make sure that the player who is passing can't regain posssession of the ball mid-pass
         this.getPossessionOfBall()
         if (this.side === Side.PLAYER) {
           this.game.player.setSelectedCourtPlayer(this)
         }
+      }
+    } else if (this.game.ball.ballState === BallState.LOOSE) {
+      this.getPossessionOfBall()
+      if (this.side === Side.PLAYER) {
+        this.game.player.setSelectedCourtPlayer(this)
       }
     }
   }
@@ -131,7 +136,7 @@ export class CourtPlayer {
     this.setState(CourtPlayerState.SHOOTING)
     this.game.time.delayedCall(jumpTime * 975 * 0.45, () => {
       this.sprite.setTexture('shoot-flick')
-      this.game.ball.playerWithBall = null
+      this.game.ball.giveUpPossession()
       this.launchBallTowardsHoop()
     })
     this.game.time.delayedCall(jumpTime * 975, () => {
@@ -156,7 +161,7 @@ export class CourtPlayer {
   }
 
   canMove() {
-    return this.state !== CourtPlayerState.SHOOTING
+    return this.state !== CourtPlayerState.SHOOTING && !this.game.isChangingPossession
   }
 
   passBall(receiver: CourtPlayer) {
@@ -188,14 +193,15 @@ export class CourtPlayer {
     const velocityVector = new Phaser.Math.Vector2(0, 0)
     this.game.physics.velocityFromRotation(angle, distance * (1 / timeToPass), velocityVector)
     this.hasPossession = false
-    this.game.ball.playerWithBall = null
+    this.game.ball.giveUpPossession()
+    this.stop()
     this.setState(CourtPlayerState.PASSING)
     this.game.time.delayedCall(timeToPass * 1000, () => {
-      this.setState(CourtPlayerState.PASSING)
+      this.setState(CourtPlayerState.IDLE)
     })
 
     // Apply ball changes
-    this.game.ball.ballState = BallState.LOOSE
+    this.game.ball.ballState = BallState.PASS
     this.game.ball.sprite.setVisible(true)
     this.game.ball.sprite.setGravity(0)
     this.game.ball.sprite.setVelocity(velocityVector.x, velocityVector.y)
@@ -234,6 +240,10 @@ export class CourtPlayer {
     this.game.ball.setPosition(this.sprite.x, this.sprite.y)
     this.game.ball.sprite.setGravity(0)
     this.game.ball.playerWithBall = this
+    const prevPlayerWithBall = this.game.ball.prevPlayerWithBall
+    if (prevPlayerWithBall && prevPlayerWithBall.side !== this.side) {
+      this.game.handleChangePossession()
+    }
   }
 
   stop() {

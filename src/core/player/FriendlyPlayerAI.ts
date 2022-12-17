@@ -1,18 +1,18 @@
+import Game from '~/scenes/Game'
 import { BehaviorTreeNode } from '../behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '../behavior-tree/Blackboard'
 import { SelectorNode } from '../behavior-tree/SelectorNode'
 import { SequenceNode } from '../behavior-tree/SequenceNode'
 import { CourtPlayer } from '../CourtPlayer'
 import { IsBallLoose } from '../cpu/behaviors/defense/IsBallLoose'
-import { ChaseRebound } from './behaviors/offense/ChaseRebound'
-import { IsPlayerCommand } from './behaviors/offense/IsPlayerCommand'
-import { IsPlayerHighlighted } from './behaviors/offense/IsPlayerHighlighted'
-import { PlayerCommandSelector } from './behaviors/offense/PlayerCommandSelector'
-import { RandomBehaviorSelector } from './behaviors/offense/RandomBehaviorSelector'
+import { ChaseRebound } from './behaviors/defense/ChaseRebound'
+import { PlayerCommandSelector } from './behaviors/PlayerCommandSelector'
 import { ScreenBehavior } from './behaviors/offense/ScreenBehavior'
 import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
-import { Stop } from './behaviors/Stop'
 import { Player } from './Player'
+import { IsPlayerHighlighted } from './behaviors/IsPlayerHighlighted'
+import { IsPlayerCommand } from './behaviors/IsPlayerCommand'
+import { TeamHasPossession } from './behaviors/offense/TeamHasPossession'
 
 export class FriendlyPlayerAI {
   public static KEY_COMMAND_BEHAVIORS = [
@@ -63,7 +63,7 @@ export class FriendlyPlayerAI {
         new SelectorNode(
           'OffenseOrDefense',
           blackboard,
-          new SequenceNode('OffenseSequence', blackboard, []),
+          new SequenceNode('OffenseSequence', blackboard, [new TeamHasPossession(blackboard)]),
           new SelectorNode(
             'DefenseSelector',
             blackboard,
@@ -79,7 +79,10 @@ export class FriendlyPlayerAI {
   }
 
   update() {
-    if (this.player.getSelectedCourtPlayer() !== this.courtPlayer) {
+    if (
+      this.player.getSelectedCourtPlayer() !== this.courtPlayer &&
+      !Game.instance.isChangingPossession
+    ) {
       this.behaviorTree.tick()
     }
   }

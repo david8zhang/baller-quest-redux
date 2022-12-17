@@ -11,8 +11,9 @@ import { ChaseRebound } from './behaviors/defense/ChaseRebound'
 import { IsBallLoose } from './behaviors/defense/IsBallLoose'
 import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
 import { CPU } from './CPU'
-import { Stop } from './behaviors/Stop'
-import { HasPossession } from './behaviors/offense/HasPossession'
+import { TeamHasPossession } from './behaviors/offense/TeamHasPossession'
+import { PlayerHasPossession } from './behaviors/offense/PlayerHasPosession'
+import { PassBall } from './behaviors/offense/PassBall'
 
 export class CPUPlayerAI {
   private game: Game
@@ -35,7 +36,7 @@ export class CPUPlayerAI {
 
   getTeammates() {
     return this.cpu.getCourtPlayers().filter((player) => {
-      player != this.courtPlayer
+      return player != this.courtPlayer
     })
   }
 
@@ -50,7 +51,18 @@ export class CPUPlayerAI {
       new SelectorNode(
         'OffenseOrDefense',
         this.blackboard,
-        new SequenceNode('OffenseSequence', this.blackboard, [new HasPossession(this.blackboard)]),
+        new SequenceNode('OffenseSequence', this.blackboard, [
+          new TeamHasPossession(this.blackboard),
+          new SelectorNode(
+            'OnOrOffBallOffense',
+            this.blackboard,
+            new SequenceNode('OnBallOffenseSequence', this.blackboard, [
+              new PlayerHasPossession(this.blackboard),
+              new PassBall(this.blackboard),
+            ]),
+            new SequenceNode('OffballOffenseSequence', this.blackboard, [])
+          ),
+        ]),
         new SequenceNode('DefenseSequence', this.blackboard, [
           new SelectorNode(
             'ReboundOrDefend',
@@ -75,6 +87,8 @@ export class CPUPlayerAI {
   }
 
   process() {
-    this.behaviorTree.tick()
+    if (!Game.instance.isChangingPossession) {
+      this.behaviorTree.tick()
+    }
   }
 }

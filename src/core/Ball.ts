@@ -21,6 +21,7 @@ export class Ball {
   private game: Game
   public ballState: BallState = BallState.LOOSE
   public sprite: Phaser.Physics.Arcade.Sprite
+  public prevPlayerWithBall: CourtPlayer | null = null
   public playerWithBall: CourtPlayer | null = null
   public floorCollider!: Phaser.Physics.Arcade.Collider
 
@@ -39,6 +40,11 @@ export class Ball {
 
   handlePlayerCollision() {
     this.floorCollider.active = false
+  }
+
+  giveUpPossession() {
+    this.prevPlayerWithBall = this.playerWithBall
+    this.playerWithBall = null
   }
 
   setupHoopCollider() {

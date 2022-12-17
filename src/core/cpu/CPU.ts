@@ -1,7 +1,7 @@
 import Game from '~/scenes/Game'
 import { Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
-import { INITIAL_PLAYER_POSITIONS_CPU } from './CPUConstants'
+import { DEFENSE_POSITIONS_CPU, OFFENSE_POSITIONS_CPU } from './CPUConstants'
 import { CPUPlayerAI } from './CPUPlayerAI'
 
 export class CPU {
@@ -11,6 +11,7 @@ export class CPU {
   constructor(game: Game) {
     this.game = game
     this.setupPlayers()
+    this.positionPlayers()
   }
 
   getCourtPlayers() {
@@ -21,14 +22,28 @@ export class CPU {
     return this.game.player.getCourtPlayers()
   }
 
-  setupPlayers() {
-    Object.keys(INITIAL_PLAYER_POSITIONS_CPU).forEach((key) => {
-      const gridPos = INITIAL_PLAYER_POSITIONS_CPU[key]
+  positionPlayers() {
+    const hasPossession = this.game.ball.playerWithBall!.side === Side.CPU
+    const initialPositions = hasPossession ? OFFENSE_POSITIONS_CPU : DEFENSE_POSITIONS_CPU
+    const playerMapping = this.getCourtPlayers().reduce((acc, curr) => {
+      acc[curr.playerId] = curr
+      return acc
+    }, {})
+    Object.keys(initialPositions).forEach((key) => {
+      const gridPos = initialPositions[key]
       const worldPos = this.game.court.getWorldPositionForCoordinates(gridPos.row, gridPos.col)
+      const player = playerMapping[key] as CourtPlayer
+      player.sprite.x = worldPos.x
+      player.sprite.y = worldPos.y
+    })
+  }
+
+  setupPlayers() {
+    Object.keys(DEFENSE_POSITIONS_CPU).forEach((key) => {
       const player = new CourtPlayer(this.game, {
         position: {
-          x: worldPos.x,
-          y: worldPos.y,
+          x: 0,
+          y: 0,
         },
         side: Side.CPU,
         tint: 0xff0000,

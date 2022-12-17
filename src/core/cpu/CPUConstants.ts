@@ -1,4 +1,4 @@
-export const INITIAL_PLAYER_POSITIONS_CPU = {
+export const DEFENSE_POSITIONS_CPU = {
   cpu1: {
     row: 14,
     col: 13,
@@ -9,6 +9,21 @@ export const INITIAL_PLAYER_POSITIONS_CPU = {
   },
   cpu3: {
     row: 13,
+    col: 6,
+  },
+}
+
+export const OFFENSE_POSITIONS_CPU = {
+  cpu1: {
+    row: 17,
+    col: 13,
+  },
+  cpu2: {
+    row: 16,
+    col: 20,
+  },
+  cpu3: {
+    row: 16,
     col: 6,
   },
 }

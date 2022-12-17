@@ -1,8 +1,8 @@
 import { BehaviorStatus } from '~/core/behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '~/core/behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '~/core/behavior-tree/Blackboard'
-import { FriendlyPlayerAI } from '../../FriendlyPlayerAI'
-import { BlackboardKeys } from '../BlackboardKeys'
+import { FriendlyPlayerAI } from '../FriendlyPlayerAI'
+import { BlackboardKeys } from './BlackboardKeys'
 
 export class PlayerCommandSelector extends BehaviorTreeNode {
   private behaviorsToSelectFrom: any = {}

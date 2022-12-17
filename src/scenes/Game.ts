@@ -16,7 +16,7 @@ export default class Game extends Phaser.Scene {
   public ball!: Ball
   public court!: Court
   public cursor!: Cursor
-
+  public isChangingPossession: boolean = false
   public playerCourtPlayers!: Phaser.GameObjects.Group
   public cpuCourtPlayers!: Phaser.GameObjects.Group
   private static _instance: Game
@@ -60,6 +60,25 @@ export default class Game extends Phaser.Scene {
     this.physics.add.overlap(this.ball.sprite, this.playerCourtPlayers, playerBallCollisionHandler)
     this.physics.add.overlap(this.ball.sprite, this.cpuCourtPlayers, playerBallCollisionHandler)
     this.physics.add.collider(this.playerCourtPlayers, this.cpuCourtPlayers)
+  }
+
+  handleChangePossession() {
+    this.player.getCourtPlayers().forEach((player) => {
+      player.stop()
+    })
+    this.cpu.getCourtPlayers().forEach((player) => {
+      player.stop()
+    })
+    this.isChangingPossession = true
+    this.time.delayedCall(5000, () => {
+      this.resetPositioning()
+    })
+  }
+
+  resetPositioning() {
+    this.player.positionPlayers()
+    this.cpu.positionPlayers()
+    this.isChangingPossession = false
   }
 
   update() {

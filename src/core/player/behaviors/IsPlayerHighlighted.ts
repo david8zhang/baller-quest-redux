@@ -2,7 +2,7 @@ import { BehaviorStatus } from '~/core/behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '~/core/behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '~/core/behavior-tree/Blackboard'
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { BlackboardKeys } from '../BlackboardKeys'
+import { BlackboardKeys } from './BlackboardKeys'
 
 export class IsPlayerHighlighted extends BehaviorTreeNode {
   constructor(blackboard: Blackboard) {

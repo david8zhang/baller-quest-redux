@@ -3,23 +3,9 @@ import { getClosestPlayer, PLAYER_SPEED, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
 import { FriendlyPlayerAI } from './FriendlyPlayerAI'
+import { DEFENSE_POSITIONS_PLAYER, OFFENSE_POSITIONS_PLAYER } from './PlayerConstants'
 
 export class Player {
-  public static INITIAL_PLAYER_POSITIONS = {
-    player1: {
-      row: 17,
-      col: 13,
-    },
-    player2: {
-      row: 16,
-      col: 20,
-    },
-    player3: {
-      row: 16,
-      col: 6,
-    },
-  }
-
   private game: Game
   private selectedCourtPlayer!: CourtPlayer
   private players: FriendlyPlayerAI[] = []
@@ -49,6 +35,7 @@ export class Player {
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
     this.setupPlayers()
+    this.positionPlayers()
   }
   setupKeyboardPressListener() {
     this.game.input.keyboard.on('keydown', (e) => {
@@ -79,14 +66,12 @@ export class Player {
   }
 
   setupPlayers() {
-    Object.keys(Player.INITIAL_PLAYER_POSITIONS).forEach((playerId: string, index: number) => {
-      const gridPos = Player.INITIAL_PLAYER_POSITIONS[playerId]
-      const worldPosForRowCol = this.game.court.getWorldPositionForCoordinates(
-        gridPos.row,
-        gridPos.col
-      )
+    Object.keys(OFFENSE_POSITIONS_PLAYER).forEach((playerId: string, index: number) => {
       const newPlayer = new CourtPlayer(this.game, {
-        position: worldPosForRowCol,
+        position: {
+          x: 0,
+          y: 0,
+        },
         side: Side.PLAYER,
         tint: 0x00ff00,
         playerId,
@@ -99,6 +84,22 @@ export class Player {
       const friendlyPlayerAI = new FriendlyPlayerAI(newPlayer, this)
       this.players.push(friendlyPlayerAI)
       this.game.playerCourtPlayers.add(newPlayer.sprite)
+    })
+  }
+
+  positionPlayers() {
+    const hasPossession = this.game.ball.playerWithBall!.side === Side.PLAYER
+    const initialPositions = hasPossession ? OFFENSE_POSITIONS_PLAYER : DEFENSE_POSITIONS_PLAYER
+    const playerMapping = this.getCourtPlayers().reduce((acc, curr) => {
+      acc[curr.playerId] = curr
+      return acc
+    }, {})
+    Object.keys(initialPositions).forEach((key) => {
+      const gridPos = initialPositions[key]
+      const worldPos = this.game.court.getWorldPositionForCoordinates(gridPos.row, gridPos.col)
+      const player = playerMapping[key] as CourtPlayer
+      player.sprite.x = worldPos.x
+      player.sprite.y = worldPos.y
     })
   }
 

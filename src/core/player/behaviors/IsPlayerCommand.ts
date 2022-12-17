@@ -3,9 +3,8 @@ import { BehaviorTreeNode } from '~/core/behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '~/core/behavior-tree/Blackboard'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import Game from '~/scenes/Game'
-import { FriendlyPlayerAI } from '../../FriendlyPlayerAI'
-import { BlackboardKeys } from '../BlackboardKeys'
-import { ScreenBehavior } from './ScreenBehavior'
+import { FriendlyPlayerAI } from '../FriendlyPlayerAI'
+import { BlackboardKeys } from './BlackboardKeys'
 
 export class IsPlayerCommand extends BehaviorTreeNode {
   private keys: Phaser.Input.Keyboard.Key[] = []
