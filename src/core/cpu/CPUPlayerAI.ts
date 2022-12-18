@@ -14,6 +14,9 @@ import { CPU } from './CPU'
 import { TeamHasPossession } from './behaviors/offense/TeamHasPossession'
 import { PlayerHasPossession } from './behaviors/offense/PlayerHasPosession'
 import { PassBall } from './behaviors/offense/PassBall'
+import { RandomSelector } from '../behavior-tree/RandomSelector'
+import { ShootBall } from './behaviors/offense/ShootBall'
+import { Idle } from './behaviors/offense/Idle'
 
 export class CPUPlayerAI {
   private game: Game
@@ -58,9 +61,12 @@ export class CPUPlayerAI {
             this.blackboard,
             new SequenceNode('OnBallOffenseSequence', this.blackboard, [
               new PlayerHasPossession(this.blackboard),
-              new PassBall(this.blackboard),
+              new RandomSelector('RandomOnBallSelector', this.blackboard, [
+                new PassBall(this.blackboard),
+                new ShootBall(this.blackboard),
+              ]),
             ]),
-            new SequenceNode('OffballOffenseSequence', this.blackboard, [])
+            new SequenceNode('OffballOffenseSequence', this.blackboard, [new Idle(this.blackboard)])
           ),
         ]),
         new SequenceNode('DefenseSequence', this.blackboard, [

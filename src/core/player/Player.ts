@@ -1,9 +1,10 @@
 import Game from '~/scenes/Game'
-import { getClosestPlayer, PLAYER_SPEED, Side } from '../Constants'
+import { getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
 import { FriendlyPlayerAI } from './FriendlyPlayerAI'
 import { DEFENSE_POSITIONS_PLAYER, OFFENSE_POSITIONS_PLAYER } from './PlayerConstants'
+import { SprintMeter } from './SprintMeter'
 
 export class Player {
   private game: Game
@@ -16,6 +17,8 @@ export class Player {
   private keyArrowRight!: Phaser.Input.Keyboard.Key
   private keyArrowUp!: Phaser.Input.Keyboard.Key
   private keyArrowDown!: Phaser.Input.Keyboard.Key
+
+  private sprintMeter: SprintMeter
 
   constructor(game: Game) {
     this.game = game
@@ -32,6 +35,7 @@ export class Player {
       },
       this.game
     )
+    this.sprintMeter = new SprintMeter(this.game)
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
     this.setupPlayers()
@@ -135,7 +139,7 @@ export class Player {
     const upDown = this.keyArrowUp.isDown
     const downDown = this.keyArrowDown.isDown
 
-    const speed = PLAYER_SPEED
+    const speed = this.sprintMeter.getSpeed()
     let velocityX = 0
     let velocityY = 0
     if (leftDown || rightDown) {

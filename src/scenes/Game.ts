@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { Ball } from '~/core/Ball'
-import { WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
+import { SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
 import { Court } from '~/core/Court'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { createPlayerAnims } from '~/core/CourtPlayerAnims'
@@ -16,6 +16,8 @@ export default class Game extends Phaser.Scene {
   public ball!: Ball
   public court!: Court
   public cursor!: Cursor
+  private changingPossessionText!: Phaser.GameObjects.Text
+  private changingPossessionOverlay!: Phaser.GameObjects.Rectangle
   public isChangingPossession: boolean = false
   public playerCourtPlayers!: Phaser.GameObjects.Group
   public cpuCourtPlayers!: Phaser.GameObjects.Group
@@ -48,6 +50,25 @@ export default class Game extends Phaser.Scene {
     this.player = new Player(this)
     this.cpu = new CPU(this)
     this.setupColliders()
+    this.setupUI()
+  }
+
+  setupUI() {
+    this.changingPossessionOverlay = this.add
+      .rectangle(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT, 0x000000, 0.5)
+      .setDepth(SORT_ORDER.ui)
+      .setVisible(false)
+    const sideWithPossession = this.ball.playerWithBall ? this.ball.playerWithBall.side : ''
+    this.changingPossessionText = this.add
+      .text(0, 0, `${sideWithPossession} BALL!`, {
+        fontSize: '20px',
+      })
+      .setDepth(SORT_ORDER.ui)
+      .setVisible(false)
+    this.changingPossessionText.setPosition(
+      WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
+      WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
+    )
   }
 
   setupColliders() {
@@ -70,12 +91,22 @@ export default class Game extends Phaser.Scene {
       player.stop()
     })
     this.isChangingPossession = true
+    this.changingPossessionOverlay.setVisible(true)
+    const sideWithPossession = this.ball.playerWithBall ? this.ball.playerWithBall.side : ''
+    this.changingPossessionText.setText(`${sideWithPossession} BALL!`).setVisible(true)
+    this.changingPossessionText.setPosition(
+      WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
+      WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
+    )
     this.time.delayedCall(5000, () => {
       this.resetPositioning()
     })
   }
 
   resetPositioning() {
+    this.changingPossessionOverlay.setVisible(false)
+    this.changingPossessionText.setVisible(false)
+
     this.player.positionPlayers()
     this.cpu.positionPlayers()
     this.isChangingPossession = false

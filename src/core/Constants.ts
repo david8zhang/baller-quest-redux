@@ -12,10 +12,13 @@ export enum Direction {
   UP = 'up',
   DOWN = 'down',
   LEFT = 'left',
-  RIGHt = 'right',
+  RIGHT = 'right',
 }
 
-export const PLAYER_SPEED = 150
+export const COURT_PLAYER_SPEED = 200
+export const COURT_PLAYER_DEFENSE_SPEED = 250
+export const COURT_PLAYER_SPRINT_SPEED = 300
+export const COURT_PLAYER_TIRED_SPEED = 150
 
 export const createArc = (
   sprite: Phaser.Physics.Arcade.Sprite,
@@ -29,6 +32,7 @@ export const createArc = (
 }
 
 export const SORT_ORDER = {
+  ui: 100,
   rim: 10,
   ball: 5,
   stand: 1,

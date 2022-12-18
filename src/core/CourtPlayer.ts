@@ -1,11 +1,11 @@
 import Game from '~/scenes/Game'
 import { BallState } from './Ball'
 import {
+  COURT_PLAYER_SPEED,
   createArc,
   getDistanceBetween,
   OFFBALL_ANIMS,
   ONBALL_ANIMS,
-  PLAYER_SPEED,
   Side,
 } from './Constants'
 
@@ -82,7 +82,10 @@ export class CourtPlayer {
 
   handleBallCollision() {
     if (this.game.ball.ballState === BallState.PASS) {
-      if (this.state !== CourtPlayerState.PASSING) {
+      if (
+        this.state !== CourtPlayerState.PASSING &&
+        this.game.ball.prevPlayerWithBall!.side === this.side
+      ) {
         // Make sure that the player who is passing can't regain posssession of the ball mid-pass
         this.getPossessionOfBall()
         if (this.side === Side.PLAYER) {
@@ -301,7 +304,7 @@ export class CourtPlayer {
         }
       )
       const velocityVector = new Phaser.Math.Vector2()
-      this.game.physics.velocityFromRotation(angle, PLAYER_SPEED, velocityVector)
+      this.game.physics.velocityFromRotation(angle, COURT_PLAYER_SPEED, velocityVector)
       this.sprite.setVelocity(velocityVector.x, velocityVector.y)
     }
   }
