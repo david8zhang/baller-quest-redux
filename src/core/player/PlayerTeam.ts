@@ -2,12 +2,12 @@ import Game from '~/scenes/Game'
 import { getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
+import { Team } from '../Team'
 import { FriendlyPlayerAI } from './FriendlyPlayerAI'
-import { DEFENSE_POSITIONS_PLAYER, OFFENSE_POSITIONS_PLAYER } from './PlayerConstants'
+import { PlayerConstants } from './PlayerConstants'
 import { SprintMeter } from './SprintMeter'
 
-export class Player {
-  private game: Game
+export class PlayerTeam extends Team {
   private selectedCourtPlayer!: CourtPlayer
   private players: FriendlyPlayerAI[] = []
   private selectedCourtPlayerCursor: Cursor
@@ -17,25 +17,24 @@ export class Player {
   private keyArrowRight!: Phaser.Input.Keyboard.Key
   private keyArrowUp!: Phaser.Input.Keyboard.Key
   private keyArrowDown!: Phaser.Input.Keyboard.Key
-
   private sprintMeter: SprintMeter
 
   constructor(game: Game) {
-    this.game = game
+    super(game)
     this.selectedCourtPlayerCursor = new Cursor(
       {
         position: { x: 0, y: 0 },
       },
-      this.game
+      game
     )
     this.passCursor = new Cursor(
       {
         position: { x: 0, y: 0 },
         alpha: 0.5,
       },
-      this.game
+      game
     )
-    this.sprintMeter = new SprintMeter(this.game)
+    this.sprintMeter = new SprintMeter(game)
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
     this.setupPlayers()
@@ -61,6 +60,26 @@ export class Player {
     })
   }
 
+  public getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null {
+    const otherTeamPlayers = this.getOtherTeamCourtPlayers()
+    const playerToDefendId = PlayerConstants.DEFENSIVE_ASSIGNMENTS[playerId]
+    return otherTeamPlayers.find((player) => player.playerId === playerToDefendId) || null
+  }
+
+  public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
+    return PlayerConstants.OFFENSE_POSITIONS_PLAYER
+  }
+
+  public getDefensivePositions(): { [key: string]: { row: number; col: number } } {
+    return PlayerConstants.DEFENSE_POSITIONS_PLAYER
+  }
+
+  public hasPossession(): boolean {
+    return (
+      this.game.ball.playerWithBall !== null && this.game.ball.playerWithBall.side === Side.PLAYER
+    )
+  }
+
   getOtherTeamCourtPlayers() {
     return this.game.cpu.getCourtPlayers()
   }
@@ -70,30 +89,34 @@ export class Player {
   }
 
   setupPlayers() {
-    Object.keys(OFFENSE_POSITIONS_PLAYER).forEach((playerId: string, index: number) => {
-      const newPlayer = new CourtPlayer(this.game, {
-        position: {
-          x: 0,
-          y: 0,
-        },
-        side: Side.PLAYER,
-        tint: 0x00ff00,
-        playerId,
-      })
-      if (index === 0) {
-        this.selectedCourtPlayer = newPlayer
-        this.selectedCourtPlayer.getPossessionOfBall()
-        this.selectedCourtPlayerCursor.selectCourtPlayer(this.selectedCourtPlayer)
+    Object.keys(PlayerConstants.OFFENSE_POSITIONS_PLAYER).forEach(
+      (playerId: string, index: number) => {
+        const newPlayer = new CourtPlayer(this.game, {
+          position: {
+            x: 0,
+            y: 0,
+          },
+          side: Side.PLAYER,
+          tint: 0x00ff00,
+          playerId,
+        })
+        if (index === 0) {
+          this.selectedCourtPlayer = newPlayer
+          this.selectedCourtPlayer.getPossessionOfBall()
+          this.selectedCourtPlayerCursor.selectCourtPlayer(this.selectedCourtPlayer)
+        }
+        const friendlyPlayerAI = new FriendlyPlayerAI(newPlayer, this)
+        this.players.push(friendlyPlayerAI)
+        this.game.playerCourtPlayers.add(newPlayer.sprite)
       }
-      const friendlyPlayerAI = new FriendlyPlayerAI(newPlayer, this)
-      this.players.push(friendlyPlayerAI)
-      this.game.playerCourtPlayers.add(newPlayer.sprite)
-    })
+    )
   }
 
   positionPlayers() {
     const hasPossession = this.game.ball.playerWithBall!.side === Side.PLAYER
-    const initialPositions = hasPossession ? OFFENSE_POSITIONS_PLAYER : DEFENSE_POSITIONS_PLAYER
+    const initialPositions = hasPossession
+      ? PlayerConstants.OFFENSE_POSITIONS_PLAYER
+      : PlayerConstants.DEFENSE_POSITIONS_PLAYER
     const playerMapping = this.getCourtPlayers().reduce((acc, curr) => {
       acc[curr.playerId] = curr
       return acc

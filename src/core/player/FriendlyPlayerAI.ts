@@ -1,89 +1,31 @@
-import Game from '~/scenes/Game'
-import { BehaviorTreeNode } from '../behavior-tree/BehaviorTreeNode'
-import { Blackboard } from '../behavior-tree/Blackboard'
-import { SelectorNode } from '../behavior-tree/SelectorNode'
-import { SequenceNode } from '../behavior-tree/SequenceNode'
 import { CourtPlayer } from '../CourtPlayer'
-import { IsBallLoose } from '../cpu/behaviors/defense/IsBallLoose'
-import { ChaseRebound } from './behaviors/defense/ChaseRebound'
-import { PlayerCommandSelector } from './behaviors/PlayerCommandSelector'
-import { ScreenBehavior } from './behaviors/offense/ScreenBehavior'
-import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
-import { Player } from './Player'
-import { IsPlayerHighlighted } from './behaviors/IsPlayerHighlighted'
-import { IsPlayerCommand } from './behaviors/IsPlayerCommand'
-import { TeamHasPossession } from './behaviors/offense/TeamHasPossession'
+import { PlayerTeam } from './PlayerTeam'
 
 export class FriendlyPlayerAI {
-  public static KEY_COMMAND_BEHAVIORS = [
-    {
-      key: Phaser.Input.Keyboard.KeyCodes.Q,
-      behavior: ScreenBehavior,
-    },
-  ]
   public courtPlayer: CourtPlayer
-  private player: Player
-  private behaviorTree!: BehaviorTreeNode
-  constructor(courtPlayer: CourtPlayer, player: Player) {
+  private playerTeam: PlayerTeam
+  constructor(courtPlayer: CourtPlayer, playerTeam: PlayerTeam) {
     this.courtPlayer = courtPlayer
-    this.player = player
-    this.setupBehaviorTree()
+    this.playerTeam = playerTeam
   }
 
   getTeammates() {
-    return this.player.getCourtPlayers().filter((player) => {
+    return this.playerTeam.getCourtPlayers().filter((player) => {
       player != this.courtPlayer
     })
   }
 
   getOtherTeamPlayers() {
-    return this.player.getOtherTeamCourtPlayers()
+    return this.playerTeam.getOtherTeamCourtPlayers()
   }
 
   getSelectedPlayer() {
-    return this.player.getSelectedCourtPlayer()
+    return this.playerTeam.getSelectedCourtPlayer()
   }
 
   getHighlightedPlayer() {
-    return this.player.getHighlightedPlayer()
+    return this.playerTeam.getHighlightedPlayer()
   }
 
-  setupBehaviorTree() {
-    const blackboard = new Blackboard()
-    this.behaviorTree = new SequenceNode('FriendlyPlayerAI', blackboard, [
-      new PopulateBlackboard(blackboard, this),
-      new SelectorNode(
-        'PlayerCommandOrAIControl',
-        blackboard,
-        new SequenceNode('PlayerCommandSequence', blackboard, [
-          new IsPlayerHighlighted(blackboard),
-          new IsPlayerCommand(blackboard),
-          new PlayerCommandSelector(blackboard),
-        ]),
-        new SelectorNode(
-          'OffenseOrDefense',
-          blackboard,
-          new SequenceNode('OffenseSequence', blackboard, [new TeamHasPossession(blackboard)]),
-          new SelectorNode(
-            'DefenseSelector',
-            blackboard,
-            new SequenceNode('ReboundSequence', blackboard, [
-              new IsBallLoose(blackboard),
-              new ChaseRebound(blackboard),
-            ]),
-            new SequenceNode('DefendSequence', blackboard, [])
-          )
-        )
-      ),
-    ])
-  }
-
-  update() {
-    if (
-      this.player.getSelectedCourtPlayer() !== this.courtPlayer &&
-      !Game.instance.isChangingPossession
-    ) {
-      this.behaviorTree.tick()
-    }
-  }
+  update() {}
 }

@@ -4,7 +4,6 @@
 
 ## TODO:
 
-- Sprinting past defenders
 - Layups
 - Setting screens and rolling
 - Blocking shots

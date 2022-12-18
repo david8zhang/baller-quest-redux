@@ -1,30 +1,50 @@
 import Game from '~/scenes/Game'
 import { Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
-import { DEFENSE_POSITIONS_CPU, OFFENSE_POSITIONS_CPU } from './CPUConstants'
+import { Team } from '../Team'
+import { CPUConstants } from './CPUConstants'
 import { CPUPlayerAI } from './CPUPlayerAI'
 
-export class CPU {
-  private game: Game
+export class CPUTeam extends Team {
   private players: CPUPlayerAI[] = []
 
   constructor(game: Game) {
-    this.game = game
+    super(game)
     this.setupPlayers()
     this.positionPlayers()
   }
 
-  getCourtPlayers() {
+  public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
+    return CPUConstants.OFFENSE_POSITIONS_CPU
+  }
+
+  public getDefensivePositions(): { [key: string]: { row: number; col: number } } {
+    return CPUConstants.DEFENSE_POSITIONS_CPU
+  }
+
+  public hasPossession(): boolean {
+    return this.game.ball.playerWithBall !== null && this.game.ball.playerWithBall.side === Side.CPU
+  }
+
+  public getCourtPlayers() {
     return this.players.map((p) => p.courtPlayer)
   }
 
-  getOtherTeamCourtPlayers() {
+  public getOtherTeamCourtPlayers() {
     return this.game.player.getCourtPlayers()
   }
 
-  positionPlayers() {
+  public getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null {
+    const otherTeamPlayers = this.getOtherTeamCourtPlayers()
+    const playerToDefendId = CPUConstants.DEFENSIVE_ASSIGNMENTS[playerId]
+    return otherTeamPlayers.find((player) => player.playerId === playerToDefendId) || null
+  }
+
+  public positionPlayers() {
     const hasPossession = this.game.ball.playerWithBall!.side === Side.CPU
-    const initialPositions = hasPossession ? OFFENSE_POSITIONS_CPU : DEFENSE_POSITIONS_CPU
+    const initialPositions = hasPossession
+      ? CPUConstants.OFFENSE_POSITIONS_CPU
+      : CPUConstants.DEFENSE_POSITIONS_CPU
     const playerMapping = this.getCourtPlayers().reduce((acc, curr) => {
       acc[curr.playerId] = curr
       return acc
@@ -38,8 +58,8 @@ export class CPU {
     })
   }
 
-  setupPlayers() {
-    Object.keys(DEFENSE_POSITIONS_CPU).forEach((key) => {
+  private setupPlayers() {
+    Object.keys(CPUConstants.DEFENSE_POSITIONS_CPU).forEach((key) => {
       const player = new CourtPlayer(this.game, {
         position: {
           x: 0,
@@ -56,7 +76,7 @@ export class CPU {
 
   update() {
     this.players.forEach((p) => {
-      p.process()
+      p.update()
     })
   }
 }

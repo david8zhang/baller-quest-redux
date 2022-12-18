@@ -4,14 +4,14 @@ import { SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
 import { Court } from '~/core/Court'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { createPlayerAnims } from '~/core/CourtPlayerAnims'
-import { CPU } from '~/core/cpu/CPU'
+import { CPUTeam } from '~/core/cpu/CPUTeam'
 import { Cursor } from '~/core/Cursor'
 import { Hoop } from '~/core/Hoop'
-import { Player } from '~/core/player/Player'
+import { PlayerTeam } from '~/core/player/PlayerTeam'
 
 export default class Game extends Phaser.Scene {
-  public player!: Player
-  public cpu!: CPU
+  public player!: PlayerTeam
+  public cpu!: CPUTeam
   public hoop!: Hoop
   public ball!: Ball
   public court!: Court
@@ -47,8 +47,8 @@ export default class Game extends Phaser.Scene {
       position: { x: 0, y: 0 },
     })
     this.cameras.main.setBackgroundColor('#fff8dc')
-    this.player = new Player(this)
-    this.cpu = new CPU(this)
+    this.player = new PlayerTeam(this)
+    this.cpu = new CPUTeam(this)
     this.setupColliders()
     this.setupUI()
   }

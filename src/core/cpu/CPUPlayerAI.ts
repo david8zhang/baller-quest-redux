@@ -1,36 +1,61 @@
 import Game from '~/scenes/Game'
 import { CourtPlayer } from '../CourtPlayer'
-import { BehaviorTreeNode } from '../behavior-tree/BehaviorTreeNode'
-import { Blackboard } from '../behavior-tree/Blackboard'
-import { SelectorNode } from '../behavior-tree/SelectorNode'
-import { SequenceNode } from '../behavior-tree/SequenceNode'
-import { ContestPlayerShot } from './behaviors/defense/ContestPlayerShot'
-import { GetManToDefend } from './behaviors/defense/GetManToDefend'
-import { StayInFrontOfMan } from './behaviors/defense/StayInFrontOfMan'
-import { ChaseRebound } from './behaviors/defense/ChaseRebound'
-import { IsBallLoose } from './behaviors/defense/IsBallLoose'
-import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
-import { CPU } from './CPU'
-import { TeamHasPossession } from './behaviors/offense/TeamHasPossession'
-import { PlayerHasPossession } from './behaviors/offense/PlayerHasPosession'
-import { PassBall } from './behaviors/offense/PassBall'
-import { RandomSelector } from '../behavior-tree/RandomSelector'
-import { ShootBall } from './behaviors/offense/ShootBall'
-import { Idle } from './behaviors/offense/Idle'
+import { HasPossession } from '../decision-tree/decisions/HasPossession'
+import { IsBallLoose } from '../decision-tree/decisions/IsBallLoose'
+import { LeafNode } from '../decision-tree/LeafNode'
+import { SelectorNode } from '../decision-tree/SelectorNode'
+import { SequenceNode } from '../decision-tree/SequenceNode'
+import { TreeNode } from '../decision-tree/TreeNode'
+import { ChaseRebound } from '../states/ChaseRebound'
+import { DefendManState } from '../states/defense/DefendManState'
+import { IdleState } from '../states/IdleState'
+import { State, StateMachine } from '../states/StateMachine'
+import { States } from '../states/States'
+import { CPUTeam } from './CPUTeam'
 
 export class CPUPlayerAI {
   private game: Game
-  private cpu: CPU
+  private cpuTeam: CPUTeam
   public courtPlayer: CourtPlayer
+  public stateMachine: StateMachine
+  public decisionTree!: TreeNode
 
-  public blackboard!: Blackboard
-  public behaviorTree!: BehaviorTreeNode
-
-  constructor(game: Game, courtPlayer: CourtPlayer, cpu: CPU) {
+  constructor(game: Game, courtPlayer: CourtPlayer, cpuTeam: CPUTeam) {
     this.game = game
     this.courtPlayer = courtPlayer
-    this.cpu = cpu
-    this.setupBehaviorTree()
+    this.cpuTeam = cpuTeam
+    this.stateMachine = new StateMachine(
+      States.IDLE,
+      {
+        [States.IDLE]: new IdleState(),
+        [States.DEFEND_MAN]: new DefendManState(),
+        [States.CHASE_REBOUND]: new ChaseRebound(),
+      },
+      [this.courtPlayer, this.cpuTeam]
+    )
+    this.setupDecisionTree()
+  }
+
+  setupDecisionTree() {
+    this.decisionTree = new SelectorNode(
+      'LooseBallSelector',
+      this.cpuTeam,
+      new SequenceNode('ChaseReboundSelector', this.cpuTeam, [
+        new IsBallLoose(this.cpuTeam),
+        new LeafNode('ChaseRebound', this.cpuTeam, States.CHASE_REBOUND),
+      ]),
+      new SelectorNode(
+        'OffenseOrDefenseSelector',
+        this.cpuTeam,
+        new SequenceNode('OffenseSequence', this.cpuTeam, [
+          new HasPossession(this.cpuTeam),
+          new LeafNode('Idle', this.cpuTeam, States.IDLE),
+        ]),
+        new SequenceNode('DefenseSequence', this.cpuTeam, [
+          new LeafNode('DefendMan', this.cpuTeam, States.DEFEND_MAN),
+        ])
+      )
+    )
   }
 
   get ball() {
@@ -38,63 +63,18 @@ export class CPUPlayerAI {
   }
 
   getTeammates() {
-    return this.cpu.getCourtPlayers().filter((player) => {
+    return this.cpuTeam.getCourtPlayers().filter((player) => {
       return player != this.courtPlayer
     })
   }
 
   getOtherTeamPlayers() {
-    return this.cpu.getOtherTeamCourtPlayers()
+    return this.cpuTeam.getOtherTeamCourtPlayers()
   }
 
-  setupBehaviorTree() {
-    this.blackboard = new Blackboard()
-    this.behaviorTree = new SequenceNode('RootSequence', this.blackboard, [
-      new PopulateBlackboard(this.blackboard, this),
-      new SelectorNode(
-        'OffenseOrDefense',
-        this.blackboard,
-        new SequenceNode('OffenseSequence', this.blackboard, [
-          new TeamHasPossession(this.blackboard),
-          new SelectorNode(
-            'OnOrOffBallOffense',
-            this.blackboard,
-            new SequenceNode('OnBallOffenseSequence', this.blackboard, [
-              new PlayerHasPossession(this.blackboard),
-              new RandomSelector('RandomOnBallSelector', this.blackboard, [
-                new PassBall(this.blackboard),
-                new ShootBall(this.blackboard),
-              ]),
-            ]),
-            new SequenceNode('OffballOffenseSequence', this.blackboard, [new Idle(this.blackboard)])
-          ),
-        ]),
-        new SequenceNode('DefenseSequence', this.blackboard, [
-          new SelectorNode(
-            'ReboundOrDefend',
-            this.blackboard,
-            new SequenceNode('ReboundSequence', this.blackboard, [
-              new IsBallLoose(this.blackboard),
-              new ChaseRebound(this.blackboard),
-            ]),
-            new SequenceNode('DefenseSequence', this.blackboard, [
-              new GetManToDefend(this.blackboard),
-              new SelectorNode(
-                'StayWithDefenderOrContest',
-                this.blackboard,
-                new ContestPlayerShot(this.blackboard),
-                new StayInFrontOfMan(this.blackboard)
-              ),
-            ])
-          ),
-        ])
-      ),
-    ])
-  }
-
-  process() {
-    if (!Game.instance.isChangingPossession) {
-      this.behaviorTree.tick()
-    }
+  update() {
+    const nextState = this.decisionTree.process() as States
+    this.stateMachine.transition(nextState)
+    this.stateMachine.step()
   }
 }
