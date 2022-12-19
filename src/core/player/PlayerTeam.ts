@@ -1,7 +1,10 @@
 import Game from '~/scenes/Game'
 import { getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
+import { CourtPlayerAI } from '../CourtPlayerAI'
 import { Cursor } from '../Cursor'
+import { DefendManState } from '../states/defense/DefendManState'
+import { States } from '../states/States'
 import { Team } from '../Team'
 import { FriendlyPlayerAI } from './FriendlyPlayerAI'
 import { PlayerConstants } from './PlayerConstants'
@@ -9,7 +12,7 @@ import { SprintMeter } from './SprintMeter'
 
 export class PlayerTeam extends Team {
   private selectedCourtPlayer!: CourtPlayer
-  private players: FriendlyPlayerAI[] = []
+  public players: FriendlyPlayerAI[] = []
   private selectedCourtPlayerCursor: Cursor
   private passCursor: Cursor
 
@@ -20,7 +23,7 @@ export class PlayerTeam extends Team {
   private sprintMeter: SprintMeter
 
   constructor(game: Game) {
-    super(game)
+    super(game, Side.PLAYER)
     this.selectedCourtPlayerCursor = new Cursor(
       {
         position: { x: 0, y: 0 },
@@ -38,24 +41,49 @@ export class PlayerTeam extends Team {
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
     this.setupPlayers()
-    this.positionPlayers()
+    super.positionPlayers()
   }
   setupKeyboardPressListener() {
     this.game.input.keyboard.on('keydown', (e) => {
-      if (e.code === 'KeyS') {
-        if (this.selectedCourtPlayer.canShootBall()) {
-          this.selectedCourtPlayer.shoot()
+      switch (e.code) {
+        case 'KeyS': {
+          if (this.selectedCourtPlayer.canShootBall()) {
+            this.selectedCourtPlayer.shoot()
+          }
+          break
         }
-      }
-      if (e.code === 'Space') {
-        if (this.passCursor.selectedCourtPlayer) {
-          // If the currently selected player has the ball, pass it. Otherwise, switch player
-          if (this.selectedCourtPlayer.canPassBall()) {
-            this.selectedCourtPlayer.passBall(this.passCursor.selectedCourtPlayer)
-          } else {
-            this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
+        case 'KeyQ': {
+          this.callForScreen()
+          break
+        }
+        case 'Space': {
+          if (this.passCursor.selectedCourtPlayer) {
+            // If the currently selected player has the ball, pass it. Otherwise, switch player
+            if (this.selectedCourtPlayer.canPassBall()) {
+              this.selectedCourtPlayer.passBall(this.passCursor.selectedCourtPlayer)
+            } else {
+              this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
+            }
           }
         }
+      }
+    })
+  }
+
+  getOtherTeam(): Team {
+    return this.game.cpu
+  }
+
+  public getEnemyAIs(): CourtPlayerAI[] {
+    return this.game.cpu.players
+  }
+
+  callForScreen() {
+    const highlightedPlayer = this.getHighlightedPlayer()
+    this.players.forEach((courtPlayerAI: FriendlyPlayerAI) => {
+      if (courtPlayerAI.courtPlayer === highlightedPlayer) {
+        courtPlayerAI.isPlayerCommandOverride = true
+        courtPlayerAI.setState(States.SET_SCREEN)
       }
     })
   }
@@ -110,24 +138,6 @@ export class PlayerTeam extends Team {
         this.game.playerCourtPlayers.add(newPlayer.sprite)
       }
     )
-  }
-
-  positionPlayers() {
-    const hasPossession = this.game.ball.playerWithBall!.side === Side.PLAYER
-    const initialPositions = hasPossession
-      ? PlayerConstants.OFFENSE_POSITIONS_PLAYER
-      : PlayerConstants.DEFENSE_POSITIONS_PLAYER
-    const playerMapping = this.getCourtPlayers().reduce((acc, curr) => {
-      acc[curr.playerId] = curr
-      return acc
-    }, {})
-    Object.keys(initialPositions).forEach((key) => {
-      const gridPos = initialPositions[key]
-      const worldPos = this.game.court.getWorldPositionForCoordinates(gridPos.row, gridPos.col)
-      const player = playerMapping[key] as CourtPlayer
-      player.sprite.x = worldPos.x
-      player.sprite.y = worldPos.y
-    })
   }
 
   setSelectedCourtPlayer(courtPlayer: CourtPlayer) {

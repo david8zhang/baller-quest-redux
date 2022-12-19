@@ -48,6 +48,7 @@ export class CourtPlayer {
     if (tint) {
       this.sprite.setTintFill(tint)
     }
+    this.sprite.setPushable(false)
     this.sprite.body.setSize(16, 20)
     this.sprite.body.offset.y = 10
     this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle)
