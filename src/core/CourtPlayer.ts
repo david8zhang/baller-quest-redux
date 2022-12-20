@@ -152,7 +152,7 @@ export class CourtPlayer {
   handleBallCollision() {
     if (this.game.ball.ballState === BallState.PASS) {
       if (
-        // this.state !== CourtPlayerState.PASSING &&
+        this.getCurrState().key !== States.PASSING &&
         this.game.ball.prevPlayerWithBall!.side === this.side
       ) {
         // Make sure that the player who is passing can't regain posssession of the ball mid-pass
@@ -214,6 +214,41 @@ export class CourtPlayer {
     if (prevPlayerWithBall && prevPlayerWithBall.side !== this.side) {
       this.game.handleChangePossession()
     }
+  }
+
+  passBall(receiver: CourtPlayer) {
+    const timeToPass = 0.25
+    const angle = Phaser.Math.Angle.BetweenPoints(
+      {
+        x: this.sprite.x,
+        y: this.sprite.y,
+      },
+      {
+        x: receiver.sprite.x + receiver.sprite.body.velocity.x * timeToPass,
+        y: receiver.sprite.y + receiver.sprite.body.velocity.y * timeToPass,
+      }
+    )
+    const posAfterGivenTime = {
+      x: receiver.sprite.x + receiver.sprite.body.velocity.x * timeToPass,
+      y: receiver.sprite.y + receiver.sprite.body.velocity.y * timeToPass,
+    }
+    const distance = getDistanceBetween(
+      {
+        x: this.sprite.x,
+        y: this.sprite.y,
+      },
+      posAfterGivenTime
+    )
+    const velocityVector = new Phaser.Math.Vector2(0, 0)
+    Game.instance.physics.velocityFromRotation(angle, distance * (1 / timeToPass), velocityVector)
+
+    Game.instance.ball.ballState = BallState.PASS
+    Game.instance.ball.sprite.setVisible(true)
+    Game.instance.ball.sprite.setGravity(0)
+    Game.instance.ball.sprite.setVelocity(velocityVector.x, velocityVector.y)
+
+    this.hasPossession = false
+    Game.instance.ball.giveUpPossession()
   }
 
   setState(state: States, ...enterArgs: any) {

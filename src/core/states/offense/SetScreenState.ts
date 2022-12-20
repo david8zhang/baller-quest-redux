@@ -12,13 +12,25 @@ export enum ScreenDirection {
 export class SetScreenState extends State {
   public startedScreenTimestamp = -1
   public static SCREEN_DURATION = 5000
+  public onScreenFinishedCallback: Function | null = null
+  public screenPosition!: { x: number; y: number }
 
-  execute(currPlayer: CourtPlayer, team: Team) {
+  enter(currPlayer: CourtPlayer, team: Team, cb: Function) {
+    if (cb) {
+      this.onScreenFinishedCallback = cb
+    }
+  }
+
+  execute(currPlayer: CourtPlayer, team: Team, callback?: Function) {
     if (this.startedScreenTimestamp != -1) {
       const currTimestamp = Date.now()
-      if (currTimestamp - this.startedScreenTimestamp > SetScreenState.SCREEN_DURATION) {
-        currPlayer.setState(States.GO_BACK_TO_SPOT)
-        this.startedScreenTimestamp = -1
+      if (currPlayer.isAtPoint(this.screenPosition)) {
+        if (currTimestamp - this.startedScreenTimestamp > SetScreenState.SCREEN_DURATION) {
+          currPlayer.setState(States.GO_BACK_TO_SPOT, this.onScreenFinishedCallback)
+          this.startedScreenTimestamp = -1
+        } else {
+          currPlayer.stop()
+        }
       }
     } else {
       const ballHandler = Game.instance.ball.playerWithBall
@@ -33,10 +45,11 @@ export class SetScreenState extends State {
           const screenPosition = {
             x:
               direction === ScreenDirection.RIGHT
-                ? defenderForBallHandler.sprite.x + 20
-                : defenderForBallHandler.sprite.x - 20,
-            y: defenderForBallHandler.sprite.y,
+                ? defenderForBallHandler.sprite.x + 40
+                : defenderForBallHandler.sprite.x - 40,
+            y: defenderForBallHandler.sprite.y + 5,
           }
+          this.screenPosition = screenPosition
           currPlayer.moveTowards(screenPosition)
         }
       }

@@ -5,6 +5,14 @@ import { State } from '../StateMachine'
 import { States } from '../States'
 
 export class GoBackToSpotState extends State {
+  public onScreenFinishedCallback: Function | null = null
+
+  enter(currPlayer: CourtPlayer, team: Team, cb: Function) {
+    if (cb) {
+      this.onScreenFinishedCallback = cb
+    }
+  }
+
   execute(currPlayer: CourtPlayer, team: Team) {
     const hasPossession = team.hasPossession()
     const positionToGoBackTo = hasPossession
@@ -17,8 +25,9 @@ export class GoBackToSpotState extends State {
     )
     if (currPlayer.isAtPoint(worldPosition)) {
       if (currPlayer.constructor.name === 'PlayerCourtPlayer') {
-        const currPlayerAI = currPlayer as PlayerCourtPlayer
-        currPlayerAI.isPlayerCommandOverride = false
+        if (this.onScreenFinishedCallback) {
+          this.onScreenFinishedCallback(currPlayer)
+        }
       }
       currPlayer.setState(States.IDLE)
     } else {

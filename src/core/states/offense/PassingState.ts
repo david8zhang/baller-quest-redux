@@ -4,10 +4,10 @@ import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
 import { State } from '../StateMachine'
+import { States } from '../States'
 
 export class PassingState extends State {
-  enter(currPlayer: CourtPlayer, team: Team, receiver: CourtPlayer) {
-    console.log('Passing ball!')
+  enter(currPlayer: CourtPlayer, team: Team, receiver: CourtPlayer, callback?: Function) {
     const timeToPass = 0.25
     const angle = Phaser.Math.Angle.BetweenPoints(
       {
@@ -32,17 +32,22 @@ export class PassingState extends State {
     )
     const velocityVector = new Phaser.Math.Vector2(0, 0)
     Game.instance.physics.velocityFromRotation(angle, distance * (1 / timeToPass), velocityVector)
+
     currPlayer.hasPossession = false
     Game.instance.ball.giveUpPossession()
 
     // Apply ball changes
+
     Game.instance.ball.ballState = BallState.PASS
     Game.instance.ball.sprite.setVisible(true)
     Game.instance.ball.sprite.setGravity(0)
     Game.instance.ball.sprite.setVelocity(velocityVector.x, velocityVector.y)
 
-    // Game.instance.time.delayedCall(timeToPass * 1000, () => {
-    //   currPlayer.setState(States.IDLE)
-    // })
+    Game.instance.time.delayedCall(timeToPass * 1000, () => {
+      currPlayer.setState(States.IDLE)
+      if (callback) {
+        callback(currPlayer)
+      }
+    })
   }
 }

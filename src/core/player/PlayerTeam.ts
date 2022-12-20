@@ -46,19 +46,42 @@ export class PlayerTeam extends Team {
       switch (e.code) {
         case 'KeyS': {
           if (this.selectedCourtPlayer.canShootBall()) {
-            this.selectedCourtPlayer.setState(States.SHOOTING)
+            const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+            courtPlayer.isPlayerCommandOverride = true
+            this.selectedCourtPlayer.setState(States.SHOOTING, (player: PlayerCourtPlayer) => {
+              console.log('called shooting callback')
+              player.isPlayerCommandOverride = false
+            })
           }
           break
         }
         case 'KeyQ': {
-          this.callForScreen()
+          const highlightedPlayer = this.getHighlightedPlayer()
+          this.players.forEach((courtPlayer: CourtPlayer) => {
+            if (courtPlayer === highlightedPlayer) {
+              ;(courtPlayer as PlayerCourtPlayer).isPlayerCommandOverride = true
+              courtPlayer.setState(States.SET_SCREEN, (player: PlayerCourtPlayer) => {
+                console.log('called screen callback')
+                player.isPlayerCommandOverride = false
+              })
+            }
+          })
           break
         }
         case 'Space': {
           if (this.passCursor.selectedCourtPlayer) {
             // If the currently selected player has the ball, pass it. Otherwise, switch player
             if (this.selectedCourtPlayer.canPassBall()) {
-              this.selectedCourtPlayer.setState(States.PASSING, this.passCursor.selectedCourtPlayer)
+              const playerCourtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+              playerCourtPlayer.isPlayerCommandOverride = true
+              this.selectedCourtPlayer.setState(
+                States.PASSING,
+                this.passCursor.selectedCourtPlayer,
+                (player: PlayerCourtPlayer) => {
+                  console.log('called pass callback')
+                  player.isPlayerCommandOverride = false
+                }
+              )
             }
             this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
           }
@@ -70,16 +93,6 @@ export class PlayerTeam extends Team {
 
   getOtherTeam(): Team {
     return this.game.cpu
-  }
-
-  callForScreen() {
-    const highlightedPlayer = this.getHighlightedPlayer()
-    this.players.forEach((courtPlayer: CourtPlayer) => {
-      if (courtPlayer === highlightedPlayer) {
-        ;(courtPlayer as PlayerCourtPlayer).isPlayerCommandOverride = true
-        courtPlayer.setState(States.SET_SCREEN)
-      }
-    })
   }
 
   public getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null {

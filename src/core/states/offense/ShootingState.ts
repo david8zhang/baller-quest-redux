@@ -7,7 +7,7 @@ import { State } from '../StateMachine'
 import { States } from '../States'
 
 export class ShootingState extends State {
-  enter(currPlayer: CourtPlayer, team: Team) {
+  enter(currPlayer: CourtPlayer, team: Team, callback: Function) {
     currPlayer.stop()
     currPlayer.sprite.body.checkCollision.none = true
     currPlayer.hasPossession = false
@@ -27,6 +27,9 @@ export class ShootingState extends State {
     Game.instance.time.delayedCall(jumpTime * 975, () => {
       currPlayer.sprite.body.checkCollision.none = false
       currPlayer.setState(States.IDLE)
+      if (callback) {
+        callback(currPlayer)
+      }
     })
   }
 

@@ -14,7 +14,9 @@ export class PlayerCourtPlayer extends CourtPlayer {
     if (playerTeam.getSelectedCourtPlayer() !== this && !Game.instance.isChangingPossession) {
       if (!this.isPlayerCommandOverride) {
         const nextState = this.decisionTree.process()
-        this.stateMachine.transition(nextState)
+        if (nextState !== this.stateMachine.getState()) {
+          this.stateMachine.transition(nextState)
+        }
       }
       this.stateMachine.step()
     }
