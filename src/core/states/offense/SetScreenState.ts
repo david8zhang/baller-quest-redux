@@ -25,12 +25,11 @@ export class SetScreenState extends State {
     if (this.startedScreenTimestamp != -1) {
       const currTimestamp = Date.now()
       if (currPlayer.isAtPoint(this.screenPosition)) {
-        if (currTimestamp - this.startedScreenTimestamp > SetScreenState.SCREEN_DURATION) {
-          currPlayer.setState(States.GO_BACK_TO_SPOT, this.onScreenFinishedCallback)
-          this.startedScreenTimestamp = -1
-        } else {
-          currPlayer.stop()
-        }
+        currPlayer.stop()
+      }
+      if (currTimestamp - this.startedScreenTimestamp > SetScreenState.SCREEN_DURATION) {
+        currPlayer.setState(States.GO_BACK_TO_SPOT, this.onScreenFinishedCallback)
+        this.startedScreenTimestamp = -1
       }
     } else {
       const ballHandler = Game.instance.ball.playerWithBall
