@@ -1,12 +1,12 @@
 import { States } from '../states/States'
-import { Team } from '../Team'
+import { Blackboard } from './Blackboard'
 import { Decision } from './Decision'
 import { TreeNode } from './TreeNode'
 
 export class LeafNode extends TreeNode {
   private state: States
-  constructor(name: string, team: Team, state: States) {
-    super(name, team)
+  constructor(name: string, blackboard: Blackboard, state: States) {
+    super(name, blackboard)
     this.state = state
   }
 

@@ -1,16 +1,14 @@
 import Game from '~/scenes/Game'
-import { CourtPlayer } from '../CourtPlayer'
-import { CourtPlayerAI } from '../CourtPlayerAI'
+import { CourtPlayer, CourtPlayerConfig } from '../CourtPlayer'
 import { States } from '../states/States'
-import { CPUTeam } from './CPUTeam'
 
-export class CPUPlayerAI extends CourtPlayerAI {
-  constructor(courtPlayer: CourtPlayer, cpuTeam: CPUTeam) {
-    super(courtPlayer, cpuTeam)
+export class CPUCourtPlayer extends CourtPlayer {
+  constructor(game: Game, config: CourtPlayerConfig) {
+    super(game, config)
   }
 
   update() {
-    if (!Game.instance.isChangingPossession) {
+    if (!Game.instance.isChangingPossession && this.stateMachine) {
       const nextState = this.decisionTree.process() as States
       this.stateMachine.transition(nextState)
       this.stateMachine.step()

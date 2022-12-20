@@ -2,20 +2,32 @@ import Game from '~/scenes/Game'
 import { BallState } from './Ball'
 import {
   COURT_PLAYER_SPEED,
-  createArc,
   getDistanceBetween,
   OFFBALL_ANIMS,
   ONBALL_ANIMS,
   Side,
+  SORT_ORDER,
 } from './Constants'
-
-export enum CourtPlayerState {
-  SHOOTING = 'SHOOTING',
-  DRIBBLING = 'DRIBBLING',
-  PASSING = 'PASSING',
-  CONTESTING = 'CONTESTING',
-  IDLE = 'IDLE',
-}
+import { Blackboard } from './decision-tree/Blackboard'
+import { HasPossession } from './decision-tree/decisions/HasPossession'
+import { IsBallLoose } from './decision-tree/decisions/IsBallLoose'
+import { LeafNode } from './decision-tree/LeafNode'
+import { PopulateBlackboard } from './decision-tree/PopulateBlackboard'
+import { SelectorNode } from './decision-tree/SelectorNode'
+import { SequenceNode } from './decision-tree/SequenceNode'
+import { TreeNode } from './decision-tree/TreeNode'
+import { ChaseReboundState } from './states/ChaseReboundState'
+import { DefendManState } from './states/defense/DefendManState'
+import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
+import { IdleState } from './states/IdleState'
+import { ContestShotState } from './states/offense/ContestShotState'
+import { GoBackToSpotState } from './states/offense/GoBackToSpotState'
+import { PassingState } from './states/offense/PassingState'
+import { SetScreenState } from './states/offense/SetScreenState'
+import { ShootingState } from './states/offense/ShootingState'
+import { StateMachine } from './states/StateMachine'
+import { States } from './states/States'
+import { Team } from './Team'
 
 export interface CourtPlayerConfig {
   position: {
@@ -25,6 +37,7 @@ export interface CourtPlayerConfig {
   side: Side
   playerId: string
   tint?: number
+  team: Team
 }
 
 export class CourtPlayer {
@@ -32,13 +45,17 @@ export class CourtPlayer {
   public side: Side
   public sprite: Phaser.Physics.Arcade.Sprite
   public hasPossession: boolean = false
-
-  public state: CourtPlayerState = CourtPlayerState.IDLE
   public playerId: string
+
+  protected stateText: Phaser.GameObjects.Text
+  protected stateMachine: StateMachine
+  protected team: Team
+  protected decisionTree!: TreeNode
+  protected blackboard: Blackboard
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
-    const { position, side, tint, playerId } = config
+    const { position, side, tint, playerId, team } = config
     this.playerId = playerId
     this.side = side
     this.sprite = this.game.physics.add
@@ -49,15 +66,77 @@ export class CourtPlayer {
       this.sprite.setTintFill(tint)
     }
     this.sprite.setPushable(false)
-    this.sprite.body.setSize(16, 20)
-    this.sprite.body.offset.y = 10
+    this.sprite.body.setSize(10, 15)
+    this.sprite.body.offset.y = 16
     this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle)
     this.sprite.setData('ref', this)
     this.sprite.setCollideWorldBounds(true)
+
+    this.team = team
+    this.stateMachine = new StateMachine(
+      States.IDLE,
+      {
+        [States.IDLE]: new IdleState(),
+        [States.DEFEND_MAN]: new DefendManState(),
+        [States.CHASE_REBOUND]: new ChaseReboundState(),
+        [States.SET_SCREEN]: new SetScreenState(),
+        [States.GO_BACK_TO_SPOT]: new GoBackToSpotState(),
+        [States.SWITCH_DEFENSE]: new SwitchDefenseState(),
+        [States.PASSING]: new PassingState(),
+        [States.SHOOTING]: new ShootingState(),
+        [States.CONTEST_SHOT]: new ContestShotState(),
+      },
+      [this, this.team]
+    )
+    this.stateText = Game.instance.add
+      .text(this.x, this.y - 20, '', {
+        fontSize: '12px',
+        color: 'black',
+      })
+      .setDepth(SORT_ORDER.ui)
+    this.blackboard = new Blackboard()
+    this.setupDecisionTree()
+  }
+
+  setupDecisionTree() {
+    this.decisionTree = new SequenceNode('RootSequence', this.blackboard, [
+      new PopulateBlackboard(this.blackboard, this, this.team),
+      new SelectorNode(
+        'LooseBallSelector',
+        this.blackboard,
+        new SequenceNode('ChaseReboundSelector', this.blackboard, [
+          new IsBallLoose(this.blackboard),
+          new LeafNode('ChaseRebound', this.blackboard, States.CHASE_REBOUND),
+        ]),
+        new SelectorNode(
+          'OffenseOrDefenseSelector',
+          this.blackboard,
+          new SequenceNode('OffenseSequence', this.blackboard, [
+            new HasPossession(this.blackboard),
+            new LeafNode('Idle', this.blackboard, States.IDLE),
+          ]),
+          new SelectorNode(
+            'ShouldSwitchDefense',
+            this.blackboard,
+            new SequenceNode('SwitchSequence', this.blackboard, [
+              new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN),
+            ]),
+            new SequenceNode('NormalDefenseSequence', this.blackboard, [
+              new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN),
+            ])
+          )
+        )
+      ),
+    ])
+  }
+
+  step() {
+    this.stateMachine.step()
   }
 
   canPassBall() {
-    return this.hasPossession && this.state !== CourtPlayerState.SHOOTING
+    const state = this.getCurrState().key
+    return this.hasPossession && state !== States.SHOOTING
   }
 
   isMoving() {
@@ -65,26 +144,15 @@ export class CourtPlayer {
     return Math.abs(velocity.x) > 0 || Math.abs(velocity.y) > 0
   }
 
-  shoot() {
-    this.playJumpAnimation()
-  }
-
-  getState() {
-    return this.state
-  }
-
-  setState(state: CourtPlayerState) {
-    this.state = state
-  }
-
   canShootBall() {
-    return this.state !== CourtPlayerState.SHOOTING && this.hasPossession
+    const state = this.getCurrState().key
+    return state !== States.SHOOTING && this.hasPossession
   }
 
   handleBallCollision() {
     if (this.game.ball.ballState === BallState.PASS) {
       if (
-        this.state !== CourtPlayerState.PASSING &&
+        // this.state !== CourtPlayerState.PASSING &&
         this.game.ball.prevPlayerWithBall!.side === this.side
       ) {
         // Make sure that the player who is passing can't regain posssession of the ball mid-pass
@@ -101,59 +169,19 @@ export class CourtPlayer {
     }
   }
 
-  launchBallTowardsHoop() {
-    const ball = this.game.ball
-    ball.show()
-    this.game.ball.setPosition(this.sprite.x + 5, this.sprite.y - 28)
-
-    const isMiss = Phaser.Math.Between(0, 100) > 0
-    let posToLandX = this.game.hoop.rimSprite.x
-    if (isMiss) {
-      ball.ballState = BallState.MISSED_SHOT
-      const missOffset = Phaser.Math.Between(0, 1) ? -10 : 10
-      posToLandX = this.game.hoop.rimSprite.x + missOffset
-    } else {
-      ball.ballState = BallState.MADE_SHOT
-    }
-    createArc(
-      ball.sprite,
-      {
-        x: posToLandX,
-        y: this.game.hoop.rimSprite.y - 20,
-      },
-      1.5
+  public update() {
+    this.stateText.setText(this.stateMachine.getState())
+    this.stateText.setPosition(
+      this.x - this.stateText.displayWidth / 2,
+      this.y - 20 - this.stateText.displayHeight / 2
     )
   }
 
-  playJumpAnimation() {
-    this.stop()
-    this.sprite.body.checkCollision.none = true
-    this.hasPossession = false
-    this.sprite.setFlipX(false)
-    const jumpTime = 0.7
-    const initialX = this.sprite.x
-    const initialY = this.sprite.y
-    this.sprite.anims.stop()
-    this.sprite.setTexture('shoot-jump')
-
-    createArc(this.sprite, { x: initialX, y: initialY }, jumpTime)
-    this.setState(CourtPlayerState.SHOOTING)
-    this.game.time.delayedCall(jumpTime * 975 * 0.45, () => {
-      this.sprite.setTexture('shoot-flick')
-      this.game.ball.giveUpPossession()
-      this.launchBallTowardsHoop()
-    })
-    this.game.time.delayedCall(jumpTime * 975, () => {
-      this.landAfterJumping()
-    })
-  }
-
-  landAfterJumping() {
-    this.sprite.body.checkCollision.none = false
-    this.setState(CourtPlayerState.IDLE)
-    this.sprite.setVelocity(0, 0)
-    this.sprite.setGravityY(0)
-    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
+  public getCurrState() {
+    return {
+      key: this.stateMachine.getState(),
+      data: this.stateMachine.getFullState(),
+    }
   }
 
   get x() {
@@ -165,70 +193,8 @@ export class CourtPlayer {
   }
 
   canMove() {
-    return this.state !== CourtPlayerState.SHOOTING && !this.game.isChangingPossession
-  }
-
-  passBall(receiver: CourtPlayer) {
-    if (!this.hasPossession) {
-      return
-    }
-    const timeToPass = 0.25
-    const angle = Phaser.Math.Angle.BetweenPoints(
-      {
-        x: this.sprite.x,
-        y: this.sprite.y,
-      },
-      {
-        x: receiver.sprite.x + receiver.sprite.body.velocity.x * timeToPass,
-        y: receiver.sprite.y + receiver.sprite.body.velocity.y * timeToPass,
-      }
-    )
-    const posAfterGivenTime = {
-      x: receiver.sprite.x + receiver.sprite.body.velocity.x * timeToPass,
-      y: receiver.sprite.y + receiver.sprite.body.velocity.y * timeToPass,
-    }
-    const distance = getDistanceBetween(
-      {
-        x: this.sprite.x,
-        y: this.sprite.y,
-      },
-      posAfterGivenTime
-    )
-    const velocityVector = new Phaser.Math.Vector2(0, 0)
-    this.game.physics.velocityFromRotation(angle, distance * (1 / timeToPass), velocityVector)
-    this.hasPossession = false
-    this.game.ball.giveUpPossession()
-    this.stop()
-    this.setState(CourtPlayerState.PASSING)
-    this.game.time.delayedCall(timeToPass * 1000, () => {
-      this.setState(CourtPlayerState.IDLE)
-    })
-
-    // Apply ball changes
-    this.game.ball.ballState = BallState.PASS
-    this.game.ball.sprite.setVisible(true)
-    this.game.ball.sprite.setGravity(0)
-    this.game.ball.sprite.setVelocity(velocityVector.x, velocityVector.y)
-  }
-
-  contestShot() {
-    this.stop()
-    const jumpTime = 0.7
-    const initialX = this.sprite.x
-    const initialY = this.sprite.y
-    this.setState(CourtPlayerState.CONTESTING)
-    createArc(
-      this.sprite,
-      {
-        x: initialX,
-        y: initialY,
-      },
-      jumpTime
-    )
-    this.game.time.delayedCall(jumpTime * 975, () => {
-      this.setState(CourtPlayerState.IDLE)
-      this.landAfterJumping()
-    })
+    const state = this.getCurrState().key
+    return state !== States.SHOOTING && !this.game.isChangingPossession
   }
 
   losePossessionOfBall() {
@@ -250,13 +216,14 @@ export class CourtPlayer {
     }
   }
 
+  setState(state: States, ...enterArgs: any) {
+    this.stateMachine.transition(state, ...enterArgs)
+  }
+
   stop() {
     this.sprite.setFlipX(false)
-    // if the player is currently in their shooting motion
-    if (this.state !== CourtPlayerState.SHOOTING) {
-      this.sprite.setVelocity(0, 0)
-      this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
-    }
+    this.sprite.setVelocity(0, 0)
+    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
   }
 
   setVelocityX(xVelocity: number) {

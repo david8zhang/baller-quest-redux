@@ -1,5 +1,4 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { CourtPlayerAI } from '~/core/CourtPlayerAI'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
 import { State } from '../StateMachine'
@@ -8,12 +7,11 @@ export class DefendManState extends State {
   public manToDefend: CourtPlayer | null = null
   private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
 
-  enter(currPlayer: CourtPlayerAI, team: Team) {
-    const courtPlayer = currPlayer.courtPlayer
-    this.manToDefend = team.getDefensiveAssignmentForPlayer(courtPlayer.playerId)
+  enter(currPlayer: CourtPlayer, team: Team) {
+    this.manToDefend = team.getDefensiveAssignmentForPlayer(currPlayer.playerId)
   }
 
-  execute(currPlayer: CourtPlayerAI): void {
+  execute(currPlayer: CourtPlayer): void {
     if (this.manToDefend) {
       const hoop = Game.instance.hoop
       const line = new Phaser.Geom.Line(
@@ -23,7 +21,7 @@ export class DefendManState extends State {
         hoop.standSprite.y
       )
       const pointToMoveTo = line.getPoint(DefendManState.DEFENSIVE_SPACING_PERCENTAGE)
-      currPlayer.courtPlayer.moveTowards(pointToMoveTo)
+      currPlayer.moveTowards(pointToMoveTo)
     }
   }
 }

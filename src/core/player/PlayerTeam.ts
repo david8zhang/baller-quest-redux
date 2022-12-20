@@ -1,18 +1,16 @@
 import Game from '~/scenes/Game'
 import { getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
-import { CourtPlayerAI } from '../CourtPlayerAI'
 import { Cursor } from '../Cursor'
-import { DefendManState } from '../states/defense/DefendManState'
 import { States } from '../states/States'
 import { Team } from '../Team'
-import { FriendlyPlayerAI } from './FriendlyPlayerAI'
 import { PlayerConstants } from './PlayerConstants'
+import { PlayerCourtPlayer } from './PlayerCourtPlayer'
 import { SprintMeter } from './SprintMeter'
 
 export class PlayerTeam extends Team {
   private selectedCourtPlayer!: CourtPlayer
-  public players: FriendlyPlayerAI[] = []
+  public players: CourtPlayer[] = []
   private selectedCourtPlayerCursor: Cursor
   private passCursor: Cursor
 
@@ -48,7 +46,7 @@ export class PlayerTeam extends Team {
       switch (e.code) {
         case 'KeyS': {
           if (this.selectedCourtPlayer.canShootBall()) {
-            this.selectedCourtPlayer.shoot()
+            this.selectedCourtPlayer.setState(States.SHOOTING)
           }
           break
         }
@@ -60,11 +58,11 @@ export class PlayerTeam extends Team {
           if (this.passCursor.selectedCourtPlayer) {
             // If the currently selected player has the ball, pass it. Otherwise, switch player
             if (this.selectedCourtPlayer.canPassBall()) {
-              this.selectedCourtPlayer.passBall(this.passCursor.selectedCourtPlayer)
-            } else {
-              this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
+              this.selectedCourtPlayer.setState(States.PASSING, this.passCursor.selectedCourtPlayer)
             }
+            this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
           }
+          break
         }
       }
     })
@@ -74,16 +72,12 @@ export class PlayerTeam extends Team {
     return this.game.cpu
   }
 
-  public getEnemyAIs(): CourtPlayerAI[] {
-    return this.game.cpu.players
-  }
-
   callForScreen() {
     const highlightedPlayer = this.getHighlightedPlayer()
-    this.players.forEach((courtPlayerAI: FriendlyPlayerAI) => {
-      if (courtPlayerAI.courtPlayer === highlightedPlayer) {
-        courtPlayerAI.isPlayerCommandOverride = true
-        courtPlayerAI.setState(States.SET_SCREEN)
+    this.players.forEach((courtPlayer: CourtPlayer) => {
+      if (courtPlayer === highlightedPlayer) {
+        ;(courtPlayer as PlayerCourtPlayer).isPlayerCommandOverride = true
+        courtPlayer.setState(States.SET_SCREEN)
       }
     })
   }
@@ -113,13 +107,13 @@ export class PlayerTeam extends Team {
   }
 
   getCourtPlayers() {
-    return this.players.map((p) => p.courtPlayer)
+    return this.players
   }
 
   setupPlayers() {
     Object.keys(PlayerConstants.OFFENSE_POSITIONS_PLAYER).forEach(
       (playerId: string, index: number) => {
-        const newPlayer = new CourtPlayer(this.game, {
+        const newPlayer = new PlayerCourtPlayer(this.game, {
           position: {
             x: 0,
             y: 0,
@@ -127,14 +121,14 @@ export class PlayerTeam extends Team {
           side: Side.PLAYER,
           tint: 0x00ff00,
           playerId,
+          team: this,
         })
         if (index === 0) {
           this.selectedCourtPlayer = newPlayer
           this.selectedCourtPlayer.getPossessionOfBall()
           this.selectedCourtPlayerCursor.selectCourtPlayer(this.selectedCourtPlayer)
         }
-        const friendlyPlayerAI = new FriendlyPlayerAI(newPlayer, this)
-        this.players.push(friendlyPlayerAI)
+        this.players.push(newPlayer)
         this.game.playerCourtPlayers.add(newPlayer.sprite)
       }
     )

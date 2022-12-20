@@ -1,0 +1,26 @@
+import { CourtPlayer } from '~/core/CourtPlayer'
+import { Team } from '~/core/Team'
+import Game from '~/scenes/Game'
+import { State } from '../StateMachine'
+
+export class SwitchDefenseState extends State {
+  private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
+
+  execute(currPlayer: CourtPlayer, team: Team) {
+    const currBallHandler = team.game.ball.playerWithBall
+    if (currBallHandler) {
+      // Have the current player defend the screen handler
+      const hoop = Game.instance.hoop
+      const line = new Phaser.Geom.Line(
+        currBallHandler.sprite.x,
+        currBallHandler.sprite.y,
+        hoop.standSprite.x,
+        hoop.standSprite.y
+      )
+      const pointToMoveTo = line.getPoint(SwitchDefenseState.DEFENSIVE_SPACING_PERCENTAGE)
+      currPlayer.moveTowards(pointToMoveTo)
+    } else {
+      currPlayer.stop()
+    }
+  }
+}

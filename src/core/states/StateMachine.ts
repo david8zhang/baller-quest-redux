@@ -36,7 +36,9 @@ export class StateMachine {
       this.state = this.initialState
       this.possibleStates[this.state].enter(...this.stateArgs)
     }
-    this.possibleStates[this.state].execute(...this.stateArgs)
+    if (this.possibleStates[this.state]) {
+      this.possibleStates[this.state].execute(...this.stateArgs)
+    }
   }
 
   transition(newState: string, ...enterArgs: any[]) {
@@ -44,7 +46,9 @@ export class StateMachine {
       this.possibleStates[this.state].exit(...this.stateArgs, ...enterArgs)
     }
     this.state = newState
-    this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs)
+    if (this.possibleStates[this.state]) {
+      this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs)
+    }
   }
 }
 

@@ -1,15 +1,12 @@
 import Game from '~/scenes/Game'
 import { Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
-import { CourtPlayerAI } from '../CourtPlayerAI'
-import { DefendManState } from '../states/defense/DefendManState'
-import { States } from '../states/States'
 import { Team } from '../Team'
 import { CPUConstants } from './CPUConstants'
-import { CPUPlayerAI } from './CPUPlayerAI'
+import { CPUCourtPlayer } from './CPUCourtPlayer'
 
 export class CPUTeam extends Team {
-  public players: CPUPlayerAI[] = []
+  public players: CPUCourtPlayer[] = []
 
   constructor(game: Game) {
     super(game, Side.CPU)
@@ -30,17 +27,12 @@ export class CPUTeam extends Team {
   }
 
   public getCourtPlayers() {
-    return this.players.map((p) => p.courtPlayer)
+    return this.players
   }
 
   public getOtherTeamCourtPlayers() {
     return this.game.player.getCourtPlayers()
   }
-
-  public getEnemyAIs(): CourtPlayerAI[] {
-    return this.game.player.players
-  }
-
   public getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null {
     const otherTeamPlayers = this.getOtherTeamCourtPlayers()
     const playerToDefendId = CPUConstants.DEFENSIVE_ASSIGNMENTS[playerId]
@@ -53,7 +45,7 @@ export class CPUTeam extends Team {
 
   private setupPlayers() {
     Object.keys(CPUConstants.DEFENSE_POSITIONS_CPU).forEach((key) => {
-      const player = new CourtPlayer(this.game, {
+      const player = new CPUCourtPlayer(this.game, {
         position: {
           x: 0,
           y: 0,
@@ -61,8 +53,9 @@ export class CPUTeam extends Team {
         side: Side.CPU,
         tint: 0xff0000,
         playerId: key,
+        team: this,
       })
-      this.players.push(new CPUPlayerAI(player, this))
+      this.players.push(player)
       this.game.cpuCourtPlayers.add(player.sprite)
     })
   }
