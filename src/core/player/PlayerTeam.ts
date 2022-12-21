@@ -49,7 +49,6 @@ export class PlayerTeam extends Team {
             const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
             courtPlayer.isPlayerCommandOverride = true
             this.selectedCourtPlayer.setState(States.SHOOTING, (player: PlayerCourtPlayer) => {
-              console.log('called shooting callback')
               player.isPlayerCommandOverride = false
             })
           }
@@ -61,7 +60,6 @@ export class PlayerTeam extends Team {
             if (courtPlayer === highlightedPlayer) {
               ;(courtPlayer as PlayerCourtPlayer).isPlayerCommandOverride = true
               courtPlayer.setState(States.SET_SCREEN, (player: PlayerCourtPlayer) => {
-                console.log('called screen callback')
                 player.isPlayerCommandOverride = false
               })
             }
@@ -78,7 +76,6 @@ export class PlayerTeam extends Team {
                 States.PASSING,
                 this.passCursor.selectedCourtPlayer,
                 (player: PlayerCourtPlayer) => {
-                  console.log('called pass callback')
                   player.isPlayerCommandOverride = false
                 }
               )
