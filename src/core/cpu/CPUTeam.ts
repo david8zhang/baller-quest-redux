@@ -60,6 +60,10 @@ export class CPUTeam extends Team {
     })
   }
 
+  public shouldDunk(): boolean {
+    return false
+  }
+
   update() {
     this.players.forEach((p) => {
       p.update()

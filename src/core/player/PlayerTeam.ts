@@ -41,51 +41,80 @@ export class PlayerTeam extends Team {
     this.setupPlayers()
     super.positionPlayers()
   }
+
+  shouldDunk() {
+    return this.sprintMeter.isSprinting
+  }
+
   setupKeyboardPressListener() {
     this.game.input.keyboard.on('keydown', (e) => {
       switch (e.code) {
         case 'KeyS': {
-          if (this.selectedCourtPlayer.canShootBall()) {
-            const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
-            courtPlayer.isPlayerCommandOverride = true
-            this.selectedCourtPlayer.setState(States.SHOOTING, (player: PlayerCourtPlayer) => {
-              player.isPlayerCommandOverride = false
-            })
+          if (this.selectedCourtPlayer.canDunkBall()) {
+            console.log('Dunking!')
+          } else if (this.selectedCourtPlayer.canLayupBall()) {
+            console.log('Layup!')
+          } else if (this.selectedCourtPlayer.canShootBall()) {
+            console.log('Shooting!')
           }
           break
         }
         case 'KeyQ': {
-          const highlightedPlayer = this.getHighlightedPlayer()
-          this.players.forEach((courtPlayer: CourtPlayer) => {
-            if (courtPlayer === highlightedPlayer) {
-              ;(courtPlayer as PlayerCourtPlayer).isPlayerCommandOverride = true
-              courtPlayer.setState(States.SET_SCREEN, (player: PlayerCourtPlayer) => {
-                player.isPlayerCommandOverride = false
-              })
-            }
-          })
+          this.callForScreen()
           break
         }
         case 'Space': {
-          if (this.passCursor.selectedCourtPlayer) {
-            // If the currently selected player has the ball, pass it. Otherwise, switch player
-            if (this.selectedCourtPlayer.canPassBall()) {
-              const playerCourtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
-              playerCourtPlayer.isPlayerCommandOverride = true
-              this.selectedCourtPlayer.setState(
-                States.PASSING,
-                this.passCursor.selectedCourtPlayer,
-                (player: PlayerCourtPlayer) => {
-                  player.isPlayerCommandOverride = false
-                }
-              )
-            }
-            this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
-          }
+          this.passBall()
           break
         }
       }
     })
+  }
+
+  dunkBall() {
+    const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+    courtPlayer.isPlayerCommandOverride = true
+    this.selectedCourtPlayer.setState(States.LAYUP, (player: PlayerCourtPlayer) => {
+      player.isPlayerCommandOverride = false
+    })
+  }
+
+  shootBall() {
+    const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+    courtPlayer.isPlayerCommandOverride = true
+    this.selectedCourtPlayer.setState(States.SHOOTING, (player: PlayerCourtPlayer) => {
+      player.isPlayerCommandOverride = false
+    })
+  }
+
+  callForScreen() {
+    const highlightedPlayer = this.getHighlightedPlayer()
+    this.players.forEach((courtPlayer: CourtPlayer) => {
+      if (courtPlayer === highlightedPlayer) {
+        ;(courtPlayer as PlayerCourtPlayer).isPlayerCommandOverride = true
+        courtPlayer.setState(States.SET_SCREEN, (player: PlayerCourtPlayer) => {
+          player.isPlayerCommandOverride = false
+        })
+      }
+    })
+  }
+
+  passBall() {
+    if (this.passCursor.selectedCourtPlayer) {
+      // If the currently selected player has the ball, pass it. Otherwise, switch player
+      if (this.selectedCourtPlayer.canPassBall()) {
+        const playerCourtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+        playerCourtPlayer.isPlayerCommandOverride = true
+        this.selectedCourtPlayer.setState(
+          States.PASSING,
+          this.passCursor.selectedCourtPlayer,
+          (player: PlayerCourtPlayer) => {
+            player.isPlayerCommandOverride = false
+          }
+        )
+      }
+      this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
+    }
   }
 
   getOtherTeam(): Team {

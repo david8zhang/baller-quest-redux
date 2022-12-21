@@ -3,6 +3,8 @@ import { CourtPlayer } from './CourtPlayer'
 export const WINDOW_WIDTH = 864
 export const WINDOW_HEIGHT = 640
 
+export const LAYUP_DISTANCE = 180
+
 export enum Side {
   PLAYER = 'PLAYER',
   CPU = 'CPU',

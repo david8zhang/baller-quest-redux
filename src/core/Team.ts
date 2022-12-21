@@ -20,6 +20,7 @@ export abstract class Team {
 
   public abstract getOffensivePositions(): { [key: string]: { row: number; col: number } }
   public abstract getDefensivePositions(): { [key: string]: { row: number; col: number } }
+  public abstract shouldDunk(): boolean
   public abstract update(): void
 
   public abstract getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null

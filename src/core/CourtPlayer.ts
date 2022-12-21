@@ -3,6 +3,7 @@ import { BallState } from './Ball'
 import {
   COURT_PLAYER_SPEED,
   getDistanceBetween,
+  LAYUP_DISTANCE,
   OFFBALL_ANIMS,
   ONBALL_ANIMS,
   Side,
@@ -52,6 +53,7 @@ export class CourtPlayer {
   protected team: Team
   protected decisionTree!: TreeNode
   protected blackboard: Blackboard
+  protected raycastIntersectRect: Phaser.Geom.Rectangle
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -72,6 +74,7 @@ export class CourtPlayer {
     this.sprite.setData('ref', this)
     this.sprite.setCollideWorldBounds(true)
 
+    this.raycastIntersectRect = new Phaser.Geom.Rectangle(this.sprite.x, this.sprite.y, 48, 64)
     this.team = team
     this.stateMachine = new StateMachine(
       States.IDLE,
@@ -96,6 +99,32 @@ export class CourtPlayer {
       .setDepth(SORT_ORDER.ui)
     this.blackboard = new Blackboard()
     this.setupDecisionTree()
+  }
+
+  canDunkBall() {
+    return this.canLayupBall() && this.team.shouldDunk()
+  }
+
+  canLayupBall() {
+    const distanceToHoop = Phaser.Math.Distance.Between(
+      this.sprite.x,
+      this.sprite.y,
+      Game.instance.hoop.standSprite.x,
+      Game.instance.hoop.standSprite.y
+    )
+    const lineToHoop = new Phaser.Geom.Line(
+      this.sprite.x,
+      this.sprite.y,
+      Game.instance.hoop.standSprite.x,
+      Game.instance.hoop.standSprite.y
+    )
+    let intersectsWithDefender = false
+    this.team.getOtherTeamCourtPlayers().forEach((p: CourtPlayer) => {
+      if (Phaser.Geom.Intersects.LineToRectangle(lineToHoop, p.raycastIntersectRect)) {
+        intersectsWithDefender = true
+      }
+    })
+    return distanceToHoop <= LAYUP_DISTANCE && !intersectsWithDefender
   }
 
   setupDecisionTree() {
@@ -170,6 +199,10 @@ export class CourtPlayer {
   }
 
   public update() {
+    this.raycastIntersectRect.setPosition(
+      this.sprite.x - this.raycastIntersectRect.width / 2,
+      this.sprite.y - 15
+    )
     this.stateText.setText(this.stateMachine.getState())
     this.stateText.setPosition(
       this.x - this.stateText.displayWidth / 2,
