@@ -51,11 +51,11 @@ export class PlayerTeam extends Team {
       switch (e.code) {
         case 'KeyS': {
           if (this.selectedCourtPlayer.canDunkBall()) {
-            console.log('Dunking!')
+            this.dunkBall()
           } else if (this.selectedCourtPlayer.canLayupBall()) {
-            console.log('Layup!')
+            this.layupBall()
           } else if (this.selectedCourtPlayer.canShootBall()) {
-            console.log('Shooting!')
+            this.shootBall()
           }
           break
         }
@@ -71,10 +71,18 @@ export class PlayerTeam extends Team {
     })
   }
 
-  dunkBall() {
+  layupBall() {
     const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
     courtPlayer.isPlayerCommandOverride = true
     this.selectedCourtPlayer.setState(States.LAYUP, (player: PlayerCourtPlayer) => {
+      player.isPlayerCommandOverride = false
+    })
+  }
+
+  dunkBall() {
+    const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+    courtPlayer.isPlayerCommandOverride = true
+    this.selectedCourtPlayer.setState(States.DUNK, (player: PlayerCourtPlayer) => {
       player.isPlayerCommandOverride = false
     })
   }
@@ -101,6 +109,7 @@ export class PlayerTeam extends Team {
 
   passBall() {
     if (this.passCursor.selectedCourtPlayer) {
+      const passRecipient = this.passCursor.selectedCourtPlayer
       // If the currently selected player has the ball, pass it. Otherwise, switch player
       if (this.selectedCourtPlayer.canPassBall()) {
         const playerCourtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
@@ -110,10 +119,10 @@ export class PlayerTeam extends Team {
           this.passCursor.selectedCourtPlayer,
           (player: PlayerCourtPlayer) => {
             player.isPlayerCommandOverride = false
+            this.setSelectedCourtPlayer(passRecipient)
           }
         )
       }
-      this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer)
     }
   }
 

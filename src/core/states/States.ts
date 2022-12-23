@@ -9,4 +9,5 @@ export enum States {
   CONTEST_SHOT = 'ContestShot',
   PASSING = 'Passing',
   LAYUP = 'Layup',
+  DUNK = 'Dunk',
 }

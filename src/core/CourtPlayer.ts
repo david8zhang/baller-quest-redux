@@ -22,11 +22,13 @@ import { DefendManState } from './states/defense/DefendManState'
 import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
 import { IdleState } from './states/IdleState'
 import { ContestShotState } from './states/offense/ContestShotState'
+import { DunkState } from './states/offense/DunkState'
 import { GoBackToSpotState } from './states/offense/GoBackToSpotState'
+import { LayupState } from './states/offense/LayupState'
 import { PassingState } from './states/offense/PassingState'
 import { SetScreenState } from './states/offense/SetScreenState'
 import { ShootingState } from './states/offense/ShootingState'
-import { StateMachine } from './states/StateMachine'
+import { State, StateMachine } from './states/StateMachine'
 import { States } from './states/States'
 import { Team } from './Team'
 
@@ -88,6 +90,8 @@ export class CourtPlayer {
         [States.PASSING]: new PassingState(),
         [States.SHOOTING]: new ShootingState(),
         [States.CONTEST_SHOT]: new ContestShotState(),
+        [States.LAYUP]: new LayupState(),
+        [States.DUNK]: new DunkState(),
       },
       [this, this.team]
     )
@@ -102,7 +106,8 @@ export class CourtPlayer {
   }
 
   canDunkBall() {
-    return this.canLayupBall() && this.team.shouldDunk()
+    const state = this.getCurrState().key
+    return this.canLayupBall() && this.team.shouldDunk() && state !== States.DUNK
   }
 
   canLayupBall() {
@@ -124,7 +129,8 @@ export class CourtPlayer {
         intersectsWithDefender = true
       }
     })
-    return distanceToHoop <= LAYUP_DISTANCE && !intersectsWithDefender
+    const currState = this.getCurrState().key
+    return distanceToHoop <= LAYUP_DISTANCE && !intersectsWithDefender && currState !== States.LAYUP
   }
 
   setupDecisionTree() {
@@ -226,8 +232,9 @@ export class CourtPlayer {
   }
 
   canMove() {
-    const state = this.getCurrState().key
-    return state !== States.SHOOTING && !this.game.isChangingPossession
+    const immovableStates: States[] = [States.SHOOTING, States.LAYUP, States.DUNK]
+    const state = this.getCurrState().key as States
+    return !immovableStates.includes(state) && !this.game.isChangingPossession
   }
 
   losePossessionOfBall() {

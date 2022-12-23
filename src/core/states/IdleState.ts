@@ -4,7 +4,6 @@ import { State } from './StateMachine'
 
 export class IdleState extends State {
   enter(currPlayer: CourtPlayer) {
-    currPlayer.stop()
     currPlayer.sprite.setVelocity(0, 0)
     currPlayer.sprite.setGravityY(0)
     currPlayer.sprite.anims.play(
