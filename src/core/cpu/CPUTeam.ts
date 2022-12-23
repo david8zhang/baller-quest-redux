@@ -60,6 +60,10 @@ export class CPUTeam extends Team {
     })
   }
 
+  public getPlayerToReceiveBallOnNewPossession(): CourtPlayer {
+    return this.players.find((p) => p.playerId === CPUConstants.NEW_POSSESSION_PLAYER_ID)!
+  }
+
   public shouldDunk(): boolean {
     return false
   }

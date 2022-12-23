@@ -1,3 +1,4 @@
+import { BallState } from '~/core/Ball'
 import { createArc, SORT_ORDER } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
@@ -18,20 +19,25 @@ export class DunkState extends State {
       jumpDuration
     )
     currPlayer.sprite.setDepth(SORT_ORDER.ui)
+    currPlayer.sprite.body.checkCollision.none = true
     Game.instance.time.delayedCall(975 * jumpDuration, () => {
+      Game.instance.cameras.main.shake(150, 0.005)
       currPlayer.stop()
       currPlayer.sprite.setGravityY(0)
+      currPlayer.hasPossession = false
+      Game.instance.ball.giveUpPossession()
+      Game.instance.ball.ballState = BallState.DUNK
+
       Game.instance.time.delayedCall(100, () => {
         currPlayer.sprite.setGravityY(980)
         Game.instance.time.delayedCall(350, () => {
           if (onComplete) {
+            currPlayer.sprite.body.checkCollision.none = false
             onComplete(currPlayer)
           }
           currPlayer.setState(States.IDLE)
         })
       })
-
-      Game.instance.cameras.main.shake(150, 0.005)
     })
   }
 }

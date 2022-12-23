@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { Ball } from '~/core/Ball'
-import { SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
+import { Side, SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
 import { Court } from '~/core/Court'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { createPlayerAnims } from '~/core/CourtPlayerAnims'
@@ -83,7 +83,7 @@ export default class Game extends Phaser.Scene {
     this.physics.add.collider(this.playerCourtPlayers, this.cpuCourtPlayers)
   }
 
-  handleChangePossession() {
+  handleChangePossession(prevSideWithPossession: Side) {
     this.player.getCourtPlayers().forEach((player) => {
       player.stop()
     })
@@ -92,13 +92,16 @@ export default class Game extends Phaser.Scene {
     })
     this.isChangingPossession = true
     this.changingPossessionOverlay.setVisible(true)
-    const sideWithPossession = this.ball.playerWithBall ? this.ball.playerWithBall.side : ''
-    this.changingPossessionText.setText(`${sideWithPossession} BALL!`).setVisible(true)
+    const newSideWithPossession = prevSideWithPossession === Side.CPU ? Side.PLAYER : Side.CPU
+    const newTeamWithPossession = newSideWithPossession === Side.CPU ? this.cpu : this.player
+
+    this.changingPossessionText.setText(`${newSideWithPossession} BALL!`).setVisible(true)
     this.changingPossessionText.setPosition(
       WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
       WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
     )
     this.time.delayedCall(5000, () => {
+      newTeamWithPossession.handleNewPossession()
       this.resetPositioning()
     })
   }

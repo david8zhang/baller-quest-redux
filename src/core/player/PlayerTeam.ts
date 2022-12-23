@@ -241,6 +241,10 @@ export class PlayerTeam extends Team {
     }
   }
 
+  public getPlayerToReceiveBallOnNewPossession(): CourtPlayer {
+    return this.players.find((p) => p.playerId === PlayerConstants.NEW_POSSESSION_PLAYER_ID)!
+  }
+
   updatePassCursor() {
     const closestPlayer = getClosestPlayer(this.selectedCourtPlayer, this.getCourtPlayers())
     this.passCursor.selectCourtPlayer(closestPlayer)

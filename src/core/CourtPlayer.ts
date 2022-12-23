@@ -28,7 +28,7 @@ import { LayupState } from './states/offense/LayupState'
 import { PassingState } from './states/offense/PassingState'
 import { SetScreenState } from './states/offense/SetScreenState'
 import { ShootingState } from './states/offense/ShootingState'
-import { State, StateMachine } from './states/StateMachine'
+import { StateMachine } from './states/StateMachine'
 import { States } from './states/States'
 import { Team } from './Team'
 
@@ -107,16 +107,27 @@ export class CourtPlayer {
 
   canDunkBall() {
     const state = this.getCurrState().key
-    return this.canLayupBall() && this.team.shouldDunk() && state !== States.DUNK
+    return (
+      !this.hasDefenderInFront() &&
+      this.withinDunkOrLayupRange() &&
+      this.team.shouldDunk() &&
+      this.hasPossession &&
+      state !== States.LAYUP &&
+      state !== States.DUNK
+    )
   }
 
-  canLayupBall() {
+  withinDunkOrLayupRange() {
     const distanceToHoop = Phaser.Math.Distance.Between(
       this.sprite.x,
       this.sprite.y,
       Game.instance.hoop.standSprite.x,
       Game.instance.hoop.standSprite.y
     )
+    return distanceToHoop <= LAYUP_DISTANCE
+  }
+
+  hasDefenderInFront() {
     const lineToHoop = new Phaser.Geom.Line(
       this.sprite.x,
       this.sprite.y,
@@ -129,8 +140,18 @@ export class CourtPlayer {
         intersectsWithDefender = true
       }
     })
+    return intersectsWithDefender
+  }
+
+  canLayupBall() {
     const currState = this.getCurrState().key
-    return distanceToHoop <= LAYUP_DISTANCE && !intersectsWithDefender && currState !== States.LAYUP
+    return (
+      !this.hasDefenderInFront() &&
+      this.withinDunkOrLayupRange() &&
+      this.hasPossession &&
+      currState !== States.LAYUP &&
+      currState !== States.DUNK
+    )
   }
 
   setupDecisionTree() {
@@ -252,7 +273,7 @@ export class CourtPlayer {
     this.game.ball.playerWithBall = this
     const prevPlayerWithBall = this.game.ball.prevPlayerWithBall
     if (prevPlayerWithBall && prevPlayerWithBall.side !== this.side) {
-      this.game.handleChangePossession()
+      this.game.handleChangePossession(prevPlayerWithBall.side)
     }
   }
 

@@ -7,7 +7,7 @@ import { States } from './states/States'
 export abstract class Team {
   public game: Game
   public side: Side
-  public playerAI: CourtPlayer[] = []
+  public players: CourtPlayer[] = []
 
   constructor(game: Game, side: Side) {
     this.game = game
@@ -17,6 +17,7 @@ export abstract class Team {
   public abstract getCourtPlayers(): CourtPlayer[]
   public abstract getOtherTeamCourtPlayers(): CourtPlayer[]
   public abstract getOtherTeam(): Team
+  public abstract getPlayerToReceiveBallOnNewPossession(): CourtPlayer
 
   public abstract getOffensivePositions(): { [key: string]: { row: number; col: number } }
   public abstract getDefensivePositions(): { [key: string]: { row: number; col: number } }
@@ -24,6 +25,14 @@ export abstract class Team {
   public abstract update(): void
 
   public abstract getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null
+
+  public handleNewPossession() {
+    this.players.forEach((p) => {
+      p.hasPossession = false
+    })
+    const playerToReceiveBall = this.getPlayerToReceiveBallOnNewPossession()
+    playerToReceiveBall.getPossessionOfBall()
+  }
 
   public getDefenderForPlayer(player: CourtPlayer): CourtPlayer | null {
     const enemyPlayers = this.getOtherTeamCourtPlayers()

@@ -38,7 +38,7 @@ export class ShootingState extends State {
     ball.show()
     Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
 
-    const isMiss = Phaser.Math.Between(0, 100) > 0
+    const isMiss = Phaser.Math.Between(0, 100) < -1
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT

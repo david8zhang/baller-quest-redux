@@ -5,6 +5,8 @@ export class CPUConstants {
     cpu3: 'player3',
   }
 
+  public static NEW_POSSESSION_PLAYER_ID = 'cpu1'
+
   public static OFFENSE_POSITIONS_CPU = {
     cpu1: {
       row: 17,

@@ -1,5 +1,5 @@
 import { BallState } from '~/core/Ball'
-import { createArc } from '~/core/Constants'
+import { createArc, SORT_ORDER } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -19,6 +19,7 @@ export class LayupState extends State {
       },
       jumpDuration
     )
+    currPlayer.sprite.setDepth(SORT_ORDER.ui)
     Game.instance.time.delayedCall(975 * jumpDuration * 0.5, () => {
       currPlayer.hasPossession = false
       Game.instance.ball.giveUpPossession()
@@ -26,6 +27,7 @@ export class LayupState extends State {
     })
     Game.instance.time.delayedCall(975 * jumpDuration, () => {
       if (onComplete) {
+        currPlayer.sprite.body.checkCollision.none = false
         onComplete(currPlayer)
       }
       currPlayer.setState(States.IDLE)
@@ -37,7 +39,7 @@ export class LayupState extends State {
     ball.show()
     Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
 
-    const isMiss = Phaser.Math.Between(0, 100) > 0
+    const isMiss = Phaser.Math.Between(0, 100) < -1
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT

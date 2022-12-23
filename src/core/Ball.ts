@@ -15,6 +15,8 @@ export enum BallState {
   LOOSE = 'LOOSE',
   DRIBBLING = 'DRIBBLING',
   PASS = 'PASS',
+  DUNK = 'DUNK',
+  POST_MADE_SHOT = 'POST_MADE_SHOT',
 }
 
 export class Ball {
@@ -24,6 +26,7 @@ export class Ball {
   public prevPlayerWithBall: CourtPlayer | null = null
   public playerWithBall: CourtPlayer | null = null
   public floorCollider!: Phaser.Physics.Arcade.Collider
+  public ballStateText: Phaser.GameObjects.Text
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -36,10 +39,22 @@ export class Ball {
     this.sprite.body.setSize(5, 5)
     this.setupHoopCollider()
     this.sprite.setCollideWorldBounds(true)
+    this.ballStateText = this.game.add
+      .text(this.sprite.x, this.sprite.y, this.ballState, {
+        fontSize: '12px',
+        color: 'black',
+      })
+      .setDepth(SORT_ORDER.ui)
   }
 
   handlePlayerCollision() {
-    this.floorCollider.active = false
+    if (
+      this.ballState !== BallState.DUNK &&
+      this.ballState !== BallState.POST_MADE_SHOT &&
+      this.ballState !== BallState.MADE_SHOT
+    ) {
+      this.floorCollider.active = false
+    }
   }
 
   giveUpPossession() {
@@ -48,15 +63,31 @@ export class Ball {
   }
 
   setupHoopCollider() {
-    this.floorCollider = this.game.physics.add.collider(this.game.hoop.floorSprite, this.sprite)
+    this.floorCollider = this.game.physics.add.collider(
+      this.game.hoop.floorSprite,
+      this.sprite,
+      () => {
+        if (this.ballState === BallState.DUNK || this.ballState === BallState.MADE_SHOT) {
+          this.ballState = BallState.POST_MADE_SHOT
+          this.game.handleChangePossession(this.prevPlayerWithBall!.side)
+        }
+      }
+    )
     this.floorCollider.active = false
     this.game.physics.add.overlap(this.sprite, this.game.hoop.rimSprite, (obj1, obj2) => {
+      // If the ball was dunked
+      if (this.ballState == BallState.DUNK) {
+        this.show()
+        this.sprite.setVelocityY(100)
+        this.sprite.setGravityY(980)
+        this.floorCollider.active = true
+      }
+
       // Check if ball is falling downward
       if (this.sprite.body.velocity.y > 0) {
         if (this.ballState === BallState.MADE_SHOT) {
-          this.ballState = BallState.LOOSE
-          this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.5)
-          this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.5)
+          this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.8)
+          this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.9)
         } else if (this.ballState === BallState.MISSED_SHOT) {
           // Rebound
           this.ballState = BallState.LOOSE
@@ -90,6 +121,13 @@ export class Ball {
   update() {
     if (this.playerWithBall) {
       this.sprite.setPosition(this.playerWithBall.sprite.x, this.playerWithBall.sprite.y)
+      // this.ballStateText.setVisible(false)
     }
+    this.ballStateText.setVisible(true)
+    this.ballStateText.setText(this.ballState)
+    this.ballStateText.setPosition(
+      this.sprite.x - this.ballStateText.displayWidth / 2,
+      this.sprite.y - this.ballStateText.displayHeight - 10
+    )
   }
 }

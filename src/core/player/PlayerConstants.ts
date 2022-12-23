@@ -5,6 +5,8 @@ export class PlayerConstants {
     player3: 'cpu3',
   }
 
+  public static NEW_POSSESSION_PLAYER_ID = 'player1'
+
   public static DEFENSE_POSITIONS_PLAYER = {
     player1: {
       row: 14,
