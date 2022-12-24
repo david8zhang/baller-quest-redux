@@ -31,6 +31,7 @@ export abstract class Team {
       p.hasPossession = false
     })
     const playerToReceiveBall = this.getPlayerToReceiveBallOnNewPossession()
+    Game.instance.ball.prevPlayerWithBall = null
     playerToReceiveBall.getPossessionOfBall()
   }
 

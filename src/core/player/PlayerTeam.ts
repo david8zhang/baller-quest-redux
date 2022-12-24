@@ -64,7 +64,11 @@ export class PlayerTeam extends Team {
           break
         }
         case 'Space': {
-          this.passBall()
+          if (this.selectedCourtPlayer.canPassBall()) {
+            this.passBall()
+          } else {
+            this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer!)
+          }
           break
         }
       }
@@ -167,7 +171,7 @@ export class PlayerTeam extends Team {
             y: 0,
           },
           side: Side.PLAYER,
-          tint: 0x00ff00,
+          // tint: 0x00ff00,
           playerId,
           team: this,
         })

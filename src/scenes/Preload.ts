@@ -9,6 +9,11 @@ export class Preload extends Phaser.Scene {
     this.load.image('hoop-stand', 'hoop-stand.png')
     this.load.image('ball', 'ball.png')
 
+    // Dunk animations
+    this.load.image('dunk-arm-out', 'animations/dunk-front/dunk-arm-out.png')
+    this.load.image('dunk-finish', 'animations/dunk-front/dunk-finish.png')
+    this.load.image('dunk-wind-up', 'animations/dunk-front/dunk-wind-up.png')
+
     // Layup animations
     this.load.image('layup-gather', 'animations/layup-front/layup-gather.png')
     this.load.image('layup-arm-out', 'animations/layup-front/layup-arm-out.png')
