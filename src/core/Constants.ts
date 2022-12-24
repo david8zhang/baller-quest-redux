@@ -41,13 +41,13 @@ export const SORT_ORDER = {
 }
 
 export const OFFBALL_ANIMS = {
-  idle: 'idle',
-  run: 'run',
+  idle: 'idle-front',
+  run: 'run-side',
 }
 
 export const ONBALL_ANIMS = {
   idle: 'dribble-front',
-  run: 'run-with-ball',
+  run: 'run-with-ball-side',
 }
 
 export const getClosestPlayer = (src: CourtPlayer, courtPlayers: CourtPlayer[]): CourtPlayer => {

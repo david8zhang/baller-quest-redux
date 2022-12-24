@@ -11,7 +11,7 @@ export class DunkState extends State {
     const hoop = Game.instance.hoop.rimSprite
     const ball = Game.instance.ball
     currPlayer.sprite.anims.stop()
-    currPlayer.sprite.setTexture('dunk-arm-out')
+    currPlayer.sprite.setTexture('dunk-arm-out-front')
     const jumpDuration = 0.75
     createArc(
       currPlayer.sprite,
@@ -25,7 +25,7 @@ export class DunkState extends State {
     currPlayer.sprite.body.checkCollision.none = true
 
     Game.instance.time.delayedCall(975 * jumpDuration * 0.5, () => {
-      currPlayer.sprite.setTexture('dunk-wind-up')
+      currPlayer.sprite.setTexture('dunk-wind-up-front')
     })
 
     Game.instance.time.delayedCall(975 * jumpDuration, () => {
@@ -37,7 +37,7 @@ export class DunkState extends State {
       ball.setPosition(hoop.x, hoop.y)
       ball.sprite.setVelocityX(0)
       ball.ballState = BallState.DUNK
-      currPlayer.sprite.setTexture('dunk-finish')
+      currPlayer.sprite.setTexture('dunk-finish-front')
 
       Game.instance.time.delayedCall(300, () => {
         currPlayer.sprite.setGravityY(980)

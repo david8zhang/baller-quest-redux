@@ -9,39 +9,58 @@ export class Preload extends Phaser.Scene {
     this.load.image('hoop-stand', 'hoop-stand.png')
     this.load.image('ball', 'ball.png')
 
-    // Dunk animations
-    this.load.image('dunk-arm-out', 'animations/dunk-front/dunk-arm-out.png')
-    this.load.image('dunk-finish', 'animations/dunk-front/dunk-finish.png')
-    this.load.image('dunk-wind-up', 'animations/dunk-front/dunk-wind-up.png')
+    this.loadDunkAnimations()
+    this.loadLayupAnimations()
+    this.loadShootAnimations()
+    this.loadDribbleAnimations()
+    this.loadIdleAnimations()
+    this.loadRunAnimations()
+  }
 
-    // Layup animations
-    this.load.image('layup-gather', 'animations/layup-front/layup-gather.png')
-    this.load.image('layup-arm-out', 'animations/layup-front/layup-arm-out.png')
-    this.load.image('layup-flick', 'animations/layup-front/layup-flick.png')
+  loadRunAnimations() {
+    this.load.atlas(
+      'run-side',
+      'animations/run/run-side/run-side.png',
+      'animations/run/run-side/run-side.json'
+    )
+    this.load.atlas(
+      'run-with-ball-side',
+      'animations/run/run-with-ball-side/run-with-ball-side.png',
+      'animations/run/run-with-ball-side/run-with-ball-side.json'
+    )
+  }
 
-    // Shoot animations
-    this.load.image('shoot-jump', 'animations/shoot-front/shoot-jump.png')
-    this.load.image('shoot-flick', 'animations/shoot-front/shoot-flick.png')
-
-    // Dribble animations
+  loadDribbleAnimations() {
     this.load.atlas(
       'dribble-front',
-      'animations/dribble-front/dribble-front.png',
-      'animations/dribble-front/dribble-front.json'
+      'animations/dribble/dribble-front/dribble-front.png',
+      'animations/dribble/dribble-front/dribble-front.json'
     )
+  }
 
-    // Idle animations
-    this.load.atlas('idle', 'animations/idle/idle.png', 'animations/idle/idle.json')
+  loadShootAnimations() {
+    this.load.image('shoot-jump-front', 'animations/shoot/shoot-front/shoot-jump-front.png')
+    this.load.image('shoot-flick-front', 'animations/shoot/shoot-front/shoot-flick-front.png')
+  }
 
-    // Run with ball animations
+  loadDunkAnimations() {
+    this.load.image('dunk-arm-out-front', 'animations/dunk/dunk-front/dunk-arm-out-front.png')
+    this.load.image('dunk-finish-front', 'animations/dunk/dunk-front/dunk-finish-front.png')
+    this.load.image('dunk-wind-up-front', 'animations/dunk/dunk-front/dunk-wind-up-front.png')
+  }
+
+  loadIdleAnimations() {
     this.load.atlas(
-      'run-with-ball',
-      'animations/run-with-ball/run-with-ball.png',
-      'animations/run-with-ball/run-with-ball.json'
+      'idle-front',
+      'animations/idle/idle-front/idle-front.png',
+      'animations/idle/idle-front/idle-front.json'
     )
+  }
 
-    // Run animations
-    this.load.atlas('run', 'animations/run/run.png', 'animations/run/run.json')
+  loadLayupAnimations() {
+    this.load.image('layup-gather-front', 'animations/layup/layup-front/layup-gather-front.png')
+    this.load.image('layup-arm-out-front', 'animations/layup/layup-front/layup-arm-out-front.png')
+    this.load.image('layup-flick-front', 'animations/layup/layup-front/layup-flick-front.png')
   }
 
   create() {

@@ -16,11 +16,11 @@ export class ShootingState extends State {
     const initialX = currPlayer.sprite.x
     const initialY = currPlayer.sprite.y
     currPlayer.sprite.anims.stop()
-    currPlayer.sprite.setTexture('shoot-jump')
+    currPlayer.sprite.setTexture('shoot-jump-front')
 
     createArc(currPlayer.sprite, { x: initialX, y: initialY }, jumpTime)
     Game.instance.time.delayedCall(jumpTime * 975 * 0.45, () => {
-      currPlayer.sprite.setTexture('shoot-flick')
+      currPlayer.sprite.setTexture('shoot-flick-front')
       Game.instance.ball.giveUpPossession()
       this.launchBallTowardsHoop(currPlayer)
     })

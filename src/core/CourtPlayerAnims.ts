@@ -1,7 +1,7 @@
 export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => {
   anims.create({
-    key: 'idle',
-    frames: anims.generateFrameNames('idle', {
+    key: 'idle-front',
+    frames: anims.generateFrameNames('idle-front', {
       start: 0,
       end: 2,
       suffix: '.png',
@@ -22,8 +22,8 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
-    key: 'run-with-ball',
-    frames: anims.generateFrameNames('run-with-ball', {
+    key: 'run-with-ball-side',
+    frames: anims.generateFrameNames('run-with-ball-side', {
       start: 0,
       end: 5,
       suffix: '.png',
@@ -33,8 +33,8 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
-    key: 'run',
-    frames: anims.generateFrameNames('run', {
+    key: 'run-side',
+    frames: anims.generateFrameNames('run-side', {
       start: 0,
       end: 5,
       suffix: '.png',

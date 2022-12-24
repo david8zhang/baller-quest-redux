@@ -66,7 +66,7 @@ export class CourtPlayer {
     this.playerId = playerId
     this.side = side
     this.sprite = this.game.physics.add
-      .sprite(position.x, position.y, 'idle')
+      .sprite(position.x, position.y, 'idle-front')
       .setScale(3)
       .setDebug(true, true, 0x00ff00)
     if (tint) {
