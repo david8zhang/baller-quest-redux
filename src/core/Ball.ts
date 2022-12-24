@@ -78,6 +78,7 @@ export class Ball {
       // If the ball was dunked
       if (this.ballState == BallState.DUNK) {
         this.show()
+        this.sprite.setVelocityX(0)
         this.sprite.setVelocityY(100)
         this.sprite.setGravityY(980)
         this.floorCollider.active = true

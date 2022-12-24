@@ -1,5 +1,5 @@
 import { BallState } from '~/core/Ball'
-import { createArc, SORT_ORDER } from '~/core/Constants'
+import { createArc, Side, SORT_ORDER } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -9,6 +9,8 @@ import { States } from '../States'
 export class DunkState extends State {
   enter(currPlayer: CourtPlayer, team: Team, onComplete?: Function) {
     const hoop = Game.instance.hoop.rimSprite
+    const ball = Game.instance.ball
+
     const jumpDuration = 0.75
     createArc(
       currPlayer.sprite,
@@ -25,16 +27,21 @@ export class DunkState extends State {
       currPlayer.stop()
       currPlayer.sprite.setGravityY(0)
       currPlayer.hasPossession = false
-      Game.instance.ball.giveUpPossession()
-      Game.instance.ball.ballState = BallState.DUNK
+      ball.giveUpPossession()
+      ball.setPosition(hoop.x, hoop.y)
+      ball.sprite.setVelocityX(0)
+      ball.ballState = BallState.DUNK
 
-      Game.instance.time.delayedCall(100, () => {
+      const prevTint = currPlayer.side === Side.PLAYER ? 0x00ff00 : 0xff0000
+      currPlayer.sprite.setTintFill(0xa020f0)
+      Game.instance.time.delayedCall(250, () => {
         currPlayer.sprite.setGravityY(980)
         Game.instance.time.delayedCall(350, () => {
           if (onComplete) {
             currPlayer.sprite.body.checkCollision.none = false
             onComplete(currPlayer)
           }
+          currPlayer.sprite.setTintFill(prevTint)
           currPlayer.setState(States.IDLE)
         })
       })

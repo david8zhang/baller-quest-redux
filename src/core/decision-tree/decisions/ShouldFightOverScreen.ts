@@ -6,21 +6,20 @@ import { BlackboardKeys } from '../BlackboardKeys'
 import { Decision } from '../Decision'
 import { TreeNode } from '../TreeNode'
 
-export class ShouldSwitch extends TreeNode {
+export class ShouldFightOverScreen extends TreeNode {
   constructor(blackboard: Blackboard) {
-    super('ShouldSwitch', blackboard)
+    super('ShouldFightOverScreen', blackboard)
   }
 
   public process(): Decision | States {
     const currPlayer = this.blackboard.getData(BlackboardKeys.CURR_PLAYER) as CourtPlayer
     const team = this.blackboard.getData(BlackboardKeys.CURR_TEAM) as Team
     const manToDefend = team.getDefensiveAssignmentForPlayer(currPlayer.playerId)
-    if (manToDefend && manToDefend.hasPossession) {
-      const enemyTeam = team.getOtherTeam()
-      const isScreening =
-        enemyTeam.getCourtPlayers().find((p) => p.getCurrState().key === States.SET_SCREEN) !==
-        undefined
-      return isScreening ? Decision.PROCEED : Decision.STOP
+    if (manToDefend && manToDefend.getCurrState().key === States.SET_SCREEN) {
+      if (manToDefend.sprite.body.velocity.x === 0 && manToDefend.sprite.body.velocity.y === 0) {
+        return Decision.PROCEED
+      }
+      return Decision.STOP
     }
     return Decision.STOP
   }

@@ -50,7 +50,7 @@ export const ONBALL_ANIMS = {
   run: 'run-with-ball',
 }
 
-export const getClosestPlayer = (src: CourtPlayer, courtPlayers: CourtPlayer[]) => {
+export const getClosestPlayer = (src: CourtPlayer, courtPlayers: CourtPlayer[]): CourtPlayer => {
   let closestPlayer: any = null
   const velocityVector = src.sprite.body.velocity
   let shortestDistance = Number.MAX_SAFE_INTEGER

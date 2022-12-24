@@ -10,7 +10,9 @@ export class LayupState extends State {
   enter(currPlayer: CourtPlayer, team: Team, onComplete?: Function) {
     currPlayer.sprite.body.checkCollision.none = true
     const hoop = Game.instance.hoop.standSprite
-    const jumpDuration = 1
+    const jumpDuration = 0.8
+    currPlayer.sprite.anims.stop()
+    currPlayer.sprite.setTexture('layup-gather')
     createArc(
       currPlayer.sprite,
       {
@@ -20,7 +22,12 @@ export class LayupState extends State {
       jumpDuration
     )
     currPlayer.sprite.setDepth(SORT_ORDER.ui)
+    Game.instance.time.delayedCall(975 * jumpDuration * 0.25, () => {
+      currPlayer.sprite.setTexture('layup-arm-out')
+    })
+
     Game.instance.time.delayedCall(975 * jumpDuration * 0.5, () => {
+      currPlayer.sprite.setTexture('layup-flick')
       currPlayer.hasPossession = false
       Game.instance.ball.giveUpPossession()
       this.launchBallTowardsHoop(currPlayer)
@@ -54,7 +61,7 @@ export class LayupState extends State {
         x: posToLandX,
         y: Game.instance.hoop.rimSprite.y - 20,
       },
-      0.6
+      0.7
     )
   }
 }

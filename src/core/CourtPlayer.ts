@@ -12,6 +12,8 @@ import {
 import { Blackboard } from './decision-tree/Blackboard'
 import { HasPossession } from './decision-tree/decisions/HasPossession'
 import { IsBallLoose } from './decision-tree/decisions/IsBallLoose'
+import { ShouldFightOverScreen } from './decision-tree/decisions/ShouldFightOverScreen'
+import { ShouldSwitch } from './decision-tree/decisions/ShouldSwitch'
 import { LeafNode } from './decision-tree/LeafNode'
 import { PopulateBlackboard } from './decision-tree/PopulateBlackboard'
 import { SelectorNode } from './decision-tree/SelectorNode'
@@ -19,6 +21,7 @@ import { SequenceNode } from './decision-tree/SequenceNode'
 import { TreeNode } from './decision-tree/TreeNode'
 import { ChaseReboundState } from './states/ChaseReboundState'
 import { DefendManState } from './states/defense/DefendManState'
+import { FightOverScreenState } from './states/defense/FightOverScreenState'
 import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
 import { IdleState } from './states/IdleState'
 import { ContestShotState } from './states/offense/ContestShotState'
@@ -86,6 +89,7 @@ export class CourtPlayer {
         [States.CHASE_REBOUND]: new ChaseReboundState(),
         [States.SET_SCREEN]: new SetScreenState(),
         [States.GO_BACK_TO_SPOT]: new GoBackToSpotState(),
+        [States.FIGHT_OVER_SCREEN]: new FightOverScreenState(),
         [States.SWITCH_DEFENSE]: new SwitchDefenseState(),
         [States.PASSING]: new PassingState(),
         [States.SHOOTING]: new ShootingState(),
@@ -172,11 +176,20 @@ export class CourtPlayer {
             new LeafNode('Idle', this.blackboard, States.IDLE),
           ]),
           new SelectorNode(
-            'ShouldSwitchDefense',
+            'ShouldReactToScreen',
             this.blackboard,
-            new SequenceNode('SwitchSequence', this.blackboard, [
-              new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN),
-            ]),
+            new SelectorNode(
+              'ShouldSwitchOrFightOverScreen',
+              this.blackboard,
+              new SequenceNode('FightOverScreenSeq', this.blackboard, [
+                new ShouldFightOverScreen(this.blackboard),
+                new LeafNode('FightOverScreen', this.blackboard, States.FIGHT_OVER_SCREEN),
+              ]),
+              new SequenceNode('SwitchScreenSeq', this.blackboard, [
+                new ShouldSwitch(this.blackboard),
+                new LeafNode('SwitchScreen', this.blackboard, States.SWITCH_DEFENSE),
+              ])
+            ),
             new SequenceNode('NormalDefenseSequence', this.blackboard, [
               new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN),
             ])
@@ -202,7 +215,12 @@ export class CourtPlayer {
 
   canShootBall() {
     const state = this.getCurrState().key
-    return state !== States.SHOOTING && this.hasPossession
+    return (
+      state !== States.DUNK &&
+      state !== States.LAYUP &&
+      state !== States.SHOOTING &&
+      this.hasPossession
+    )
   }
 
   handleBallCollision() {
