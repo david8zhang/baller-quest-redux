@@ -7,7 +7,7 @@ import { States } from '../States'
 
 export class DefendManState extends State {
   public manToDefend: CourtPlayer | null = null
-  public reachedPointTimestamp: number = -1
+  public lastUpdatedTimestamp: number = -1
   private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
 
   enter(currPlayer: CourtPlayer, team: Team) {

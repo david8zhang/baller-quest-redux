@@ -366,7 +366,7 @@ export class CourtPlayer {
   }
 
   moveTowards(target: { x: number; y: number }) {
-    let angle = Phaser.Math.Angle.BetweenPoints(
+    const distance = getDistanceBetween(
       {
         x: this.sprite.x,
         y: this.sprite.y,
@@ -376,10 +376,24 @@ export class CourtPlayer {
         y: target.y,
       }
     )
-    const velocityVector = new Phaser.Math.Vector2()
-    this.game.physics.velocityFromRotation(angle, COURT_PLAYER_SPEED, velocityVector)
-    this.playRunAnimationForVelocity(velocityVector.x, velocityVector.y)
-    this.sprite.setVelocity(velocityVector.x, velocityVector.y)
+    if (Math.abs(distance) < 5) {
+      this.sprite.setVelocity(0, 0)
+    } else {
+      let angle = Phaser.Math.Angle.BetweenPoints(
+        {
+          x: this.sprite.x,
+          y: this.sprite.y,
+        },
+        {
+          x: target.x,
+          y: target.y,
+        }
+      )
+      const velocityVector = new Phaser.Math.Vector2()
+      this.game.physics.velocityFromRotation(angle, COURT_PLAYER_SPEED, velocityVector)
+      this.playRunAnimationForVelocity(velocityVector.x, velocityVector.y)
+      this.sprite.setVelocity(velocityVector.x, velocityVector.y)
+    }
   }
 
   playRunAnimationForVelocity(xVelocity: number, yVelocity: number) {
