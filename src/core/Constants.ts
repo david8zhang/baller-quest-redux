@@ -42,12 +42,22 @@ export const SORT_ORDER = {
 
 export const OFFBALL_ANIMS = {
   idle: 'idle-front',
-  run: 'run-side',
+  run: {
+    [Direction.UP]: 'run-front',
+    [Direction.DOWN]: 'run-front',
+    [Direction.LEFT]: 'run-side',
+    [Direction.RIGHT]: 'run-side',
+  },
 }
 
 export const ONBALL_ANIMS = {
   idle: 'dribble-front',
-  run: 'run-with-ball-side',
+  run: {
+    [Direction.UP]: 'run-with-ball-front',
+    [Direction.DOWN]: 'run-with-ball-front',
+    [Direction.LEFT]: 'run-with-ball-side',
+    [Direction.RIGHT]: 'run-with-ball-side',
+  },
 }
 
 export const getClosestPlayer = (src: CourtPlayer, courtPlayers: CourtPlayer[]): CourtPlayer => {

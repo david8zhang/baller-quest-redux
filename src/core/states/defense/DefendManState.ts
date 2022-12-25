@@ -1,10 +1,13 @@
+import { COURT_PLAYER_SPEED, OFFBALL_ANIMS } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
 import { State } from '../StateMachine'
+import { States } from '../States'
 
 export class DefendManState extends State {
   public manToDefend: CourtPlayer | null = null
+  public reachedPointTimestamp: number = -1
   private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
 
   enter(currPlayer: CourtPlayer, team: Team) {

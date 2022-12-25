@@ -45,6 +45,7 @@ export class Ball {
         color: 'black',
       })
       .setDepth(SORT_ORDER.ui)
+      .setVisible(false)
   }
 
   handlePlayerCollision() {
@@ -122,7 +123,7 @@ export class Ball {
   update() {
     if (this.playerWithBall) {
       this.sprite.setPosition(this.playerWithBall.sprite.x, this.playerWithBall.sprite.y)
-      // this.ballStateText.setVisible(false)
+      this.ballStateText.setVisible(false)
     }
     this.ballStateText.setVisible(true)
     this.ballStateText.setText(this.ballState)

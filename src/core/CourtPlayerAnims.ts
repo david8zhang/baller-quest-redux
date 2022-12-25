@@ -42,4 +42,26 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
     repeat: -1,
     frameRate: 6,
   })
+
+  anims.create({
+    key: 'run-with-ball-front',
+    frames: anims.generateFrameNames('run-with-ball-front', {
+      start: 0,
+      end: 5,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'run-front',
+    frames: anims.generateFrameNames('run-front', {
+      start: 0,
+      end: 5,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
 }

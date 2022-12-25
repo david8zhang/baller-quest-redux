@@ -28,6 +28,16 @@ export class Preload extends Phaser.Scene {
       'animations/run/run-with-ball-side/run-with-ball-side.png',
       'animations/run/run-with-ball-side/run-with-ball-side.json'
     )
+    this.load.atlas(
+      'run-with-ball-front',
+      'animations/run/run-with-ball-front/run-with-ball-front.png',
+      'animations/run/run-with-ball-front/run-with-ball-front.json'
+    )
+    this.load.atlas(
+      'run-front',
+      'animations/run/run-front/run-front.png',
+      'animations/run/run-front/run-front.json'
+    )
   }
 
   loadDribbleAnimations() {

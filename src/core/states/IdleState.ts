@@ -6,9 +6,9 @@ export class IdleState extends State {
   enter(currPlayer: CourtPlayer) {
     currPlayer.sprite.setVelocity(0, 0)
     currPlayer.sprite.setGravityY(0)
-    currPlayer.sprite.anims.play(
-      currPlayer.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle,
-      true
-    )
+    const animToPlay = currPlayer.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle
+    if (currPlayer.sprite.anims.currentAnim.key !== animToPlay) {
+      currPlayer.sprite.anims.play(animToPlay)
+    }
   }
 }

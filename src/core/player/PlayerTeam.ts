@@ -242,6 +242,7 @@ export class PlayerTeam extends Team {
     } else {
       this.selectedCourtPlayer.setVelocityX(velocityX)
       this.selectedCourtPlayer.setVelocityY(velocityY)
+      this.selectedCourtPlayer.playRunAnimationForVelocity(velocityX, velocityY)
     }
   }
 

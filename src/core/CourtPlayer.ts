@@ -22,6 +22,7 @@ import { TreeNode } from './decision-tree/TreeNode'
 import { ChaseReboundState } from './states/ChaseReboundState'
 import { DefendManState } from './states/defense/DefendManState'
 import { FightOverScreenState } from './states/defense/FightOverScreenState'
+import { IsManToDefendMoving } from './states/defense/IsManToDefendMoving'
 import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
 import { IdleState } from './states/IdleState'
 import { ContestShotState } from './states/offense/ContestShotState'
@@ -190,9 +191,15 @@ export class CourtPlayer {
                 new LeafNode('SwitchScreen', this.blackboard, States.SWITCH_DEFENSE),
               ])
             ),
-            new SequenceNode('NormalDefenseSequence', this.blackboard, [
-              new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN),
-            ])
+            new SelectorNode(
+              'NormalDefenseSelector',
+              this.blackboard,
+              new SequenceNode('DefendManSequence', this.blackboard, [
+                new IsManToDefendMoving(this.blackboard),
+                new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN),
+              ]),
+              new LeafNode('Idle', this.blackboard, States.IDLE)
+            )
           )
         )
       ),
@@ -341,14 +348,11 @@ export class CourtPlayer {
   }
 
   setVelocityX(xVelocity: number) {
-    this.sprite.setFlipX(xVelocity > 0)
     this.sprite.setVelocityX(xVelocity)
-    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.run : OFFBALL_ANIMS.run, true)
   }
 
   setVelocityY(yVelocity: number) {
     this.sprite.setVelocityY(yVelocity)
-    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.run : OFFBALL_ANIMS.run, true)
   }
 
   isAtPoint(moveTarget: { x: number; y: number }) {
@@ -362,7 +366,7 @@ export class CourtPlayer {
   }
 
   moveTowards(target: { x: number; y: number }) {
-    const distance = getDistanceBetween(
+    let angle = Phaser.Math.Angle.BetweenPoints(
       {
         x: this.sprite.x,
         y: this.sprite.y,
@@ -372,22 +376,24 @@ export class CourtPlayer {
         y: target.y,
       }
     )
-    if (Math.abs(distance) < 5) {
-      this.sprite.setVelocity(0, 0)
-    } else {
-      let angle = Phaser.Math.Angle.BetweenPoints(
-        {
-          x: this.sprite.x,
-          y: this.sprite.y,
-        },
-        {
-          x: target.x,
-          y: target.y,
-        }
-      )
-      const velocityVector = new Phaser.Math.Vector2()
-      this.game.physics.velocityFromRotation(angle, COURT_PLAYER_SPEED, velocityVector)
-      this.sprite.setVelocity(velocityVector.x, velocityVector.y)
+    const velocityVector = new Phaser.Math.Vector2()
+    this.game.physics.velocityFromRotation(angle, COURT_PLAYER_SPEED, velocityVector)
+    this.playRunAnimationForVelocity(velocityVector.x, velocityVector.y)
+    this.sprite.setVelocity(velocityVector.x, velocityVector.y)
+  }
+
+  playRunAnimationForVelocity(xVelocity: number, yVelocity: number) {
+    this.sprite.setFlipX(xVelocity > 0)
+    if (Math.abs(xVelocity) > Math.abs(yVelocity)) {
+      const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.left : OFFBALL_ANIMS.run.left
+      if (this.sprite.anims.getName() !== animToPlay) {
+        this.sprite.play(animToPlay)
+      }
+    } else if (Math.abs(yVelocity) > Math.abs(xVelocity)) {
+      const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.up : OFFBALL_ANIMS.run.up
+      if (this.sprite.anims.getName() !== animToPlay) {
+        this.sprite.play(animToPlay)
+      }
     }
   }
 }
