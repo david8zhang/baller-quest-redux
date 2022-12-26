@@ -9,22 +9,31 @@ export enum ScreenDirection {
   RIGHT = 'RIGHT',
 }
 
+export interface SetScreenStateConfig {
+  isScreeningCallback: Function
+  onScreenFinishedCallback: Function
+}
+
 export class SetScreenState extends State {
   public startedScreenTimestamp = -1
   public static SCREEN_DURATION = 5000
+
+  public isScreeningCallback: Function | null = null
   public onScreenFinishedCallback: Function | null = null
   public screenPosition!: { x: number; y: number }
 
-  enter(currPlayer: CourtPlayer, team: Team, cb: Function) {
-    if (cb) {
-      this.onScreenFinishedCallback = cb
-    }
+  enter(currPlayer: CourtPlayer, team: Team, config: SetScreenStateConfig) {
+    this.isScreeningCallback = config.isScreeningCallback
+    this.onScreenFinishedCallback = config.onScreenFinishedCallback
   }
 
   execute(currPlayer: CourtPlayer, team: Team, callback?: Function) {
     if (this.startedScreenTimestamp != -1) {
       const currTimestamp = Date.now()
       if (currPlayer.isAtPoint(this.screenPosition)) {
+        if (this.isScreeningCallback) {
+          this.isScreeningCallback()
+        }
         currPlayer.stop()
       }
       if (currTimestamp - this.startedScreenTimestamp > SetScreenState.SCREEN_DURATION) {

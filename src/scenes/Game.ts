@@ -94,6 +94,7 @@ export default class Game extends Phaser.Scene {
     this.changingPossessionOverlay.setVisible(true)
     const newSideWithPossession = prevSideWithPossession === Side.CPU ? Side.PLAYER : Side.CPU
     const newTeamWithPossession = newSideWithPossession === Side.CPU ? this.cpu : this.player
+    const newTeamOnDefense = newSideWithPossession === Side.CPU ? this.player : this.cpu
 
     this.changingPossessionText.setText(`${newSideWithPossession} BALL!`).setVisible(true)
     this.changingPossessionText.setPosition(
@@ -102,6 +103,7 @@ export default class Game extends Phaser.Scene {
     )
     this.time.delayedCall(5000, () => {
       newTeamWithPossession.handleNewPossession()
+      newTeamOnDefense.handleNewDefenseSetup()
       this.resetPositioning()
     })
   }

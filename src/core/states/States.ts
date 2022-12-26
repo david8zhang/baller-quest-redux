@@ -11,4 +11,6 @@ export enum States {
   PASSING = 'Passing',
   LAYUP = 'Layup',
   DUNK = 'Dunk',
+  DRIBBLE_TO_POINT = 'DribbleToPoint',
+  DRIVE_TO_BASKET = 'DriveToBasket',
 }

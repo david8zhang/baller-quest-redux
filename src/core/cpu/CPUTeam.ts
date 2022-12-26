@@ -4,14 +4,19 @@ import { CourtPlayer } from '../CourtPlayer'
 import { Team } from '../Team'
 import { CPUConstants } from './CPUConstants'
 import { CPUCourtPlayer } from './CPUCourtPlayer'
+import { OffensePlay } from './plays/OffensePlay'
+import { PickAndRoll } from './plays/PickAndRoll'
 
 export class CPUTeam extends Team {
   public players: CPUCourtPlayer[] = []
+  public offensePlays: OffensePlay[] = []
+  public currPlay: OffensePlay | null = null
 
   constructor(game: Game) {
     super(game, Side.CPU)
     this.setupPlayers()
     super.positionPlayers()
+    this.offensePlays = [new PickAndRoll(this)]
   }
 
   public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
@@ -33,6 +38,11 @@ export class CPUTeam extends Team {
   public getOtherTeamCourtPlayers() {
     return this.game.player.getCourtPlayers()
   }
+
+  public handleNewDefenseSetup(): void {
+    return
+  }
+
   public getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null {
     const otherTeamPlayers = this.getOtherTeamCourtPlayers()
     const playerToDefendId = CPUConstants.DEFENSIVE_ASSIGNMENTS[playerId]
@@ -69,6 +79,15 @@ export class CPUTeam extends Team {
   }
 
   update() {
+    if (this.hasPossession()) {
+      if (!this.currPlay) {
+        this.currPlay = this.offensePlays[Phaser.Math.Between(0, this.offensePlays.length - 1)]
+      } else {
+        this.currPlay.execute()
+      }
+    } else {
+      this.currPlay = null
+    }
     this.players.forEach((p) => {
       p.update()
     })

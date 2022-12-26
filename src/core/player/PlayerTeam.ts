@@ -2,6 +2,7 @@ import Game from '~/scenes/Game'
 import { getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
+import { SetScreenStateConfig } from '../states/offense/SetScreenState'
 import { States } from '../states/States'
 import { Team } from '../Team'
 import { PlayerConstants } from './PlayerConstants'
@@ -103,10 +104,15 @@ export class PlayerTeam extends Team {
     const highlightedPlayer = this.getHighlightedPlayer()
     this.players.forEach((courtPlayer: CourtPlayer) => {
       if (courtPlayer === highlightedPlayer) {
-        ;(courtPlayer as PlayerCourtPlayer).isPlayerCommandOverride = true
-        courtPlayer.setState(States.SET_SCREEN, (player: PlayerCourtPlayer) => {
-          player.isPlayerCommandOverride = false
-        })
+        const playerCourtPlayer = courtPlayer as PlayerCourtPlayer
+        playerCourtPlayer.isPlayerCommandOverride = true
+        const setScreenConfig: SetScreenStateConfig = {
+          isScreeningCallback: () => {},
+          onScreenFinishedCallback: () => {
+            playerCourtPlayer.isPlayerCommandOverride = false
+          },
+        }
+        courtPlayer.setState(States.SET_SCREEN, setScreenConfig)
       }
     })
   }
@@ -242,8 +248,14 @@ export class PlayerTeam extends Team {
     } else {
       this.selectedCourtPlayer.setVelocityX(velocityX)
       this.selectedCourtPlayer.setVelocityY(velocityY)
+      this.selectedCourtPlayer.sprite.setFlipX(velocityX > 0)
       this.selectedCourtPlayer.playRunAnimationForVelocity(velocityX, velocityY)
     }
+  }
+
+  public handleNewDefenseSetup(): void {
+    const playerToSelect = this.getCourtPlayers().find((p) => p.playerId === 'player1')
+    this.setSelectedCourtPlayer(playerToSelect!)
   }
 
   public getPlayerToReceiveBallOnNewPossession(): CourtPlayer {

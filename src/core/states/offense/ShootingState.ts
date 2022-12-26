@@ -8,6 +8,7 @@ import { States } from '../States'
 
 export class ShootingState extends State {
   enter(currPlayer: CourtPlayer, team: Team, callback: Function) {
+    const hoop = Game.instance.hoop.standSprite
     currPlayer.stop()
     currPlayer.sprite.body.checkCollision.none = true
     currPlayer.hasPossession = false
@@ -16,11 +17,32 @@ export class ShootingState extends State {
     const initialX = currPlayer.sprite.x
     const initialY = currPlayer.sprite.y
     currPlayer.sprite.anims.stop()
-    currPlayer.sprite.setTexture('shoot-jump-front')
+    const isSide = Math.abs(currPlayer.sprite.x - hoop.x) > 40
+    let isFlipped = false
+
+    if (currPlayer.sprite.x - hoop.x < 0) {
+      currPlayer.sprite.setFlipX(true)
+      isFlipped = true
+    } else {
+      currPlayer.sprite.setFlipX(false)
+    }
+
+    if (isSide) {
+      currPlayer.sprite.setTexture('shoot-side-wind')
+    } else {
+      currPlayer.sprite.setTexture('shoot-jump-front')
+    }
 
     createArc(currPlayer.sprite, { x: initialX, y: initialY }, jumpTime)
     Game.instance.time.delayedCall(jumpTime * 975 * 0.45, () => {
-      currPlayer.sprite.setTexture('shoot-flick-front')
+      if (isSide) {
+        currPlayer.sprite.setTexture('shoot-side-release')
+        const xOffset = isFlipped ? 10 : -10
+        Game.instance.ball.setPosition(currPlayer.sprite.x + xOffset, currPlayer.sprite.y - 28)
+      } else {
+        currPlayer.sprite.setTexture('shoot-flick-front')
+        Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
+      }
       Game.instance.ball.giveUpPossession()
       this.launchBallTowardsHoop(currPlayer)
     })
@@ -36,7 +58,6 @@ export class ShootingState extends State {
   launchBallTowardsHoop(currPlayer: CourtPlayer) {
     const ball = Game.instance.ball
     ball.show()
-    Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
 
     const isMiss = Phaser.Math.Between(0, 100) < -1
     let posToLandX = Game.instance.hoop.rimSprite.x

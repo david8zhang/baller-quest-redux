@@ -26,6 +26,8 @@ import { IsManToDefendMoving } from './states/defense/IsManToDefendMoving'
 import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
 import { IdleState } from './states/IdleState'
 import { ContestShotState } from './states/offense/ContestShotState'
+import { DribbleToPointState } from './states/offense/DribbleToPointState'
+import { DriveToBasketState } from './states/offense/DriveToBasketState'
 import { DunkState } from './states/offense/DunkState'
 import { GoBackToSpotState } from './states/offense/GoBackToSpotState'
 import { LayupState } from './states/offense/LayupState'
@@ -97,6 +99,8 @@ export class CourtPlayer {
         [States.CONTEST_SHOT]: new ContestShotState(),
         [States.LAYUP]: new LayupState(),
         [States.DUNK]: new DunkState(),
+        [States.DRIBBLE_TO_POINT]: new DribbleToPointState(),
+        [States.DRIVE_TO_BASKET]: new DriveToBasketState(),
       },
       [this, this.team]
     )
@@ -174,7 +178,7 @@ export class CourtPlayer {
           this.blackboard,
           new SequenceNode('OffenseSequence', this.blackboard, [
             new HasPossession(this.blackboard),
-            new LeafNode('Idle', this.blackboard, States.IDLE),
+            new LeafNode('IdleState', this.blackboard, States.IDLE),
           ]),
           new SelectorNode(
             'ShouldReactToScreen',

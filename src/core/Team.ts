@@ -35,6 +35,8 @@ export abstract class Team {
     playerToReceiveBall.getPossessionOfBall()
   }
 
+  public abstract handleNewDefenseSetup(): void
+
   public getDefenderForPlayer(player: CourtPlayer): CourtPlayer | null {
     const enemyPlayers = this.getOtherTeamCourtPlayers()
     let defender: CourtPlayer | null = null

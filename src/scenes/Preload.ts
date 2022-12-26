@@ -49,8 +49,14 @@ export class Preload extends Phaser.Scene {
   }
 
   loadShootAnimations() {
+    // Shoot front
     this.load.image('shoot-jump-front', 'animations/shoot/shoot-front/shoot-jump-front.png')
     this.load.image('shoot-flick-front', 'animations/shoot/shoot-front/shoot-flick-front.png')
+
+    // Shoot side
+    this.load.image('shoot-side-wind', 'animations/shoot/shoot-side/shoot-side-wind.png')
+    this.load.image('shoot-side-release', 'animations/shoot/shoot-side/shoot-side-release.png')
+    this.load.image('shoot-side-follow', 'animations/shoot/shoot-side/shoot-side-follow.png')
   }
 
   loadDunkAnimations() {

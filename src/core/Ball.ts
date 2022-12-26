@@ -125,11 +125,11 @@ export class Ball {
       this.sprite.setPosition(this.playerWithBall.sprite.x, this.playerWithBall.sprite.y)
       this.ballStateText.setVisible(false)
     }
-    this.ballStateText.setVisible(true)
-    this.ballStateText.setText(this.ballState)
-    this.ballStateText.setPosition(
-      this.sprite.x - this.ballStateText.displayWidth / 2,
-      this.sprite.y - this.ballStateText.displayHeight - 10
-    )
+    // this.ballStateText.setVisible(true)
+    // this.ballStateText.setText(this.ballState)
+    // this.ballStateText.setPosition(
+    //   this.sprite.x - this.ballStateText.displayWidth / 2,
+    //   this.sprite.y - this.ballStateText.displayHeight - 10
+    // )
   }
 }
