@@ -18,7 +18,11 @@ export class FightOverScreenState extends State {
         hoop.standSprite.y
       )
       const pointToMoveTo = line.getPoint(FightOverScreenState.DEFENSIVE_SPACING_PERCENTAGE)
-      currPlayer.moveTowards(pointToMoveTo)
+      if (currPlayer.isAtPoint(pointToMoveTo)) {
+        currPlayer.stop()
+      } else {
+        currPlayer.moveTowards(pointToMoveTo)
+      }
     } else {
       currPlayer.stop()
     }

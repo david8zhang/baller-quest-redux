@@ -28,7 +28,11 @@ export class SwitchDefenseState extends State {
           hoop.standSprite.y
         )
         const pointToMoveTo = line.getPoint(SwitchDefenseState.DEFENSIVE_SPACING_PERCENTAGE)
-        currPlayer.moveTowards(pointToMoveTo)
+        if (currPlayer.isAtPoint(pointToMoveTo)) {
+          currPlayer.stop()
+        } else {
+          currPlayer.moveTowards(pointToMoveTo)
+        }
       }
     }
   }

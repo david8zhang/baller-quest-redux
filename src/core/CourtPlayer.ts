@@ -376,7 +376,8 @@ export class CourtPlayer {
         y: target.y,
       }
     )
-    if (Math.abs(distance) < 5) {
+
+    if (distance < 5) {
       this.sprite.setVelocity(0, 0)
     } else {
       let angle = Phaser.Math.Angle.BetweenPoints(
@@ -397,8 +398,8 @@ export class CourtPlayer {
   }
 
   playRunAnimationForVelocity(xVelocity: number, yVelocity: number) {
-    this.sprite.setFlipX(xVelocity > 0)
     if (Math.abs(xVelocity) > Math.abs(yVelocity)) {
+      this.sprite.setFlipX(xVelocity > 0)
       const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.left : OFFBALL_ANIMS.run.left
       if (this.sprite.anims.getName() !== animToPlay) {
         this.sprite.play(animToPlay)
