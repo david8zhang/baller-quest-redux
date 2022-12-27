@@ -5,6 +5,7 @@ import { Cursor } from '../Cursor'
 import { SetScreenStateConfig } from '../states/offense/SetScreenState'
 import { States } from '../states/States'
 import { Team } from '../Team'
+import { DefenseMeter } from './DefenseMeter'
 import { PlayerConstants } from './PlayerConstants'
 import { PlayerCourtPlayer } from './PlayerCourtPlayer'
 import { SprintMeter } from './SprintMeter'
@@ -20,6 +21,8 @@ export class PlayerTeam extends Team {
   private keyArrowUp!: Phaser.Input.Keyboard.Key
   private keyArrowDown!: Phaser.Input.Keyboard.Key
   private sprintMeter: SprintMeter
+  public defensiveAssignmentMapping = PlayerConstants.DEFENSIVE_ASSIGNMENTS
+  private defenseMeter: DefenseMeter
 
   constructor(game: Game) {
     super(game, Side.PLAYER)
@@ -37,6 +40,7 @@ export class PlayerTeam extends Team {
       game
     )
     this.sprintMeter = new SprintMeter(game)
+    this.defenseMeter = new DefenseMeter(this)
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
     this.setupPlayers()
@@ -142,7 +146,7 @@ export class PlayerTeam extends Team {
 
   public getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null {
     const otherTeamPlayers = this.getOtherTeamCourtPlayers()
-    const playerToDefendId = PlayerConstants.DEFENSIVE_ASSIGNMENTS[playerId]
+    const playerToDefendId = this.defensiveAssignmentMapping[playerId]
     return otherTeamPlayers.find((player) => player.playerId === playerToDefendId) || null
   }
 
@@ -177,7 +181,6 @@ export class PlayerTeam extends Team {
             y: 0,
           },
           side: Side.PLAYER,
-          // tint: 0x00ff00,
           playerId,
           team: this,
         })
@@ -198,7 +201,7 @@ export class PlayerTeam extends Team {
     this.selectedCourtPlayer = courtPlayer
   }
 
-  getSelectedCourtPlayer() {
+  public getSelectedCourtPlayer() {
     return this.selectedCourtPlayer
   }
 

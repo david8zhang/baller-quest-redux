@@ -7,7 +7,6 @@ import { States } from '../States'
 
 export class SwitchDefenseState extends State {
   private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
-
   execute(currPlayer: CourtPlayer, team: Team) {
     const enemyTeam = team.getOtherTeam()
     const screeners = enemyTeam.getCourtPlayers().filter((player) => {

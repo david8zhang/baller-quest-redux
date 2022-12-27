@@ -4,6 +4,7 @@ import { DribbleToPointStateConfig } from '~/core/states/offense/DribbleToPointS
 import { ScreenDirection, SetScreenStateConfig } from '~/core/states/offense/SetScreenState'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
+import Game from '~/scenes/Game'
 import { OffensePlay } from './OffensePlay'
 
 export class PickAndRoll extends OffensePlay {
@@ -16,7 +17,9 @@ export class PickAndRoll extends OffensePlay {
   public execute(): void {
     if (!this.isRunning) {
       this.isRunning = true
-      this.callForScreen()
+      Game.instance.time.delayedCall(1500, () => {
+        this.callForScreen()
+      })
     }
   }
 
@@ -50,7 +53,14 @@ export class PickAndRoll extends OffensePlay {
       const config: DribbleToPointStateConfig = {
         timeout: 5000,
         onReachedPointCB: () => {
-          ballHandler.setState(States.DRIVE_TO_BASKET)
+          const driveToBasketConfig = {
+            onDriveSuccess: () => {},
+            onDriveFailed: () => {
+              ballHandler.setState(States.GO_BACK_TO_SPOT)
+            },
+            timeout: 4000,
+          }
+          ballHandler.setState(States.DRIVE_TO_BASKET, driveToBasketConfig)
         },
         failedToReachPointCB: () => {
           this.terminate()

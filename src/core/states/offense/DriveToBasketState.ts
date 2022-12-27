@@ -12,22 +12,43 @@ export interface DriveToBasketConfig {
 }
 
 export class DriveToBasketState extends State {
-  enter(currPlayer: CourtPlayer, team: Team) {}
+  private startedTimestamp: number = -1
+  private onDriveSuccess!: Function
+  private onDriveFailed!: Function
+  private timeout!: number
+
+  enter(currPlayer: CourtPlayer, team: Team, config: DriveToBasketConfig) {
+    this.onDriveSuccess = config.onDriveSuccess
+    this.onDriveFailed = config.onDriveFailed
+    this.timeout = config.timeout
+  }
 
   execute(currPlayer: CourtPlayer, team: Team) {
-    const hoop = Game.instance.hoop.standSprite
-    const distToHoop = Phaser.Math.Distance.Between(hoop.x, hoop.y, currPlayer.x, currPlayer.y)
-    if (distToHoop <= LAYUP_DISTANCE) {
-      if (currPlayer.canLayupBall()) {
-        currPlayer.setState(States.LAYUP)
-      } else {
-        currPlayer.setState(States.SHOOTING)
-      }
+    const currTimestamp = Date.now()
+    if (this.startedTimestamp === -1) {
+      this.startedTimestamp = currTimestamp
     } else {
-      currPlayer.moveTowards({
-        x: hoop.x,
-        y: hoop.y,
-      })
+      if (currTimestamp - this.startedTimestamp >= this.timeout) {
+        this.startedTimestamp = -1
+        this.onDriveFailed()
+      } else {
+        const hoop = Game.instance.hoop.standSprite
+        const distToHoop = Phaser.Math.Distance.Between(hoop.x, hoop.y, currPlayer.x, currPlayer.y)
+        if (distToHoop <= LAYUP_DISTANCE) {
+          this.startedTimestamp = -1
+          this.onDriveSuccess()
+          if (currPlayer.canLayupBall()) {
+            currPlayer.setState(States.LAYUP)
+          } else {
+            currPlayer.setState(States.SHOOTING)
+          }
+        } else {
+          currPlayer.moveTowards({
+            x: hoop.x,
+            y: hoop.y,
+          })
+        }
+      }
     }
   }
 }

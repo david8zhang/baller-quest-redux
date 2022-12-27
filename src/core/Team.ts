@@ -8,6 +8,7 @@ export abstract class Team {
   public game: Game
   public side: Side
   public players: CourtPlayer[] = []
+  public defensiveAssignmentMapping: any = {}
 
   constructor(game: Game, side: Side) {
     this.game = game
