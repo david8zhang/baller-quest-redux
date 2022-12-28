@@ -63,4 +63,8 @@ export class SetScreenState extends State {
       }
     }
   }
+
+  exit() {
+    this.startedScreenTimestamp = -1
+  }
 }

@@ -18,7 +18,6 @@ export class ShouldSwitch extends TreeNode {
     if (team.side === Side.PLAYER) {
       return Decision.STOP
     }
-
     const manToDefend = team.getDefensiveAssignmentForPlayer(currPlayer.playerId)
     if (manToDefend && manToDefend.hasPossession) {
       const enemyTeam = team.getOtherTeam()

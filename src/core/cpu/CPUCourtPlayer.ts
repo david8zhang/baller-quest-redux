@@ -8,10 +8,15 @@ export class CPUCourtPlayer extends CourtPlayer {
     super(game, config)
   }
 
+  isShooting() {
+    const state = this.getCurrState().key
+    return state === States.LAYUP || state === States.SHOOTING || state === States.DUNK
+  }
+
   update() {
     if (!Game.instance.isChangingPossession && this.stateMachine) {
       const team = this.team as CPUTeam
-      if (team.currPlay === null) {
+      if (team.currPlay === null && !this.isShooting()) {
         const nextState = this.decisionTree.process() as States
         if (nextState !== this.stateMachine.getState()) {
           this.stateMachine.transition(nextState)

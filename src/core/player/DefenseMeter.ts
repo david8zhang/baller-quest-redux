@@ -1,4 +1,6 @@
 import Game from '~/scenes/Game'
+import { getClosestPlayer } from '../Constants'
+import { CourtPlayer } from '../CourtPlayer'
 import { DefendManState } from '../states/defense/DefendManState'
 import { PlayerTeam } from './PlayerTeam'
 
@@ -20,9 +22,15 @@ export class DefenseMeter {
     })
   }
 
+  getManToDefend(selectedCourtPlayer: CourtPlayer) {
+    return getClosestPlayer(selectedCourtPlayer, this.team.getOtherTeamCourtPlayers())
+  }
+
   defendPlayer() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-    const manToDefend = this.team.getDefensiveAssignmentForPlayer(selectedCourtPlayer.playerId)
+    const manToDefend = this.getManToDefend(selectedCourtPlayer)
+
+    // const manToDefend = this.team.getDefensiveAssignmentForPlayer(selectedCourtPlayer.playerId)
     if (manToDefend) {
       const line = new Phaser.Geom.Line(
         manToDefend.sprite.x,

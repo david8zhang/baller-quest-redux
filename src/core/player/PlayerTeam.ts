@@ -198,6 +198,7 @@ export class PlayerTeam extends Team {
   setSelectedCourtPlayer(courtPlayer: CourtPlayer) {
     this.selectedCourtPlayer.stop()
     this.selectedCourtPlayerCursor.selectCourtPlayer(courtPlayer)
+    courtPlayer.setState(States.PLAYER_CONTROL)
     this.selectedCourtPlayer = courtPlayer
   }
 

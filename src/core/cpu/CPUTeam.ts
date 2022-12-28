@@ -71,6 +71,13 @@ export class CPUTeam extends Team {
     })
   }
 
+  public handleNewPossession() {
+    super.handleNewPossession()
+    this.offensePlays.forEach((play) => {
+      play.reset()
+    })
+  }
+
   public getPlayerToReceiveBallOnNewPossession(): CourtPlayer {
     return this.players.find((p) => p.playerId === CPUConstants.NEW_POSSESSION_PLAYER_ID)!
   }

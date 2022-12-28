@@ -34,9 +34,9 @@ export class LayupState extends State {
     })
     Game.instance.time.delayedCall(975 * jumpDuration, () => {
       if (onComplete) {
-        currPlayer.sprite.body.checkCollision.none = false
         onComplete(currPlayer)
       }
+      currPlayer.sprite.body.checkCollision.none = false
       currPlayer.setState(States.IDLE)
     })
   }

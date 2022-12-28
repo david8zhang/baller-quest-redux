@@ -30,6 +30,7 @@ export abstract class Team {
   public handleNewPossession() {
     this.players.forEach((p) => {
       p.hasPossession = false
+      p.setState(States.IDLE)
     })
     const playerToReceiveBall = this.getPlayerToReceiveBallOnNewPossession()
     Game.instance.ball.prevPlayerWithBall = null

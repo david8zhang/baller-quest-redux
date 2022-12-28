@@ -34,6 +34,7 @@ import { LayupState } from './states/offense/LayupState'
 import { PassingState } from './states/offense/PassingState'
 import { SetScreenState } from './states/offense/SetScreenState'
 import { ShootingState } from './states/offense/ShootingState'
+import { PlayerControlState } from './states/PlayerControlState'
 import { StateMachine } from './states/StateMachine'
 import { States } from './states/States'
 import { Team } from './Team'
@@ -101,6 +102,7 @@ export class CourtPlayer {
         [States.DUNK]: new DunkState(),
         [States.DRIBBLE_TO_POINT]: new DribbleToPointState(),
         [States.DRIVE_TO_BASKET]: new DriveToBasketState(),
+        [States.PLAYER_CONTROL]: new PlayerControlState(),
       },
       [this, this.team]
     )
@@ -174,40 +176,52 @@ export class CourtPlayer {
           new LeafNode('ChaseRebound', this.blackboard, States.CHASE_REBOUND),
         ]),
         new SelectorNode(
-          'OffenseOrDefenseSelector',
+          'ShouldDefendSelector',
           this.blackboard,
           new SequenceNode('OffenseSequence', this.blackboard, [
             new HasPossession(this.blackboard),
             new LeafNode('IdleState', this.blackboard, States.IDLE),
           ]),
-          new SelectorNode(
-            'ShouldReactToScreen',
-            this.blackboard,
-            new SelectorNode(
-              'ShouldSwitchOrFightOverScreen',
-              this.blackboard,
-              new SequenceNode('FightOverScreenSeq', this.blackboard, [
-                new ShouldFightOverScreen(this.blackboard),
-                new LeafNode('FightOverScreen', this.blackboard, States.FIGHT_OVER_SCREEN),
-              ]),
-              new SequenceNode('SwitchScreenSeq', this.blackboard, [
-                new ShouldSwitch(this.blackboard),
-                new LeafNode('SwitchScreen', this.blackboard, States.SWITCH_DEFENSE),
-              ])
-            ),
-            new SelectorNode(
-              'NormalDefenseSelector',
-              this.blackboard,
-              new SequenceNode('DefendManSequence', this.blackboard, [
-                new IsManToDefendMoving(this.blackboard),
-                new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN),
-              ]),
-              new LeafNode('Idle', this.blackboard, States.IDLE)
-            )
-          )
+          new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN)
         )
       ),
     ])
+    // this.decisionTree = new SequenceNode('RootSequence', this.blackboard, [
+    //   new PopulateBlackboard(this.blackboard, this, this.team),
+    //   new SelectorNode(
+    //     'LooseBallSelector',
+    //     this.blackboard,
+    //     new SequenceNode('ChaseReboundSelector', this.blackboard, [
+    //       new IsBallLoose(this.blackboard),
+    //       new LeafNode('ChaseRebound', this.blackboard, States.CHASE_REBOUND),
+    //     ]),
+    //     new SelectorNode(
+    //       'OffenseOrDefenseSelector',
+    //       this.blackboard,
+    //       new SequenceNode('OffenseSequence', this.blackboard, [
+    //         new HasPossession(this.blackboard),
+    //         new LeafNode('IdleState', this.blackboard, States.IDLE),
+    //       ]),
+    //       new SelectorNode(
+    //         'ShouldReactToScreen',
+    //         this.blackboard,
+    //         new SelectorNode(
+    //           'ShouldSwitchOrFightOverScreen',
+    //           this.blackboard,
+    //           new SequenceNode('FightOverScreenSeq', this.blackboard, [
+    //             new ShouldFightOverScreen(this.blackboard),
+    //             new LeafNode('FightOverScreen', this.blackboard, States.FIGHT_OVER_SCREEN),
+    //           ]),
+    //           new SequenceNode('SwitchScreenSeq', this.blackboard, [
+    //             new ShouldSwitch(this.blackboard),
+    //             new LeafNode('SwitchScreen', this.blackboard, States.SWITCH_DEFENSE),
+    //           ])
+    //         ),
+    //         new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN)
+    //       )
+    //     )
+    //   ),
+    // ])
   }
 
   step() {

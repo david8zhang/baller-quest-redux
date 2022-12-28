@@ -47,4 +47,8 @@ export class DribbleToPointState extends State {
       }
     }
   }
+
+  exit() {
+    this.startedDribblingTimestamp = -1
+  }
 }

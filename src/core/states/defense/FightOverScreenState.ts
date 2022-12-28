@@ -9,7 +9,6 @@ export class FightOverScreenState extends State {
   execute(currPlayer: CourtPlayer, team: Team) {
     const currBallHandler = team.game.ball.playerWithBall
     if (currBallHandler) {
-      // Have the current player defend the screen handler
       const hoop = Game.instance.hoop
       const line = new Phaser.Geom.Line(
         currBallHandler.sprite.x,
@@ -18,11 +17,7 @@ export class FightOverScreenState extends State {
         hoop.standSprite.y
       )
       const pointToMoveTo = line.getPoint(FightOverScreenState.DEFENSIVE_SPACING_PERCENTAGE)
-      if (currPlayer.isAtPoint(pointToMoveTo)) {
-        currPlayer.stop()
-      } else {
-        currPlayer.moveTowards(pointToMoveTo)
-      }
+      currPlayer.moveTowards(pointToMoveTo)
     } else {
       currPlayer.stop()
     }

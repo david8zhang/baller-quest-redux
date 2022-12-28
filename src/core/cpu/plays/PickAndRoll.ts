@@ -14,6 +14,15 @@ export class PickAndRoll extends OffensePlay {
     super(team)
   }
 
+  reset() {
+    this.isDrivingAroundScreen = false
+    this.isRunning = false
+  }
+
+  public terminate() {
+    super.terminate()
+  }
+
   public execute(): void {
     if (!this.isRunning) {
       this.isRunning = true
@@ -54,9 +63,13 @@ export class PickAndRoll extends OffensePlay {
         timeout: 5000,
         onReachedPointCB: () => {
           const driveToBasketConfig = {
-            onDriveSuccess: () => {},
+            onDriveSuccess: () => {
+              this.terminate()
+            },
             onDriveFailed: () => {
-              ballHandler.setState(States.GO_BACK_TO_SPOT)
+              ballHandler.setState(States.GO_BACK_TO_SPOT, () => {
+                this.terminate()
+              })
             },
             timeout: 4000,
           }

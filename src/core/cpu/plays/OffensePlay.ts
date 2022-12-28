@@ -9,9 +9,14 @@ export abstract class OffensePlay {
     this.team = team
   }
 
+  reset() {
+    this.isRunning = false
+  }
+
   public abstract execute(): void
 
   public terminate() {
+    this.isRunning = false
     const courtPlayers = this.team.getCourtPlayers()
     courtPlayers.forEach((p) => {
       p.setState(States.IDLE)
