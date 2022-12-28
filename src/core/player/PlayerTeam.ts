@@ -23,6 +23,7 @@ export class PlayerTeam extends Team {
   private sprintMeter: SprintMeter
   public defensiveAssignmentMapping = PlayerConstants.DEFENSIVE_ASSIGNMENTS
   private defenseMeter: DefenseMeter
+  public canCallForScreen: boolean = true
 
   constructor(game: Game) {
     super(game, Side.PLAYER)
@@ -104,21 +105,27 @@ export class PlayerTeam extends Team {
     })
   }
 
+  getScreener() {
+    return this.players[this.players.length - 1]
+  }
+
   callForScreen() {
-    const highlightedPlayer = this.getHighlightedPlayer()
-    this.players.forEach((courtPlayer: CourtPlayer) => {
-      if (courtPlayer === highlightedPlayer) {
-        const playerCourtPlayer = courtPlayer as PlayerCourtPlayer
-        playerCourtPlayer.isPlayerCommandOverride = true
-        const setScreenConfig: SetScreenStateConfig = {
-          isScreeningCallback: () => {},
-          onScreenFinishedCallback: () => {
-            playerCourtPlayer.isPlayerCommandOverride = false
-          },
+    const highlightedPlayer = this.getScreener()
+    if (highlightedPlayer.getCurrState().key !== States.SET_SCREEN) {
+      this.players.forEach((courtPlayer: CourtPlayer) => {
+        if (courtPlayer === highlightedPlayer) {
+          const playerCourtPlayer = courtPlayer as PlayerCourtPlayer
+          playerCourtPlayer.isPlayerCommandOverride = true
+          const setScreenConfig: SetScreenStateConfig = {
+            isScreeningCallback: () => {},
+            onScreenFinishedCallback: () => {
+              playerCourtPlayer.isPlayerCommandOverride = false
+            },
+          }
+          courtPlayer.setState(States.SET_SCREEN, setScreenConfig)
         }
-        courtPlayer.setState(States.SET_SCREEN, setScreenConfig)
-      }
-    })
+      })
+    }
   }
 
   passBall() {

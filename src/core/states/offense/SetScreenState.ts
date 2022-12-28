@@ -20,7 +20,7 @@ export class SetScreenState extends State {
 
   public isScreeningCallback: Function | null = null
   public onScreenFinishedCallback: Function | null = null
-  public screenPosition!: { x: number; y: number }
+  public screenPosition: { x: number; y: number } | null = null
 
   enter(currPlayer: CourtPlayer, team: Team, config: SetScreenStateConfig) {
     this.isScreeningCallback = config.isScreeningCallback
@@ -30,7 +30,7 @@ export class SetScreenState extends State {
   execute(currPlayer: CourtPlayer, team: Team, callback?: Function) {
     if (this.startedScreenTimestamp != -1) {
       const currTimestamp = Date.now()
-      if (currPlayer.isAtPoint(this.screenPosition)) {
+      if (this.screenPosition && currPlayer.isAtPoint(this.screenPosition)) {
         if (this.isScreeningCallback) {
           this.isScreeningCallback()
         }
@@ -50,15 +50,16 @@ export class SetScreenState extends State {
             : ScreenDirection.LEFT
         const defenderForBallHandler = team.getDefenderForPlayer(ballHandler)
         if (defenderForBallHandler) {
-          const screenPosition = {
-            x:
-              direction === ScreenDirection.RIGHT
-                ? defenderForBallHandler.sprite.x + 40
-                : defenderForBallHandler.sprite.x - 40,
-            y: defenderForBallHandler.sprite.y + 5,
+          if (!this.screenPosition) {
+            this.screenPosition = {
+              x:
+                direction === ScreenDirection.RIGHT
+                  ? defenderForBallHandler.sprite.x + 40
+                  : defenderForBallHandler.sprite.x - 40,
+              y: defenderForBallHandler.sprite.y + 5,
+            }
           }
-          this.screenPosition = screenPosition
-          currPlayer.moveTowards(screenPosition)
+          currPlayer.moveTowards(this.screenPosition)
         }
       }
     }
@@ -66,5 +67,6 @@ export class SetScreenState extends State {
 
   exit() {
     this.startedScreenTimestamp = -1
+    this.screenPosition = null
   }
 }

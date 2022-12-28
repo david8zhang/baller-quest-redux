@@ -176,52 +176,32 @@ export class CourtPlayer {
           new LeafNode('ChaseRebound', this.blackboard, States.CHASE_REBOUND),
         ]),
         new SelectorNode(
-          'ShouldDefendSelector',
+          'OffenseOrDefenseSelector',
           this.blackboard,
           new SequenceNode('OffenseSequence', this.blackboard, [
             new HasPossession(this.blackboard),
             new LeafNode('IdleState', this.blackboard, States.IDLE),
           ]),
-          new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN)
+          new SelectorNode(
+            'ShouldReactToScreen',
+            this.blackboard,
+            new SelectorNode(
+              'ShouldSwitchOrFightOverScreen',
+              this.blackboard,
+              new SequenceNode('FightOverScreenSeq', this.blackboard, [
+                new ShouldFightOverScreen(this.blackboard),
+                new LeafNode('FightOverScreen', this.blackboard, States.FIGHT_OVER_SCREEN),
+              ]),
+              new SequenceNode('SwitchScreenSeq', this.blackboard, [
+                new ShouldSwitch(this.blackboard),
+                new LeafNode('SwitchScreen', this.blackboard, States.SWITCH_DEFENSE),
+              ])
+            ),
+            new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN)
+          )
         )
       ),
     ])
-    // this.decisionTree = new SequenceNode('RootSequence', this.blackboard, [
-    //   new PopulateBlackboard(this.blackboard, this, this.team),
-    //   new SelectorNode(
-    //     'LooseBallSelector',
-    //     this.blackboard,
-    //     new SequenceNode('ChaseReboundSelector', this.blackboard, [
-    //       new IsBallLoose(this.blackboard),
-    //       new LeafNode('ChaseRebound', this.blackboard, States.CHASE_REBOUND),
-    //     ]),
-    //     new SelectorNode(
-    //       'OffenseOrDefenseSelector',
-    //       this.blackboard,
-    //       new SequenceNode('OffenseSequence', this.blackboard, [
-    //         new HasPossession(this.blackboard),
-    //         new LeafNode('IdleState', this.blackboard, States.IDLE),
-    //       ]),
-    //       new SelectorNode(
-    //         'ShouldReactToScreen',
-    //         this.blackboard,
-    //         new SelectorNode(
-    //           'ShouldSwitchOrFightOverScreen',
-    //           this.blackboard,
-    //           new SequenceNode('FightOverScreenSeq', this.blackboard, [
-    //             new ShouldFightOverScreen(this.blackboard),
-    //             new LeafNode('FightOverScreen', this.blackboard, States.FIGHT_OVER_SCREEN),
-    //           ]),
-    //           new SequenceNode('SwitchScreenSeq', this.blackboard, [
-    //             new ShouldSwitch(this.blackboard),
-    //             new LeafNode('SwitchScreen', this.blackboard, States.SWITCH_DEFENSE),
-    //           ])
-    //         ),
-    //         new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN)
-    //       )
-    //     )
-    //   ),
-    // ])
   }
 
   step() {
