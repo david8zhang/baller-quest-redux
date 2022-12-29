@@ -16,6 +16,18 @@ export class Preload extends Phaser.Scene {
     this.loadIdleAnimations()
     this.loadRunAnimations()
     this.loadContestAnimations()
+    this.loadPassAnimations()
+  }
+
+  loadPassAnimations() {
+    this.load.image('pass-front-wind-up', 'animations/pass/pass-front/pass-wind-up.png')
+    this.load.image('pass-front-release', 'animations/pass/pass-front/pass-release.png')
+
+    this.load.image('pass-back-wind-up', 'animations/pass/pass-back/pass-wind-up.png')
+    this.load.image('pass-back-release', 'animations/pass/pass-back/pass-release.png')
+
+    this.load.image('pass-side-wind-up', 'animations/pass/pass-side/pass-wind-up.png')
+    this.load.image('pass-side-release', 'animations/pass/pass-side/pass-release.png')
   }
 
   loadContestAnimations() {

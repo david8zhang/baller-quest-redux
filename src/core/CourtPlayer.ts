@@ -11,20 +11,10 @@ import {
 } from './Constants'
 import { createDecisionTree } from './CourtPlayerDecisionTree'
 import { Blackboard } from './decision-tree/Blackboard'
-import { HasPossession } from './decision-tree/decisions/HasPossession'
-import { IsBallLoose } from './decision-tree/decisions/IsBallLoose'
-import { ShouldContestShot } from './decision-tree/decisions/ShouldContestShot'
-import { ShouldFightOverScreen } from './decision-tree/decisions/ShouldFightOverScreen'
-import { ShouldSwitch } from './decision-tree/decisions/ShouldSwitch'
-import { LeafNode } from './decision-tree/LeafNode'
-import { PopulateBlackboard } from './decision-tree/PopulateBlackboard'
-import { SelectorNode } from './decision-tree/SelectorNode'
-import { SequenceNode } from './decision-tree/SequenceNode'
 import { TreeNode } from './decision-tree/TreeNode'
 import { ChaseReboundState } from './states/ChaseReboundState'
 import { DefendManState } from './states/defense/DefendManState'
 import { FightOverScreenState } from './states/defense/FightOverScreenState'
-import { IsManToDefendMoving } from './states/defense/IsManToDefendMoving'
 import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
 import { IdleState } from './states/IdleState'
 import { ContestShotState } from './states/offense/ContestShotState'
@@ -243,7 +233,7 @@ export class CourtPlayer {
   }
 
   canMove() {
-    const immovableStates: States[] = [States.SHOOTING, States.LAYUP, States.DUNK]
+    const immovableStates: States[] = [States.SHOOTING, States.LAYUP, States.DUNK, States.PASSING]
     const state = this.getCurrState().key as States
     return !immovableStates.includes(state) && !this.game.isChangingPossession
   }
@@ -267,49 +257,16 @@ export class CourtPlayer {
     }
   }
 
-  passBall(receiver: CourtPlayer) {
-    const timeToPass = 0.25
-    const angle = Phaser.Math.Angle.BetweenPoints(
-      {
-        x: this.sprite.x,
-        y: this.sprite.y,
-      },
-      {
-        x: receiver.sprite.x + receiver.sprite.body.velocity.x * timeToPass,
-        y: receiver.sprite.y + receiver.sprite.body.velocity.y * timeToPass,
-      }
-    )
-    const posAfterGivenTime = {
-      x: receiver.sprite.x + receiver.sprite.body.velocity.x * timeToPass,
-      y: receiver.sprite.y + receiver.sprite.body.velocity.y * timeToPass,
-    }
-    const distance = getDistanceBetween(
-      {
-        x: this.sprite.x,
-        y: this.sprite.y,
-      },
-      posAfterGivenTime
-    )
-    const velocityVector = new Phaser.Math.Vector2(0, 0)
-    Game.instance.physics.velocityFromRotation(angle, distance * (1 / timeToPass), velocityVector)
-
-    Game.instance.ball.ballState = BallState.PASS
-    Game.instance.ball.sprite.setVisible(true)
-    Game.instance.ball.sprite.setGravity(0)
-    Game.instance.ball.sprite.setVelocity(velocityVector.x, velocityVector.y)
-
-    this.hasPossession = false
-    Game.instance.ball.giveUpPossession()
-  }
-
   setState(state: States, ...enterArgs: any) {
     this.stateMachine.transition(state, ...enterArgs)
   }
 
   stop() {
-    this.sprite.setFlipX(false)
     this.sprite.setVelocity(0, 0)
-    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
+    if (this.getCurrState().key !== States.PASSING) {
+      this.sprite.setFlipX(false)
+      this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
+    }
   }
 
   setVelocityX(xVelocity: number) {
