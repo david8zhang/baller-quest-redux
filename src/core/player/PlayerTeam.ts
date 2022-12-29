@@ -106,12 +106,29 @@ export class PlayerTeam extends Team {
   }
 
   getScreener() {
-    return this.players[this.players.length - 1]
+    let screenerPlayerId = ''
+    if (this.selectedCourtPlayer.playerId === PlayerConstants.PRIMARY_SCREENER_ID) {
+      screenerPlayerId = PlayerConstants.SECONDARY_SCREENER_ID
+    } else {
+      screenerPlayerId = PlayerConstants.PRIMARY_SCREENER_ID
+    }
+    return this.getCourtPlayers().find((p) => p.playerId === screenerPlayerId)!
+  }
+
+  isCurrentlyScreening() {
+    const courtPlayers = this.getCourtPlayers()
+    for (let i = 0; i < courtPlayers.length; i++) {
+      const courtPlayer = courtPlayers[i]
+      if (courtPlayer.getCurrState().key === States.SET_SCREEN) {
+        return true
+      }
+    }
+    return false
   }
 
   callForScreen() {
     const highlightedPlayer = this.getScreener()
-    if (highlightedPlayer.getCurrState().key !== States.SET_SCREEN) {
+    if (!this.isCurrentlyScreening() && this.hasPossession()) {
       this.players.forEach((courtPlayer: CourtPlayer) => {
         if (courtPlayer === highlightedPlayer) {
           const playerCourtPlayer = courtPlayer as PlayerCourtPlayer

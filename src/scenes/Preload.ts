@@ -15,6 +15,11 @@ export class Preload extends Phaser.Scene {
     this.loadDribbleAnimations()
     this.loadIdleAnimations()
     this.loadRunAnimations()
+    this.loadContestAnimations()
+  }
+
+  loadContestAnimations() {
+    this.load.image('contest-front', 'animations/contest/contest-front.png')
   }
 
   loadRunAnimations() {

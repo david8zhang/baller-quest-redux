@@ -9,9 +9,11 @@ import {
   Side,
   SORT_ORDER,
 } from './Constants'
+import { createDecisionTree } from './CourtPlayerDecisionTree'
 import { Blackboard } from './decision-tree/Blackboard'
 import { HasPossession } from './decision-tree/decisions/HasPossession'
 import { IsBallLoose } from './decision-tree/decisions/IsBallLoose'
+import { ShouldContestShot } from './decision-tree/decisions/ShouldContestShot'
 import { ShouldFightOverScreen } from './decision-tree/decisions/ShouldFightOverScreen'
 import { ShouldSwitch } from './decision-tree/decisions/ShouldSwitch'
 import { LeafNode } from './decision-tree/LeafNode'
@@ -166,42 +168,7 @@ export class CourtPlayer {
   }
 
   setupDecisionTree() {
-    this.decisionTree = new SequenceNode('RootSequence', this.blackboard, [
-      new PopulateBlackboard(this.blackboard, this, this.team),
-      new SelectorNode(
-        'LooseBallSelector',
-        this.blackboard,
-        new SequenceNode('ChaseReboundSelector', this.blackboard, [
-          new IsBallLoose(this.blackboard),
-          new LeafNode('ChaseRebound', this.blackboard, States.CHASE_REBOUND),
-        ]),
-        new SelectorNode(
-          'OffenseOrDefenseSelector',
-          this.blackboard,
-          new SequenceNode('OffenseSequence', this.blackboard, [
-            new HasPossession(this.blackboard),
-            new LeafNode('IdleState', this.blackboard, States.IDLE),
-          ]),
-          new SelectorNode(
-            'ShouldReactToScreen',
-            this.blackboard,
-            new SelectorNode(
-              'ShouldSwitchOrFightOverScreen',
-              this.blackboard,
-              new SequenceNode('FightOverScreenSeq', this.blackboard, [
-                new ShouldFightOverScreen(this.blackboard),
-                new LeafNode('FightOverScreen', this.blackboard, States.FIGHT_OVER_SCREEN),
-              ]),
-              new SequenceNode('SwitchScreenSeq', this.blackboard, [
-                new ShouldSwitch(this.blackboard),
-                new LeafNode('SwitchScreen', this.blackboard, States.SWITCH_DEFENSE),
-              ])
-            ),
-            new LeafNode('DefendMan', this.blackboard, States.DEFEND_MAN)
-          )
-        )
-      ),
-    ])
+    this.decisionTree = createDecisionTree(this.blackboard, this, this.team)
   }
 
   step() {

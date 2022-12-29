@@ -5,10 +5,12 @@ import { State } from '../StateMachine'
 
 export class FightOverScreenState extends State {
   private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
+  public newDefensiveAssignment: CourtPlayer | null = null
 
   execute(currPlayer: CourtPlayer, team: Team) {
     const currBallHandler = team.game.ball.playerWithBall
     if (currBallHandler) {
+      this.newDefensiveAssignment = currBallHandler
       const hoop = Game.instance.hoop
       const line = new Phaser.Geom.Line(
         currBallHandler.sprite.x,
@@ -20,6 +22,13 @@ export class FightOverScreenState extends State {
       currPlayer.moveTowards(pointToMoveTo)
     } else {
       currPlayer.stop()
+    }
+  }
+
+  exit(currPlayer: CourtPlayer, team: Team) {
+    if (this.newDefensiveAssignment) {
+      team.defensiveAssignmentMapping[currPlayer.playerId] = this.newDefensiveAssignment.playerId
+      this.newDefensiveAssignment = null
     }
   }
 }

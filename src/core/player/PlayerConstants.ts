@@ -6,6 +6,8 @@ export class PlayerConstants {
   }
 
   public static NEW_POSSESSION_PLAYER_ID = 'player1'
+  public static PRIMARY_SCREENER_ID = 'player2'
+  public static SECONDARY_SCREENER_ID = 'player3'
 
   public static DEFENSE_POSITIONS_PLAYER = {
     player1: {

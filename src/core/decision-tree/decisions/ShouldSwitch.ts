@@ -1,5 +1,6 @@
 import { Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
+import { SetScreenState } from '~/core/states/offense/SetScreenState'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
 import { Blackboard } from '../Blackboard'
@@ -21,10 +22,14 @@ export class ShouldSwitch extends TreeNode {
     const manToDefend = team.getDefensiveAssignmentForPlayer(currPlayer.playerId)
     if (manToDefend && manToDefend.hasPossession) {
       const enemyTeam = team.getOtherTeam()
-      const isScreening =
-        enemyTeam.getCourtPlayers().find((p) => p.getCurrState().key === States.SET_SCREEN) !==
-        undefined
-      return isScreening ? Decision.PROCEED : Decision.STOP
+      const screener = enemyTeam
+        .getCourtPlayers()
+        .find((p) => p.getCurrState().key === States.SET_SCREEN)
+      if (screener != undefined) {
+        const state = screener.getCurrState().data as SetScreenState
+        return state.isAtScreenPosition ? Decision.PROCEED : Decision.STOP
+      }
+      return Decision.STOP
     }
     return Decision.STOP
   }

@@ -1,5 +1,6 @@
 import { Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
+import { SetScreenState } from '~/core/states/offense/SetScreenState'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
 import { Blackboard } from '../Blackboard'
@@ -21,7 +22,8 @@ export class ShouldFightOverScreen extends TreeNode {
 
     const manToDefend = team.getDefensiveAssignmentForPlayer(currPlayer.playerId)
     if (manToDefend && manToDefend.getCurrState().key === States.SET_SCREEN) {
-      if (manToDefend.sprite.body.velocity.x === 0 && manToDefend.sprite.body.velocity.y === 0) {
+      const state = manToDefend.getCurrState().data as SetScreenState
+      if (state.isAtScreenPosition) {
         return Decision.PROCEED
       }
       return Decision.STOP

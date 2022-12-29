@@ -21,6 +21,7 @@ export class SwitchDefenseState extends State {
         screener.sprite.body.velocity.x == 0 &&
         screener.sprite.body.velocity.y === 0
       ) {
+        this.newDefensiveAssignment = screener
         const hoop = Game.instance.hoop
         const line = new Phaser.Geom.Line(
           screener.sprite.x,
@@ -35,6 +36,13 @@ export class SwitchDefenseState extends State {
           currPlayer.moveTowards(pointToMoveTo)
         }
       }
+    }
+  }
+
+  exit(currPlayer: CourtPlayer, team: Team) {
+    if (this.newDefensiveAssignment) {
+      team.defensiveAssignmentMapping[currPlayer.playerId] = this.newDefensiveAssignment.playerId
+      this.newDefensiveAssignment = null
     }
   }
 }

@@ -21,6 +21,7 @@ export class SetScreenState extends State {
   public isScreeningCallback: Function | null = null
   public onScreenFinishedCallback: Function | null = null
   public screenPosition: { x: number; y: number } | null = null
+  public isAtScreenPosition: boolean = false
 
   enter(currPlayer: CourtPlayer, team: Team, config: SetScreenStateConfig) {
     this.isScreeningCallback = config.isScreeningCallback
@@ -31,6 +32,7 @@ export class SetScreenState extends State {
     if (this.startedScreenTimestamp != -1) {
       const currTimestamp = Date.now()
       if (this.screenPosition && currPlayer.isAtPoint(this.screenPosition)) {
+        this.isAtScreenPosition = true
         if (this.isScreeningCallback) {
           this.isScreeningCallback()
         }
@@ -66,6 +68,7 @@ export class SetScreenState extends State {
   }
 
   exit() {
+    this.isAtScreenPosition = false
     this.startedScreenTimestamp = -1
     this.screenPosition = null
   }

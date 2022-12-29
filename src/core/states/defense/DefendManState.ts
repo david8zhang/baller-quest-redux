@@ -16,22 +16,6 @@ export class DefendManState extends State {
 
   setManToDefend(currPlayer: CourtPlayer, team: Team) {
     this.manToDefend = team.getDefensiveAssignmentForPlayer(currPlayer.playerId)
-    // const enemyTeam = team.getOtherTeam()
-    // const otherPlayers = enemyTeam.getCourtPlayers()
-    // const playerIdsBeingDefended: string[] = []
-    // team.getCourtPlayers().forEach((p) => {
-    //   if (p.getCurrState().key === States.DEFEND_MAN) {
-    //     const stateData = p.getCurrState().data as DefendManState
-    //     if (stateData.manToDefend) {
-    //       playerIdsBeingDefended.push(stateData.manToDefend.playerId)
-    //     }
-    //   }
-    // })
-    // const playersNotBeingDefended = otherPlayers.filter(
-    //   (p) => !playerIdsBeingDefended.includes(p.playerId)
-    // )
-    // const closestPlayerToDefend = getClosestPlayer(currPlayer, playersNotBeingDefended)
-    // this.manToDefend = closestPlayerToDefend
   }
 
   execute(currPlayer: CourtPlayer, team: Team): void {
