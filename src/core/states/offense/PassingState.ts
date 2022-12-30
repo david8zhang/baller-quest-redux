@@ -54,7 +54,7 @@ export class PassingState extends State {
     currPlayer.sprite.anims.stop()
     currPlayer.sprite.setFlipX(animConfig.flipX)
     currPlayer.sprite.setTexture(animConfig.anims['wind-up'])
-    Game.instance.time.delayedCall(250, () => {
+    Game.instance.time.delayedCall(200, () => {
       currPlayer.sprite.setTexture(animConfig.anims['release'])
       const timeToPass = 0.25
       const angle = Phaser.Math.Angle.BetweenPoints(

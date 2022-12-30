@@ -210,6 +210,7 @@ export class CourtPlayer {
       this.sprite.x - this.raycastIntersectRect.width / 2,
       this.sprite.y - 15
     )
+
     this.stateText.setText(this.stateMachine.getState())
     this.stateText.setPosition(
       this.x - this.stateText.displayWidth / 2,

@@ -24,10 +24,8 @@ export class GoBackToSpotState extends State {
       gridPosForPlayer.col
     )
     if (currPlayer.isAtPoint(worldPosition)) {
-      if (currPlayer.constructor.name === 'PlayerCourtPlayer') {
-        if (this.onScreenFinishedCallback) {
-          this.onScreenFinishedCallback(currPlayer)
-        }
+      if (this.onScreenFinishedCallback) {
+        this.onScreenFinishedCallback(currPlayer)
       }
       currPlayer.setState(States.IDLE)
     } else {

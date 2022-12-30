@@ -17,11 +17,13 @@ export interface SetScreenStateConfig {
 export class SetScreenState extends State {
   public startedScreenTimestamp = -1
   public static SCREEN_DURATION = 5000
+  public static TRAVEL_DURATION = 2500
 
   public isScreeningCallback: Function | null = null
   public onScreenFinishedCallback: Function | null = null
   public screenPosition: { x: number; y: number } | null = null
   public isAtScreenPosition: boolean = false
+  private travelTimeExpired: boolean = false
 
   enter(currPlayer: CourtPlayer, team: Team, config: SetScreenStateConfig) {
     this.isScreeningCallback = config.isScreeningCallback
@@ -31,16 +33,23 @@ export class SetScreenState extends State {
   execute(currPlayer: CourtPlayer, team: Team, callback?: Function) {
     if (this.startedScreenTimestamp != -1) {
       const currTimestamp = Date.now()
-      if (this.screenPosition && currPlayer.isAtPoint(this.screenPosition)) {
-        this.isAtScreenPosition = true
-        if (this.isScreeningCallback) {
-          this.isScreeningCallback()
+      if (this.screenPosition) {
+        if (currPlayer.isAtPoint(this.screenPosition) || this.travelTimeExpired) {
+          this.isAtScreenPosition = true
+          if (this.isScreeningCallback) {
+            this.isScreeningCallback()
+          }
+          currPlayer.stop()
+          // If the player is at the screen position for longer than the screen duration
+          if (currTimestamp - this.startedScreenTimestamp > SetScreenState.SCREEN_DURATION) {
+            currPlayer.setState(States.GO_BACK_TO_SPOT, this.onScreenFinishedCallback)
+          }
+        } else {
+          if (currTimestamp - this.startedScreenTimestamp > SetScreenState.TRAVEL_DURATION) {
+            this.travelTimeExpired = true
+            currPlayer.stop()
+          }
         }
-        currPlayer.stop()
-      }
-      if (currTimestamp - this.startedScreenTimestamp > SetScreenState.SCREEN_DURATION) {
-        currPlayer.setState(States.GO_BACK_TO_SPOT, this.onScreenFinishedCallback)
-        this.startedScreenTimestamp = -1
       }
     } else {
       const ballHandler = Game.instance.ball.playerWithBall
@@ -68,6 +77,7 @@ export class SetScreenState extends State {
   }
 
   exit() {
+    this.travelTimeExpired = false
     this.isAtScreenPosition = false
     this.startedScreenTimestamp = -1
     this.screenPosition = null

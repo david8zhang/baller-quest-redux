@@ -17,9 +17,6 @@ export class PickAndRoll extends OffensePlay {
   reset() {
     this.isDrivingAroundScreen = false
     this.isRunning = false
-  }
-
-  public terminate() {
     super.terminate()
   }
 
@@ -40,7 +37,9 @@ export class PickAndRoll extends OffensePlay {
       const screener = getClosestPlayer(ballHandler, allTeamPlayers)
       const setScreenConfig: SetScreenStateConfig = {
         onScreenFinishedCallback: () => {
-          this.terminate()
+          if (!this.isDrivingAroundScreen) {
+            this.reset()
+          }
         },
         isScreeningCallback: () => {
           this.driveAroundScreen(screener, ballHandler)
@@ -64,11 +63,11 @@ export class PickAndRoll extends OffensePlay {
         onReachedPointCB: () => {
           const driveToBasketConfig = {
             onDriveSuccess: () => {
-              this.terminate()
+              this.reset()
             },
             onDriveFailed: () => {
               ballHandler.setState(States.GO_BACK_TO_SPOT, () => {
-                this.terminate()
+                this.reset()
               })
             },
             timeout: 4000,
@@ -76,7 +75,7 @@ export class PickAndRoll extends OffensePlay {
           ballHandler.setState(States.DRIVE_TO_BASKET, driveToBasketConfig)
         },
         failedToReachPointCB: () => {
-          this.terminate()
+          this.reset()
         },
         point,
       }

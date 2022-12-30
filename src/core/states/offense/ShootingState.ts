@@ -59,7 +59,23 @@ export class ShootingState extends State {
     const ball = Game.instance.ball
     ball.show()
 
-    const isMiss = Phaser.Math.Between(0, 100) < -1
+    const distance = Phaser.Math.Distance.Between(
+      currPlayer.sprite.x,
+      currPlayer.sprite.y,
+      Game.instance.hoop.rimSprite.x,
+      Game.instance.hoop.rimSprite.y
+    )
+
+    let arcTime = 1.5
+    if (distance < 150) {
+      arcTime = 1
+    } else if (distance >= 150 && distance < 200) {
+      arcTime = 1.2
+    } else if (distance > 200) {
+      arcTime = 1.5
+    }
+
+    const isMiss = Phaser.Math.Between(0, 100) < 50
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT
@@ -74,7 +90,7 @@ export class ShootingState extends State {
         x: posToLandX,
         y: Game.instance.hoop.rimSprite.y - 20,
       },
-      1.5
+      arcTime
     )
   }
 }
