@@ -17,7 +17,7 @@ export interface SetScreenStateConfig {
 export class SetScreenState extends State {
   public startedScreenTimestamp = -1
   public static SCREEN_DURATION = 5000
-  public static TRAVEL_DURATION = 2500
+  public static TRAVEL_DURATION = 2000
 
   public isScreeningCallback: Function | null = null
   public onScreenFinishedCallback: Function | null = null

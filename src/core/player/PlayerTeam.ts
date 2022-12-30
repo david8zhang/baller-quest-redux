@@ -56,12 +56,16 @@ export class PlayerTeam extends Team {
     this.game.input.keyboard.on('keydown', (e) => {
       switch (e.code) {
         case 'KeyS': {
-          if (this.selectedCourtPlayer.canDunkBall()) {
-            this.dunkBall()
-          } else if (this.selectedCourtPlayer.canLayupBall()) {
-            this.layupBall()
-          } else if (this.selectedCourtPlayer.canShootBall()) {
-            this.shootBall()
+          if (this.hasPossession()) {
+            if (this.selectedCourtPlayer.canDunkBall()) {
+              this.dunkBall()
+            } else if (this.selectedCourtPlayer.canLayupBall()) {
+              this.layupBall()
+            } else if (this.selectedCourtPlayer.canShootBall()) {
+              this.shootBall()
+            }
+          } else {
+            this.contestShot()
           }
           break
         }
@@ -81,10 +85,20 @@ export class PlayerTeam extends Team {
     })
   }
 
+  contestShot() {
+    const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+    courtPlayer.isPlayerCommandOverride = true
+    this.selectedCourtPlayer.setState(States.CONTEST_SHOT, (player: PlayerCourtPlayer) => {
+      player.setState(States.PLAYER_CONTROL)
+      player.isPlayerCommandOverride = false
+    })
+  }
+
   layupBall() {
     const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
     courtPlayer.isPlayerCommandOverride = true
     this.selectedCourtPlayer.setState(States.LAYUP, (player: PlayerCourtPlayer) => {
+      player.setState(States.PLAYER_CONTROL)
       player.isPlayerCommandOverride = false
     })
   }
@@ -93,6 +107,7 @@ export class PlayerTeam extends Team {
     const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
     courtPlayer.isPlayerCommandOverride = true
     this.selectedCourtPlayer.setState(States.DUNK, (player: PlayerCourtPlayer) => {
+      player.setState(States.PLAYER_CONTROL)
       player.isPlayerCommandOverride = false
     })
   }
@@ -101,6 +116,7 @@ export class PlayerTeam extends Team {
     const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
     courtPlayer.isPlayerCommandOverride = true
     this.selectedCourtPlayer.setState(States.SHOOTING, (player: PlayerCourtPlayer) => {
+      player.setState(States.PLAYER_CONTROL)
       player.isPlayerCommandOverride = false
     })
   }
@@ -210,6 +226,7 @@ export class PlayerTeam extends Team {
         })
         if (index === 0) {
           this.selectedCourtPlayer = newPlayer
+          this.selectedCourtPlayer.setState(States.PLAYER_CONTROL)
           this.selectedCourtPlayer.getPossessionOfBall()
           this.selectedCourtPlayerCursor.selectCourtPlayer(this.selectedCourtPlayer)
         }
@@ -243,7 +260,8 @@ export class PlayerTeam extends Team {
       !this.keyArrowRight ||
       !this.keyArrowUp ||
       !this.keyArrowDown ||
-      !this.selectedCourtPlayer.canMove()
+      !this.selectedCourtPlayer.canMove() ||
+      this.selectedCourtPlayer.getCurrState().key !== States.PLAYER_CONTROL
     ) {
       return
     }
@@ -284,6 +302,12 @@ export class PlayerTeam extends Team {
   public handleNewDefenseSetup(): void {
     const playerToSelect = this.getCourtPlayers().find((p) => p.playerId === 'player1')
     this.setSelectedCourtPlayer(playerToSelect!)
+  }
+
+  public handleNewPossession(): void {
+    super.handleNewPossession()
+    const playerToControl = this.getPlayerToReceiveBallOnNewPossession()
+    this.setSelectedCourtPlayer(playerToControl)
   }
 
   public getPlayerToReceiveBallOnNewPossession(): CourtPlayer {

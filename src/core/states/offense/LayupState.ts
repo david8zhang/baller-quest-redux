@@ -33,11 +33,12 @@ export class LayupState extends State {
       this.launchBallTowardsHoop(currPlayer)
     })
     Game.instance.time.delayedCall(975 * jumpDuration, () => {
+      currPlayer.sprite.body.checkCollision.none = false
       if (onComplete) {
         onComplete(currPlayer)
+      } else {
+        currPlayer.setState(States.IDLE)
       }
-      currPlayer.sprite.body.checkCollision.none = false
-      currPlayer.setState(States.IDLE)
     })
   }
 

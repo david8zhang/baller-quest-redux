@@ -42,11 +42,12 @@ export class DunkState extends State {
       Game.instance.time.delayedCall(300, () => {
         currPlayer.sprite.setGravityY(980)
         Game.instance.time.delayedCall(300, () => {
+          currPlayer.sprite.body.checkCollision.none = false
           if (onComplete) {
-            currPlayer.sprite.body.checkCollision.none = false
             onComplete(currPlayer)
+          } else {
+            currPlayer.setState(States.IDLE)
           }
-          currPlayer.setState(States.IDLE)
         })
       })
     })

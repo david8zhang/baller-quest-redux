@@ -264,10 +264,8 @@ export class CourtPlayer {
 
   stop() {
     this.sprite.setVelocity(0, 0)
-    if (this.getCurrState().key !== States.PASSING) {
-      this.sprite.setFlipX(false)
-      this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
-    }
+    this.sprite.setFlipX(false)
+    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
   }
 
   setVelocityX(xVelocity: number) {

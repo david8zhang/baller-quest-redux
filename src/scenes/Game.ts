@@ -101,7 +101,7 @@ export default class Game extends Phaser.Scene {
       WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
       WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
     )
-    this.time.delayedCall(5000, () => {
+    this.time.delayedCall(2000, () => {
       newTeamWithPossession.handleNewPossession()
       newTeamOnDefense.handleNewDefenseSetup()
       this.resetPositioning()

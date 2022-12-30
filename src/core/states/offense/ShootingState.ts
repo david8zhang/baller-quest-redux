@@ -48,9 +48,10 @@ export class ShootingState extends State {
     })
     Game.instance.time.delayedCall(jumpTime * 975, () => {
       currPlayer.sprite.body.checkCollision.none = false
-      currPlayer.setState(States.IDLE)
       if (callback) {
         callback(currPlayer)
+      } else {
+        currPlayer.setState(States.IDLE)
       }
     })
   }
