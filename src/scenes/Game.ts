@@ -8,6 +8,7 @@ import { CPUTeam } from '~/core/cpu/CPUTeam'
 import { Cursor } from '~/core/Cursor'
 import { Hoop } from '~/core/Hoop'
 import { PlayerTeam } from '~/core/player/PlayerTeam'
+import { ScoreTracker } from '~/core/ScoreTracker'
 
 export default class Game extends Phaser.Scene {
   public player!: PlayerTeam
@@ -21,6 +22,7 @@ export default class Game extends Phaser.Scene {
   public isChangingPossession: boolean = false
   public playerCourtPlayers!: Phaser.GameObjects.Group
   public cpuCourtPlayers!: Phaser.GameObjects.Group
+  private scoreTracker!: ScoreTracker
   private static _instance: Game
 
   constructor() {
@@ -30,6 +32,10 @@ export default class Game extends Phaser.Scene {
 
   public static get instance() {
     return Game._instance
+  }
+
+  onScore(side: Side, numPoints: number) {
+    this.scoreTracker.increaseScore(numPoints, side)
   }
 
   create() {
@@ -49,6 +55,9 @@ export default class Game extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#fff8dc')
     this.player = new PlayerTeam(this)
     this.cpu = new CPUTeam(this)
+
+    this.scoreTracker = new ScoreTracker(this)
+
     this.setupColliders()
     this.setupUI()
   }
@@ -101,7 +110,7 @@ export default class Game extends Phaser.Scene {
       WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
       WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
     )
-    this.time.delayedCall(2000, () => {
+    this.time.delayedCall(1500, () => {
       newTeamWithPossession.handleNewPossession()
       newTeamOnDefense.handleNewDefenseSetup()
       this.resetPositioning()

@@ -69,6 +69,7 @@ export class Ball {
       this.sprite,
       () => {
         if (this.ballState === BallState.DUNK || this.ballState === BallState.MADE_SHOT) {
+          Game.instance.onScore(this.prevPlayerWithBall!.side, 2)
           this.ballState = BallState.POST_MADE_SHOT
           this.game.handleChangePossession(this.prevPlayerWithBall!.side)
         }
@@ -125,11 +126,5 @@ export class Ball {
       this.sprite.setPosition(this.playerWithBall.sprite.x, this.playerWithBall.sprite.y)
       this.ballStateText.setVisible(false)
     }
-    // this.ballStateText.setVisible(true)
-    // this.ballStateText.setText(this.ballState)
-    // this.ballStateText.setPosition(
-    //   this.sprite.x - this.ballStateText.displayWidth / 2,
-    //   this.sprite.y - this.ballStateText.displayHeight - 10
-    // )
   }
 }

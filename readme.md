@@ -4,12 +4,19 @@
 
 ## TODO:
 
-- Layups
-- Setting screens and rolling
+### High Priority
+
+- Three pointers vs. two pointer
+- Score tracker
+- Shot success based on contest
+- Shot clock
+
+### Medium Priority
+
 - Blocking shots
-- Cutting to the basket
-- Reset positions when possession changes
-- AI offense behaviors
 - Steals
-- Rebounding
-- Dunks
+
+### Low Priority
+
+- More offensive sets for enemy
+- Offball movement for player
