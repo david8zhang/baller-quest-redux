@@ -7,8 +7,6 @@
 ### High Priority
 
 - Three pointers vs. two pointer
-- Score tracker
-- Shot success based on contest
 - Shot clock
 
 ### Medium Priority

@@ -50,6 +50,7 @@ export class CourtPlayer {
   public playerId: string
 
   protected stateText: Phaser.GameObjects.Text
+  protected playerIdText: Phaser.GameObjects.Text
   protected stateMachine: StateMachine
   protected team: Team
   protected decisionTree!: TreeNode
@@ -100,6 +101,12 @@ export class CourtPlayer {
     )
     this.stateText = Game.instance.add
       .text(this.x, this.y - 20, '', {
+        fontSize: '12px',
+        color: 'black',
+      })
+      .setDepth(SORT_ORDER.ui)
+    this.playerIdText = Game.instance.add
+      .text(this.x, this.stateText.y - 20, this.playerId, {
         fontSize: '12px',
         color: 'black',
       })
@@ -216,6 +223,10 @@ export class CourtPlayer {
       this.x - this.stateText.displayWidth / 2,
       this.y - 20 - this.stateText.displayHeight / 2
     )
+    this.playerIdText.setPosition(
+      this.x - this.playerIdText.displayWidth / 2,
+      this.stateText.y - 20
+    )
   }
 
   public getCurrState() {
@@ -253,8 +264,16 @@ export class CourtPlayer {
     this.game.ball.sprite.setGravity(0)
     this.game.ball.playerWithBall = this
     const prevPlayerWithBall = this.game.ball.prevPlayerWithBall
-    if (prevPlayerWithBall && prevPlayerWithBall.side !== this.side) {
-      this.game.handleChangePossession(prevPlayerWithBall.side)
+    if (prevPlayerWithBall) {
+      if (prevPlayerWithBall.side !== this.side) {
+        this.game.handleChangePossession(prevPlayerWithBall.side)
+      } else {
+        // Handle possession recovery
+        if (prevPlayerWithBall.getCurrState().key !== States.PASSING) {
+          this.team.handleNewPossession()
+          this.team.getOtherTeam().handleNewDefenseSetup()
+        }
+      }
     }
   }
 

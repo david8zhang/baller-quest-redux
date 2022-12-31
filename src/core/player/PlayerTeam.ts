@@ -21,7 +21,7 @@ export class PlayerTeam extends Team {
   private keyArrowUp!: Phaser.Input.Keyboard.Key
   private keyArrowDown!: Phaser.Input.Keyboard.Key
   private sprintMeter: SprintMeter
-  public defensiveAssignmentMapping = PlayerConstants.DEFENSIVE_ASSIGNMENTS
+  public defensiveAssignmentMapping = { ...PlayerConstants.DEFENSIVE_ASSIGNMENTS }
   private defenseMeter: DefenseMeter
   public canCallForScreen: boolean = true
 
@@ -300,6 +300,7 @@ export class PlayerTeam extends Team {
   }
 
   public handleNewDefenseSetup(): void {
+    this.defensiveAssignmentMapping = { ...PlayerConstants.DEFENSIVE_ASSIGNMENTS }
     const playerToSelect = this.getCourtPlayers().find((p) => p.playerId === 'player1')
     this.setSelectedCourtPlayer(playerToSelect!)
   }

@@ -66,6 +66,10 @@ export abstract class Team {
     return false
   }
 
+  updateDefensiveAssignmentMapping(defenderId: string, manToDefendId: string) {
+    this.defensiveAssignmentMapping[defenderId] = manToDefendId
+  }
+
   positionPlayers() {
     const initialPositions = this.hasPossession()
       ? this.getOffensivePositions()

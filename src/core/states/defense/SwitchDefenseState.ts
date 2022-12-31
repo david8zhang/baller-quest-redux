@@ -41,7 +41,10 @@ export class SwitchDefenseState extends State {
 
   exit(currPlayer: CourtPlayer, team: Team) {
     if (this.newDefensiveAssignment) {
-      team.defensiveAssignmentMapping[currPlayer.playerId] = this.newDefensiveAssignment.playerId
+      team.updateDefensiveAssignmentMapping(
+        currPlayer.playerId,
+        this.newDefensiveAssignment.playerId
+      )
       this.newDefensiveAssignment = null
     }
   }

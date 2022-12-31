@@ -1,5 +1,5 @@
 import { BallState } from '~/core/Ball'
-import { createArc } from '~/core/Constants'
+import { createArc, getClosestPlayer } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -44,7 +44,7 @@ export class ShootingState extends State {
         Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
       }
       Game.instance.ball.giveUpPossession()
-      this.launchBallTowardsHoop(currPlayer)
+      this.launchBallTowardsHoop(currPlayer, team)
     })
     Game.instance.time.delayedCall(jumpTime * 975, () => {
       currPlayer.sprite.body.checkCollision.none = false
@@ -56,7 +56,7 @@ export class ShootingState extends State {
     })
   }
 
-  launchBallTowardsHoop(currPlayer: CourtPlayer) {
+  launchBallTowardsHoop(currPlayer: CourtPlayer, team: Team) {
     const ball = Game.instance.ball
     ball.show()
 
@@ -76,7 +76,8 @@ export class ShootingState extends State {
       arcTime = 1.5
     }
 
-    const isMiss = Phaser.Math.Between(0, 100) < 50
+    const percentageSuccess = this.calculateShotSuccessPercentage(currPlayer, team)
+    const isMiss = Phaser.Math.Between(0, 100) > percentageSuccess
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT
@@ -93,5 +94,38 @@ export class ShootingState extends State {
       },
       arcTime
     )
+  }
+
+  calculateShotSuccessPercentage(currPlayer: CourtPlayer, team: Team) {
+    const shotContesters = team.getOtherTeamCourtPlayers().filter((p) => {
+      return p.getCurrState().key === States.CONTEST_SHOT
+    })
+    const closestContester = getClosestPlayer(currPlayer, shotContesters)
+
+    if (closestContester) {
+      const distToClosestContester = Phaser.Math.Distance.Between(
+        currPlayer.sprite.x,
+        currPlayer.sprite.y,
+        closestContester.sprite.x,
+        closestContester.sprite.y
+      )
+      if (distToClosestContester > 100) {
+        console.log('Wide open!')
+        return 75
+      }
+      if (distToClosestContester <= 100 && distToClosestContester > 80) {
+        console.log('Open')
+        return 50
+      }
+      if (distToClosestContester <= 80 && distToClosestContester > 65) {
+        console.log('Contested')
+        return 30
+      }
+      console.log('Smothered')
+      return 5
+    } else {
+      console.log('Wide Open!')
+      return 80
+    }
   }
 }

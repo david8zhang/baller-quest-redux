@@ -11,7 +11,7 @@ export class CPUTeam extends Team {
   public players: CPUCourtPlayer[] = []
   public offensePlays: OffensePlay[] = []
   public currPlay: OffensePlay | null = null
-  public defensiveAssignmentMapping: any = CPUConstants.DEFENSIVE_ASSIGNMENTS
+  public defensiveAssignmentMapping: any = { ...CPUConstants.DEFENSIVE_ASSIGNMENTS }
 
   constructor(game: Game) {
     super(game, Side.CPU)
@@ -41,6 +41,7 @@ export class CPUTeam extends Team {
   }
 
   public handleNewDefenseSetup(): void {
+    this.defensiveAssignmentMapping = { ...CPUConstants.DEFENSIVE_ASSIGNMENTS }
     return
   }
 
