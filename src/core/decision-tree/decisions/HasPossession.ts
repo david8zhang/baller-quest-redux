@@ -17,7 +17,8 @@ export class HasPossession extends TreeNode {
     const team = this.blackboard.getData(BlackboardKeys.CURR_TEAM) as Team
     if (
       ball.ballState === BallState.PASS ||
-      ball.ballState === BallState.MADE_SHOT ||
+      ball.ballState === BallState.MADE_TWO_POINT_SHOT ||
+      ball.ballState === BallState.MADE_THREE_POINT_SHOT ||
       ball.ballState === BallState.MISSED_SHOT
     ) {
       const prevPlayerWithBall = ball.prevPlayerWithBall

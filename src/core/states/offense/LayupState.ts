@@ -47,14 +47,14 @@ export class LayupState extends State {
     ball.show()
     Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
 
-    const isMiss = Phaser.Math.Between(0, 100) < -1
+    const isMiss = Phaser.Math.Between(0, 100) < 200
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT
       const missOffset = Phaser.Math.Between(0, 1) ? -10 : 10
       posToLandX = Game.instance.hoop.rimSprite.x + missOffset
     } else {
-      ball.ballState = BallState.MADE_SHOT
+      ball.ballState = BallState.MADE_TWO_POINT_SHOT
     }
     createArc(
       ball.sprite,

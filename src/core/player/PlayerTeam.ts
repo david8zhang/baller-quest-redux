@@ -85,6 +85,20 @@ export class PlayerTeam extends Team {
     })
   }
 
+  handleOffensiveRebound(side: Side) {
+    const playerWithBall = this.game.ball.playerWithBall
+    if (side === Side.PLAYER) {
+      if (playerWithBall) {
+        this.setSelectedCourtPlayer(playerWithBall)
+      }
+    } else {
+      if (playerWithBall) {
+        const closestPlayerToRebounder = getClosestPlayer(playerWithBall, this.getCourtPlayers())
+        this.setSelectedCourtPlayer(closestPlayerToRebounder)
+      }
+    }
+  }
+
   contestShot() {
     const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
     courtPlayer.isPlayerCommandOverride = true

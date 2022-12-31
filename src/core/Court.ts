@@ -1,20 +1,49 @@
 import Game from '~/scenes/Game'
-import { WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
+import { SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
 
 export class Court {
   private game: Game
+  private sprite: Phaser.GameObjects.Sprite
   public isVisible: boolean = false
   private static FIELD_ZONE_WIDTH = 32
   private static FIELD_ZONE_HEIGHT = 32
   private objects: Phaser.GameObjects.Group
   public grid: Phaser.GameObjects.Rectangle[][] = []
   public onDebugToggleHooks: Function[] = []
+  public threePointDetectorCircle!: Phaser.Geom.Ellipse
 
   constructor(game: Game) {
     this.game = game
+    this.sprite = this.game.add.sprite(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 'court')
     this.objects = this.game.add.group()
     this.debugFieldGrid()
     this.handleDebugToggleInput()
+    this.setupWallSprite()
+    this.setupThreePointDetectorCircle()
+  }
+
+  setupThreePointDetectorCircle() {
+    this.threePointDetectorCircle = new Phaser.Geom.Ellipse(
+      WINDOW_WIDTH / 2,
+      WINDOW_HEIGHT / 2 - 50,
+      600,
+      590
+    )
+  }
+
+  isThreePointShot(x: number, y: number): boolean {
+    return !this.threePointDetectorCircle.contains(x, y)
+  }
+
+  setupWallSprite() {
+    const backcourtWallSprite = this.game.physics.add
+      .sprite(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 60, '')
+      .setVisible(false)
+      .setDisplaySize(WINDOW_WIDTH, 5)
+      .setDebug(true, true, 0x00ff00)
+      .setImmovable(true)
+    this.game.physics.add.collider(backcourtWallSprite, this.game.playerCourtPlayers)
+    this.game.physics.add.collider(backcourtWallSprite, this.game.cpuCourtPlayers)
   }
 
   handleDebugToggleInput() {
@@ -52,12 +81,12 @@ export class Court {
             0x000000,
             0
           )
-          .setStrokeStyle(3, 0x00ff00, 1)
+          .setStrokeStyle(3, 0x000000, 1)
           .setVisible(this.isVisible)
           .setDepth(100)
         const text = this.game.add
           .text(position.x, position.y, `${i},${j}`)
-          .setTintFill(0x00ff00)
+          .setTintFill(0x000000)
           .setAlpha(1)
           .setVisible(this.isVisible)
           .setDepth(100)

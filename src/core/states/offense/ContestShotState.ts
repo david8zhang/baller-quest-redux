@@ -11,6 +11,7 @@ export class ContestShotState extends State {
       currPlayer.stop()
       currPlayer.sprite.anims.stop()
       currPlayer.sprite.setTexture('contest-front')
+      currPlayer.sprite.body.checkCollision.none = true
       const jumpTime = 0.7
       const enemyShooter = team.getOtherTeamCourtPlayers().find((p) => {
         const currState = p.getCurrState()

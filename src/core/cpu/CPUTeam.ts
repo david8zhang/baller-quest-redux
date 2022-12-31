@@ -45,6 +45,14 @@ export class CPUTeam extends Team {
     return
   }
 
+  handleOffensiveRebound(side: Side) {
+    if (side === Side.CPU) {
+      this.handleNewPossession()
+    } else {
+      this.handleNewDefenseSetup()
+    }
+  }
+
   public getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null {
     const otherTeamPlayers = this.getOtherTeamCourtPlayers()
     const playerToDefendId = this.defensiveAssignmentMapping[playerId]

@@ -66,6 +66,8 @@ export abstract class Team {
     return false
   }
 
+  public abstract handleOffensiveRebound(side: Side): void
+
   updateDefensiveAssignmentMapping(defenderId: string, manToDefendId: string) {
     this.defensiveAssignmentMapping[defenderId] = manToDefendId
   }

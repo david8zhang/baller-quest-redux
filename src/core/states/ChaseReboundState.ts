@@ -1,4 +1,5 @@
 import Game from '~/scenes/Game'
+import { Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Team } from '../Team'
 import { State } from './StateMachine'

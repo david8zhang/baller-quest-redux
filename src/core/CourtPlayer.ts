@@ -269,9 +269,9 @@ export class CourtPlayer {
         this.game.handleChangePossession(prevPlayerWithBall.side)
       } else {
         // Handle possession recovery
-        if (prevPlayerWithBall.getCurrState().key !== States.PASSING) {
-          this.team.handleNewPossession()
-          this.team.getOtherTeam().handleNewDefenseSetup()
+        if (this.getCurrState().key === States.CHASE_REBOUND) {
+          this.team.handleOffensiveRebound(this.side)
+          this.team.getOtherTeam().handleOffensiveRebound(this.side)
         }
       }
     }

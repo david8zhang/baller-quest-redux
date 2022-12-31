@@ -6,7 +6,28 @@ import Game from '~/scenes/Game'
 import { State } from '../StateMachine'
 import { States } from '../States'
 
+export enum ShotCoverage {
+  WIDE_OPEN = 'Wide Open',
+  OPEN = 'Open',
+  CONTESTED = 'Contested',
+  SMOTHERED = 'Smothered',
+}
+
 export class ShootingState extends State {
+  private static THREE_POINT_PERCENTAGES = {
+    [ShotCoverage.WIDE_OPEN]: 50,
+    [ShotCoverage.OPEN]: 40,
+    [ShotCoverage.CONTESTED]: 10,
+    [ShotCoverage.SMOTHERED]: 1,
+  }
+
+  private static MID_RANGE_PERCENTAGES = {
+    [ShotCoverage.WIDE_OPEN]: 75,
+    [ShotCoverage.OPEN]: 60,
+    [ShotCoverage.CONTESTED]: 20,
+    [ShotCoverage.SMOTHERED]: 5,
+  }
+
   enter(currPlayer: CourtPlayer, team: Team, callback: Function) {
     const hoop = Game.instance.hoop.standSprite
     currPlayer.stop()
@@ -32,6 +53,10 @@ export class ShootingState extends State {
     } else {
       currPlayer.sprite.setTexture('shoot-jump-front')
     }
+    const isThreePointShot = Game.instance.court.isThreePointShot(
+      currPlayer.sprite.x,
+      currPlayer.sprite.y + 32
+    )
 
     createArc(currPlayer.sprite, { x: initialX, y: initialY }, jumpTime)
     Game.instance.time.delayedCall(jumpTime * 975 * 0.45, () => {
@@ -44,7 +69,7 @@ export class ShootingState extends State {
         Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
       }
       Game.instance.ball.giveUpPossession()
-      this.launchBallTowardsHoop(currPlayer, team)
+      this.launchBallTowardsHoop(currPlayer, team, isThreePointShot)
     })
     Game.instance.time.delayedCall(jumpTime * 975, () => {
       currPlayer.sprite.body.checkCollision.none = false
@@ -56,7 +81,7 @@ export class ShootingState extends State {
     })
   }
 
-  launchBallTowardsHoop(currPlayer: CourtPlayer, team: Team) {
+  launchBallTowardsHoop(currPlayer: CourtPlayer, team: Team, isThreePointShot: boolean) {
     const ball = Game.instance.ball
     ball.show()
 
@@ -76,7 +101,11 @@ export class ShootingState extends State {
       arcTime = 1.5
     }
 
-    const percentageSuccess = this.calculateShotSuccessPercentage(currPlayer, team)
+    const percentageSuccess = this.calculateShotSuccessPercentage(
+      currPlayer,
+      team,
+      isThreePointShot
+    )
     const isMiss = Phaser.Math.Between(0, 100) > percentageSuccess
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
@@ -84,7 +113,9 @@ export class ShootingState extends State {
       const missOffset = Phaser.Math.Between(0, 1) ? -10 : 10
       posToLandX = Game.instance.hoop.rimSprite.x + missOffset
     } else {
-      ball.ballState = BallState.MADE_SHOT
+      ball.ballState = isThreePointShot
+        ? BallState.MADE_THREE_POINT_SHOT
+        : BallState.MADE_TWO_POINT_SHOT
     }
     createArc(
       ball.sprite,
@@ -96,12 +127,12 @@ export class ShootingState extends State {
     )
   }
 
-  calculateShotSuccessPercentage(currPlayer: CourtPlayer, team: Team) {
+  calculateShotSuccessPercentage(currPlayer: CourtPlayer, team: Team, isThreePointShot: boolean) {
     const shotContesters = team.getOtherTeamCourtPlayers().filter((p) => {
       return p.getCurrState().key === States.CONTEST_SHOT
     })
     const closestContester = getClosestPlayer(currPlayer, shotContesters)
-
+    let shotCoverage: ShotCoverage = ShotCoverage.SMOTHERED
     if (closestContester) {
       const distToClosestContester = Phaser.Math.Distance.Between(
         currPlayer.sprite.x,
@@ -110,22 +141,23 @@ export class ShootingState extends State {
         closestContester.sprite.y
       )
       if (distToClosestContester > 100) {
-        console.log('Wide open!')
-        return 75
+        shotCoverage = ShotCoverage.WIDE_OPEN
       }
       if (distToClosestContester <= 100 && distToClosestContester > 80) {
-        console.log('Open')
-        return 50
+        shotCoverage = ShotCoverage.OPEN
       }
       if (distToClosestContester <= 80 && distToClosestContester > 65) {
-        console.log('Contested')
-        return 30
+        shotCoverage = ShotCoverage.CONTESTED
       }
-      console.log('Smothered')
-      return 5
     } else {
-      console.log('Wide Open!')
-      return 80
+      shotCoverage = ShotCoverage.WIDE_OPEN
     }
+    const percentagesConfig = isThreePointShot
+      ? ShootingState.THREE_POINT_PERCENTAGES
+      : ShootingState.MID_RANGE_PERCENTAGES
+
+    console.log(isThreePointShot ? 'Three Pointer!' : 'Two Pointer')
+    console.log('Shot Coverage: ', shotCoverage)
+    return percentagesConfig[shotCoverage]
   }
 }

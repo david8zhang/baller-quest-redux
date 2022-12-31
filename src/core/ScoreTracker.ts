@@ -17,11 +17,11 @@ export class ScoreTracker {
   initializeText() {
     this.playerScoreText = this.game.add.text(0, 0, `Player: ${this.playerScore}`).setStyle({
       fontSize: '14px',
-      color: 'black',
+      color: 'white',
     })
     this.cpuScoreText = this.game.add.text(0, 0, `CPU: ${this.cpuScore}`).setStyle({
       fontSize: '14px',
-      color: 'black',
+      color: 'white',
     })
 
     this.playerScoreText.setPosition(20, this.playerScoreText.displayHeight / 2 + 10)

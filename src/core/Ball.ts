@@ -1,5 +1,5 @@
 import Game from '~/scenes/Game'
-import { createArc, Side, SORT_ORDER } from './Constants'
+import { createArc, SORT_ORDER } from './Constants'
 import { CourtPlayer } from './CourtPlayer'
 
 export interface BallConfig {
@@ -10,7 +10,8 @@ export interface BallConfig {
 }
 
 export enum BallState {
-  MADE_SHOT = 'MADE_SHOT',
+  MADE_TWO_POINT_SHOT = 'MADE_TWO_POINT_SHOT',
+  MADE_THREE_POINT_SHOT = 'MADE_THREE_POINT_SHOT',
   MISSED_SHOT = 'MISSED_SHOT',
   LOOSE = 'LOOSE',
   DRIBBLING = 'DRIBBLING',
@@ -52,7 +53,8 @@ export class Ball {
     if (
       this.ballState !== BallState.DUNK &&
       this.ballState !== BallState.POST_MADE_SHOT &&
-      this.ballState !== BallState.MADE_SHOT
+      this.ballState !== BallState.MADE_TWO_POINT_SHOT &&
+      this.ballState !== BallState.MADE_THREE_POINT_SHOT
     ) {
       this.floorCollider.active = false
     }
@@ -68,8 +70,13 @@ export class Ball {
       this.game.hoop.floorSprite,
       this.sprite,
       () => {
-        if (this.ballState === BallState.DUNK || this.ballState === BallState.MADE_SHOT) {
-          Game.instance.onScore(this.prevPlayerWithBall!.side, 2)
+        if (
+          this.ballState === BallState.DUNK ||
+          this.ballState === BallState.MADE_TWO_POINT_SHOT ||
+          this.ballState === BallState.MADE_THREE_POINT_SHOT
+        ) {
+          const points = this.ballState === BallState.MADE_THREE_POINT_SHOT ? 3 : 2
+          Game.instance.onScore(this.prevPlayerWithBall!.side, points)
           this.ballState = BallState.POST_MADE_SHOT
           this.game.handleChangePossession(this.prevPlayerWithBall!.side)
         }
@@ -88,7 +95,10 @@ export class Ball {
 
       // Check if ball is falling downward
       if (this.sprite.body.velocity.y > 0) {
-        if (this.ballState === BallState.MADE_SHOT) {
+        if (
+          this.ballState === BallState.MADE_TWO_POINT_SHOT ||
+          this.ballState === BallState.MADE_THREE_POINT_SHOT
+        ) {
           this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.8)
           this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.9)
         } else if (this.ballState === BallState.MISSED_SHOT) {

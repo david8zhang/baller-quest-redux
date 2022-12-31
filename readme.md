@@ -6,15 +6,16 @@
 
 ### High Priority
 
-- Three pointers vs. two pointer
 - Shot clock
 
 ### Medium Priority
 
 - Blocking shots
 - Steals
+- More offensive sets for enemy
 
 ### Low Priority
 
-- More offensive sets for enemy
 - Offball movement for player
+- Hoop animation on made shots
+- Depth sorting
