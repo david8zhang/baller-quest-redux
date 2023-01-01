@@ -1,5 +1,5 @@
 import { BallState } from '~/core/Ball'
-import { createArc, SORT_ORDER } from '~/core/Constants'
+import { createArc, getClosestPlayer, SORT_ORDER } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -27,10 +27,11 @@ export class LayupState extends State {
     })
 
     Game.instance.time.delayedCall(975 * jumpDuration * 0.5, () => {
+      currPlayer.shotReleased = true
       currPlayer.sprite.setTexture('layup-flick-front')
       currPlayer.hasPossession = false
       Game.instance.ball.giveUpPossession()
-      this.launchBallTowardsHoop(currPlayer)
+      this.launchBallTowardsHoop(currPlayer, team)
     })
     Game.instance.time.delayedCall(975 * jumpDuration, () => {
       currPlayer.sprite.body.checkCollision.none = false
@@ -42,12 +43,39 @@ export class LayupState extends State {
     })
   }
 
-  launchBallTowardsHoop(currPlayer: CourtPlayer) {
+  calculateShotSuccessPercentage(currPlayer: CourtPlayer, team: Team) {
+    const shotContesters = team.getOtherTeamCourtPlayers().filter((p) => {
+      return p.getCurrState().key === States.CONTEST_SHOT
+    })
+    const closestContester = getClosestPlayer(currPlayer, shotContesters)
+    if (closestContester) {
+      const distToClosestContester = Phaser.Math.Distance.Between(
+        currPlayer.sprite.x,
+        currPlayer.sprite.y,
+        closestContester.sprite.x,
+        closestContester.sprite.y
+      )
+      if (distToClosestContester > 100) {
+        return 95
+      }
+      if (distToClosestContester <= 100 && distToClosestContester > 80) {
+        return 80
+      }
+      if (distToClosestContester <= 80 && distToClosestContester > 65) {
+        return 65
+      }
+    } else {
+      return 50
+    }
+    return 100
+  }
+
+  launchBallTowardsHoop(currPlayer: CourtPlayer, team: Team) {
     const ball = Game.instance.ball
     ball.show()
     Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
-
-    const isMiss = Phaser.Math.Between(0, 100) < 200
+    const shotPercentage = this.calculateShotSuccessPercentage(currPlayer, team)
+    const isMiss = Phaser.Math.Between(0, 100) < shotPercentage
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT
@@ -64,5 +92,9 @@ export class LayupState extends State {
       },
       0.7
     )
+  }
+
+  exit(currPlayer: CourtPlayer) {
+    currPlayer.shotReleased = false
   }
 }

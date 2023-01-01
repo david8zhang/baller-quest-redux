@@ -1,0 +1,36 @@
+import { CourtPlayer } from '~/core/CourtPlayer'
+import { States } from '~/core/states/States'
+import { Team } from '~/core/Team'
+import { Blackboard } from '../Blackboard'
+import { BlackboardKeys } from '../BlackboardKeys'
+import { Decision } from '../Decision'
+import { TreeNode } from '../TreeNode'
+
+export class ShouldBlockShot extends TreeNode {
+  constructor(blackboard: Blackboard) {
+    super('ShouldBlockShot', blackboard)
+  }
+
+  public process(): Decision | States {
+    const currPlayer = this.blackboard.getData(BlackboardKeys.CURR_PLAYER) as CourtPlayer
+    const team = this.blackboard.getData(BlackboardKeys.CURR_TEAM) as Team
+    const otherTeamPlayers = team.getOtherTeamCourtPlayers()
+    const shooter = otherTeamPlayers.find((p) => {
+      return p.getCurrState().key === States.SHOOTING
+    })
+    if (shooter && !shooter.shotReleased) {
+      const distToShooter = Phaser.Math.Distance.Between(
+        currPlayer.sprite.x,
+        currPlayer.sprite.y,
+        shooter.sprite.x,
+        shooter.sprite.y
+      )
+      if (distToShooter < 65) {
+        return Decision.PROCEED
+      } else {
+        return Decision.STOP
+      }
+    }
+    return Decision.STOP
+  }
+}

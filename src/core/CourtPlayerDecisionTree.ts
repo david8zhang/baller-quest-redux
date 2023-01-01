@@ -2,6 +2,7 @@ import { CourtPlayer } from './CourtPlayer'
 import { Blackboard } from './decision-tree/Blackboard'
 import { HasPossession } from './decision-tree/decisions/HasPossession'
 import { IsBallLoose } from './decision-tree/decisions/IsBallLoose'
+import { ShouldBlockShot } from './decision-tree/decisions/ShouldBlockShot'
 import { ShouldContestShot } from './decision-tree/decisions/ShouldContestShot'
 import { ShouldFightOverScreen } from './decision-tree/decisions/ShouldFightOverScreen'
 import { ShouldSwitch } from './decision-tree/decisions/ShouldSwitch'
@@ -27,35 +28,43 @@ export const createDecisionTree = (
         new LeafNode('ChaseRebound', blackboard, States.CHASE_REBOUND),
       ]),
       new SelectorNode(
-        'ContestShotSelector',
+        'BlockShotSelector',
         blackboard,
-        new SequenceNode('ContestShotSequence', blackboard, [
-          new ShouldContestShot(blackboard),
-          new LeafNode('ContestShot', blackboard, States.CONTEST_SHOT),
+        new SequenceNode('BlockShotSequence', blackboard, [
+          new ShouldBlockShot(blackboard),
+          new LeafNode('BlockShot', blackboard, States.BLOCK_SHOT),
         ]),
         new SelectorNode(
-          'OffenseOrDefenseSelector',
+          'ContestShotSelector',
           blackboard,
-          new SequenceNode('OffenseSequence', blackboard, [
-            new HasPossession(blackboard),
-            new LeafNode('IdleState', blackboard, States.IDLE),
+          new SequenceNode('ContestShotSequence', blackboard, [
+            new ShouldContestShot(blackboard),
+            new LeafNode('ContestShot', blackboard, States.CONTEST_SHOT),
           ]),
           new SelectorNode(
-            'ShouldReactToScreen',
+            'OffenseOrDefenseSelector',
             blackboard,
+            new SequenceNode('OffenseSequence', blackboard, [
+              new HasPossession(blackboard),
+              new LeafNode('IdleState', blackboard, States.IDLE),
+            ]),
             new SelectorNode(
-              'ShouldSwitchOrFightOverScreen',
+              'ShouldReactToScreen',
               blackboard,
-              new SequenceNode('FightOverScreenSeq', blackboard, [
-                new ShouldFightOverScreen(blackboard),
-                new LeafNode('FightOverScreen', blackboard, States.FIGHT_OVER_SCREEN),
-              ]),
-              new SequenceNode('SwitchScreenSeq', blackboard, [
-                new ShouldSwitch(blackboard),
-                new LeafNode('SwitchScreen', blackboard, States.SWITCH_DEFENSE),
-              ])
-            ),
-            new LeafNode('DefendMan', blackboard, States.DEFEND_MAN)
+              new SelectorNode(
+                'ShouldSwitchOrFightOverScreen',
+                blackboard,
+                new SequenceNode('FightOverScreenSeq', blackboard, [
+                  new ShouldFightOverScreen(blackboard),
+                  new LeafNode('FightOverScreen', blackboard, States.FIGHT_OVER_SCREEN),
+                ]),
+                new SequenceNode('SwitchScreenSeq', blackboard, [
+                  new ShouldSwitch(blackboard),
+                  new LeafNode('SwitchScreen', blackboard, States.SWITCH_DEFENSE),
+                ])
+              ),
+              new LeafNode('DefendMan', blackboard, States.DEFEND_MAN)
+            )
           )
         )
       )

@@ -11,22 +11,19 @@ export class FightOverScreenState extends State {
     const currBallHandler = team.game.ball.playerWithBall
     if (currBallHandler) {
       this.newDefensiveAssignment = currBallHandler
+      const hoop = Game.instance.hoop
+      const line = new Phaser.Geom.Line(
+        currBallHandler.sprite.x,
+        currBallHandler.sprite.y,
+        hoop.standSprite.x,
+        hoop.standSprite.y
+      )
+      const pointToMoveTo = line.getPoint(FightOverScreenState.DEFENSIVE_SPACING_PERCENTAGE)
 
-      if (
-        Math.abs(currBallHandler.sprite.body.velocity.x) > 0 ||
-        Math.abs(currBallHandler.sprite.body.velocity.y) > 0
-      ) {
-        const hoop = Game.instance.hoop
-        const line = new Phaser.Geom.Line(
-          currBallHandler.sprite.x,
-          currBallHandler.sprite.y,
-          hoop.standSprite.x,
-          hoop.standSprite.y
-        )
-        const pointToMoveTo = line.getPoint(FightOverScreenState.DEFENSIVE_SPACING_PERCENTAGE)
-        currPlayer.moveTowards(pointToMoveTo)
-      } else {
+      if (currPlayer.isAtPoint(pointToMoveTo)) {
         currPlayer.stop()
+      } else {
+        currPlayer.moveTowards(pointToMoveTo)
       }
     } else {
       currPlayer.stop()

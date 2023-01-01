@@ -6,6 +6,7 @@ import { CPUConstants } from './CPUConstants'
 import { CPUCourtPlayer } from './CPUCourtPlayer'
 import { OffensePlay } from './plays/OffensePlay'
 import { PickAndRoll } from './plays/PickAndRoll'
+import { TakeShot } from './plays/TakeShot'
 
 export class CPUTeam extends Team {
   public players: CPUCourtPlayer[] = []
@@ -17,7 +18,7 @@ export class CPUTeam extends Team {
     super(game, Side.CPU)
     this.setupPlayers()
     super.positionPlayers()
-    this.offensePlays = [new PickAndRoll(this)]
+    this.offensePlays = [new TakeShot(this)]
   }
 
   public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
@@ -45,9 +46,11 @@ export class CPUTeam extends Team {
     return
   }
 
-  handleOffensiveRebound(side: Side) {
+  handleOffensiveRebound(side: Side, shouldResetClock: boolean) {
     if (side === Side.CPU) {
-      this.game.shotClock.resetShotClockOnNewPossession()
+      if (shouldResetClock) {
+        this.game.shotClock.resetShotClockOnNewPossession()
+      }
       this.handleNewPossession()
     } else {
       this.handleNewDefenseSetup()
@@ -97,6 +100,10 @@ export class CPUTeam extends Team {
   }
 
   update() {
+    if (Game.instance.isChangingPossession) {
+      return
+    }
+
     if (this.hasPossession()) {
       if (!this.currPlay) {
         this.currPlay = this.offensePlays[Phaser.Math.Between(0, this.offensePlays.length - 1)]

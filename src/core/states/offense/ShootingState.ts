@@ -57,9 +57,9 @@ export class ShootingState extends State {
       currPlayer.sprite.x,
       currPlayer.sprite.y + 32
     )
-
     createArc(currPlayer.sprite, { x: initialX, y: initialY }, jumpTime)
     Game.instance.time.delayedCall(jumpTime * 975 * 0.45, () => {
+      currPlayer.shotReleased = true
       if (isSide) {
         currPlayer.sprite.setTexture('shoot-side-release')
         const xOffset = isFlipped ? 10 : -10
@@ -69,7 +69,10 @@ export class ShootingState extends State {
         Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
       }
       Game.instance.ball.giveUpPossession()
-      this.launchBallTowardsHoop(currPlayer, team, isThreePointShot)
+      Game.instance.ball.sprite.setDepth(Game.instance.hoop.rimSprite.depth + 1)
+      if (!currPlayer.wasShotBlocked) {
+        this.launchBallTowardsHoop(currPlayer, team, isThreePointShot)
+      }
     })
     Game.instance.time.delayedCall(jumpTime * 975, () => {
       currPlayer.sprite.body.checkCollision.none = false
@@ -117,6 +120,11 @@ export class ShootingState extends State {
         ? BallState.MADE_THREE_POINT_SHOT
         : BallState.MADE_TWO_POINT_SHOT
     }
+
+    Game.instance.time.delayedCall(arcTime * 500, () => {
+      Game.instance.ball.sprite.setDepth(Game.instance.hoop.rimSprite.depth - 1)
+    })
+
     createArc(
       ball.sprite,
       {
@@ -159,5 +167,10 @@ export class ShootingState extends State {
     console.log(isThreePointShot ? 'Three Pointer!' : 'Two Pointer')
     console.log('Shot Coverage: ', shotCoverage)
     return percentagesConfig[shotCoverage]
+  }
+
+  exit(currPlayer: CourtPlayer) {
+    currPlayer.shotReleased = false
+    currPlayer.wasShotBlocked = false
   }
 }

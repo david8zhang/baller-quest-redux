@@ -6,8 +6,6 @@
 
 ### High Priority
 
-- Shot clock
-
 ### Medium Priority
 
 - Blocking shots

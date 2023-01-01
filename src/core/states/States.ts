@@ -8,10 +8,12 @@ export enum States {
   GO_BACK_TO_SPOT = 'GoBackToSpot',
   SHOOTING = 'Shooting',
   CONTEST_SHOT = 'ContestShot',
+  BLOCK_SHOT = 'BlockShot',
   PASSING = 'Passing',
   LAYUP = 'Layup',
   DUNK = 'Dunk',
   DRIBBLE_TO_POINT = 'DribbleToPoint',
   DRIVE_TO_BASKET = 'DriveToBasket',
   PLAYER_CONTROL = 'PlayerControl',
+  FUMBLE = 'Fumble',
 }

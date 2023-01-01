@@ -12,6 +12,8 @@ export class IsBallLoose extends TreeNode {
 
   public process(): Decision | States {
     const ball = Game.instance.ball
-    return ball.ballState === BallState.LOOSE ? Decision.PROCEED : Decision.STOP
+    return ball.ballState === BallState.LOOSE || ball.ballState === BallState.BLOCKED
+      ? Decision.PROCEED
+      : Decision.STOP
   }
 }

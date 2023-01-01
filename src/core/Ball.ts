@@ -1,5 +1,5 @@
 import Game from '~/scenes/Game'
-import { createArc, SORT_ORDER } from './Constants'
+import { createArc, SORT_ORDER, WINDOW_WIDTH } from './Constants'
 import { CourtPlayer } from './CourtPlayer'
 
 export interface BallConfig {
@@ -18,6 +18,7 @@ export enum BallState {
   PASS = 'PASS',
   DUNK = 'DUNK',
   POST_MADE_SHOT = 'POST_MADE_SHOT',
+  BLOCKED = 'BLOCKED',
 }
 
 export class Ball {
@@ -29,6 +30,10 @@ export class Ball {
   public floorCollider!: Phaser.Physics.Arcade.Collider
   public ballStateText: Phaser.GameObjects.Text
   public isRebounding: boolean = false
+
+  // Floor for ball to bounce on when shot is blocked
+  public blockShotFloor!: Phaser.Physics.Arcade.Sprite
+  public blockShotFloorCollider!: Phaser.Physics.Arcade.Collider
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -48,6 +53,16 @@ export class Ball {
       })
       .setDepth(SORT_ORDER.ui)
       .setVisible(false)
+    this.setupBlockShotFloor()
+  }
+
+  setupBlockShotFloor() {
+    this.blockShotFloor = this.game.physics.add.sprite(0, 0, '').setVisible(false)
+    this.blockShotFloor.setDisplaySize(WINDOW_WIDTH, 10)
+    this.blockShotFloor.setDebugBodyColor(0xa020f0)
+    this.blockShotFloor.setImmovable(true)
+    this.blockShotFloorCollider = this.game.physics.add.collider(this.blockShotFloor, this.sprite)
+    this.blockShotFloorCollider.active = false
   }
 
   handlePlayerCollision() {
@@ -100,8 +115,8 @@ export class Ball {
           this.ballState === BallState.MADE_TWO_POINT_SHOT ||
           this.ballState === BallState.MADE_THREE_POINT_SHOT
         ) {
-          this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.8)
-          this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.9)
+          this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.7)
+          this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.85)
         } else if (this.ballState === BallState.MISSED_SHOT) {
           // Rebound
           this.isRebounding = true

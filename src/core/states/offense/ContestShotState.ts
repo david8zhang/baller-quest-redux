@@ -7,16 +7,17 @@ import { States } from '../States'
 
 export class ContestShotState extends State {
   enter(currPlayer: CourtPlayer, team: Team, onCompleteCb: Function) {
+    const enemyShooter = team.getOtherTeamCourtPlayers().find((p) => {
+      const currState = p.getCurrState()
+      return currState.key === States.SHOOTING
+    })
     Game.instance.time.delayedCall(50, () => {
       currPlayer.stop()
       currPlayer.sprite.anims.stop()
       currPlayer.sprite.setTexture('contest-front')
       currPlayer.sprite.body.checkCollision.none = true
       const jumpTime = 0.7
-      const enemyShooter = team.getOtherTeamCourtPlayers().find((p) => {
-        const currState = p.getCurrState()
-        return currState.key === States.SHOOTING
-      })
+
       if (enemyShooter) {
         const lineToShooter = new Phaser.Geom.Line(
           currPlayer.sprite.x,

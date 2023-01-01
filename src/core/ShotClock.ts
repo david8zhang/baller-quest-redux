@@ -3,9 +3,10 @@ import { BallState } from './Ball'
 import { SORT_ORDER, WINDOW_WIDTH } from './Constants'
 
 export class ShotClock {
+  private static DEFAULT_CLOCK_TIME = 24
   private game: Game
   private shotClockText: Phaser.GameObjects.Text
-  private shotTimeSeconds: number = 10
+  private shotTimeSeconds: number = ShotClock.DEFAULT_CLOCK_TIME
   private timerEvent: Phaser.Time.TimerEvent
 
   constructor(game: Game) {
@@ -20,6 +21,7 @@ export class ShotClock {
     this.timerEvent = this.game.time.addEvent({
       delay: 1000,
       repeat: -1,
+      // paused: true,
       callback: () => {
         if (this.shotTimeSeconds === 0) {
           if (!this.isBallInFlight()) {
@@ -36,7 +38,7 @@ export class ShotClock {
   }
 
   resetShotClockOnNewPossession() {
-    this.shotTimeSeconds = 10
+    this.shotTimeSeconds = ShotClock.DEFAULT_CLOCK_TIME
     this.shotClockText.setText(`${this.shotTimeSeconds.toString()}`)
     this.shotClockText.setPosition(WINDOW_WIDTH - this.shotClockText.displayWidth - 20, 20)
     this.timerEvent.paused = false

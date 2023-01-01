@@ -1,4 +1,5 @@
 import Game from '~/scenes/Game'
+import { BallState } from '../Ball'
 import { getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
@@ -85,10 +86,12 @@ export class PlayerTeam extends Team {
     })
   }
 
-  handleOffensiveRebound(side: Side) {
+  handleOffensiveRebound(side: Side, shouldResetClock: boolean) {
     const playerWithBall = this.game.ball.playerWithBall
     if (side === Side.PLAYER) {
-      this.game.shotClock.resetShotClockOnNewPossession()
+      if (shouldResetClock) {
+        this.game.shotClock.resetShotClockOnNewPossession()
+      }
       if (playerWithBall) {
         this.setSelectedCourtPlayer(playerWithBall)
       }
@@ -242,7 +245,7 @@ export class PlayerTeam extends Team {
         if (index === 0) {
           this.selectedCourtPlayer = newPlayer
           this.selectedCourtPlayer.setState(States.PLAYER_CONTROL)
-          this.selectedCourtPlayer.getPossessionOfBall()
+          this.selectedCourtPlayer.getPossessionOfBall(BallState.LOOSE)
           this.selectedCourtPlayerCursor.selectCourtPlayer(this.selectedCourtPlayer)
         }
         this.players.push(newPlayer)

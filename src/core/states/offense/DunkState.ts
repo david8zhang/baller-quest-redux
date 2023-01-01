@@ -52,4 +52,8 @@ export class DunkState extends State {
       })
     })
   }
+
+  exit(currPlayer: CourtPlayer) {
+    currPlayer.shotReleased = false
+  }
 }

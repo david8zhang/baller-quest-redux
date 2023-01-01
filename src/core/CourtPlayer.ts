@@ -17,10 +17,12 @@ import { DefendManState } from './states/defense/DefendManState'
 import { FightOverScreenState } from './states/defense/FightOverScreenState'
 import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
 import { IdleState } from './states/IdleState'
+import { BlockShotState } from './states/offense/BlockShotState'
 import { ContestShotState } from './states/offense/ContestShotState'
 import { DribbleToPointState } from './states/offense/DribbleToPointState'
 import { DriveToBasketState } from './states/offense/DriveToBasketState'
 import { DunkState } from './states/offense/DunkState'
+import { FumbleState } from './states/offense/FumbleState'
 import { GoBackToSpotState } from './states/offense/GoBackToSpotState'
 import { LayupState } from './states/offense/LayupState'
 import { PassingState } from './states/offense/PassingState'
@@ -48,6 +50,9 @@ export class CourtPlayer {
   public sprite: Phaser.Physics.Arcade.Sprite
   public hasPossession: boolean = false
   public playerId: string
+
+  public shotReleased: boolean = false
+  public wasShotBlocked: boolean = false
 
   protected stateText: Phaser.GameObjects.Text
   protected playerIdText: Phaser.GameObjects.Text
@@ -96,6 +101,8 @@ export class CourtPlayer {
         [States.DRIBBLE_TO_POINT]: new DribbleToPointState(),
         [States.DRIVE_TO_BASKET]: new DriveToBasketState(),
         [States.PLAYER_CONTROL]: new PlayerControlState(),
+        [States.BLOCK_SHOT]: new BlockShotState(),
+        [States.FUMBLE]: new FumbleState(),
       },
       [this, this.team]
     )
@@ -199,15 +206,21 @@ export class CourtPlayer {
         this.game.ball.prevPlayerWithBall!.side === this.side
       ) {
         // Make sure that the player who is passing can't regain posssession of the ball mid-pass
-        this.getPossessionOfBall()
+        this.getPossessionOfBall(this.game.ball.ballState)
         if (this.side === Side.PLAYER) {
           this.game.player.setSelectedCourtPlayer(this)
         }
       }
-    } else if (this.game.ball.ballState === BallState.LOOSE) {
-      this.getPossessionOfBall()
-      if (this.side === Side.PLAYER) {
-        this.game.player.setSelectedCourtPlayer(this)
+    } else if (
+      this.game.ball.ballState === BallState.LOOSE ||
+      this.game.ball.ballState === BallState.BLOCKED
+    ) {
+      // Player that is still in their shooting motion should not be able to grab their own ball
+      if (this.getCurrState().key !== States.FUMBLE) {
+        this.getPossessionOfBall(this.game.ball.ballState)
+        if (this.side === Side.PLAYER) {
+          this.game.player.setSelectedCourtPlayer(this)
+        }
       }
     }
   }
@@ -255,7 +268,8 @@ export class CourtPlayer {
     this.sprite.anims.play(OFFBALL_ANIMS.idle)
   }
 
-  getPossessionOfBall() {
+  getPossessionOfBall(prevBallState: BallState) {
+    this.game.ball.blockShotFloorCollider.active = false
     this.game.ball.isRebounding = false
     this.hasPossession = true
     this.game.ball.ballState = BallState.DRIBBLING
@@ -274,8 +288,10 @@ export class CourtPlayer {
           this.getCurrState().key === States.CHASE_REBOUND ||
           this.getCurrState().key === States.PLAYER_CONTROL
         ) {
-          this.team.handleOffensiveRebound(this.side)
-          this.team.getOtherTeam().handleOffensiveRebound(this.side)
+          this.team.handleOffensiveRebound(this.side, prevBallState !== BallState.BLOCKED)
+          this.team
+            .getOtherTeam()
+            .handleOffensiveRebound(this.side, prevBallState !== BallState.BLOCKED)
         }
       }
     }

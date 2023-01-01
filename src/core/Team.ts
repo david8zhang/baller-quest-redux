@@ -1,4 +1,5 @@
 import Game from '~/scenes/Game'
+import { BallState } from './Ball'
 import { getClosestPlayer, Side } from './Constants'
 import { CourtPlayer } from './CourtPlayer'
 import { DefendManState } from './states/defense/DefendManState'
@@ -34,7 +35,7 @@ export abstract class Team {
     })
     const playerToReceiveBall = this.getPlayerToReceiveBallOnNewPossession()
     Game.instance.ball.prevPlayerWithBall = null
-    playerToReceiveBall.getPossessionOfBall()
+    playerToReceiveBall.getPossessionOfBall(BallState.LOOSE)
   }
 
   public abstract handleNewDefenseSetup(): void
@@ -66,7 +67,7 @@ export abstract class Team {
     return false
   }
 
-  public abstract handleOffensiveRebound(side: Side): void
+  public abstract handleOffensiveRebound(side: Side, shouldResetClock?: boolean): void
 
   updateDefensiveAssignmentMapping(defenderId: string, manToDefendId: string) {
     this.defensiveAssignmentMapping[defenderId] = manToDefendId
