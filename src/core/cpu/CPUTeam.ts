@@ -47,6 +47,7 @@ export class CPUTeam extends Team {
 
   handleOffensiveRebound(side: Side) {
     if (side === Side.CPU) {
+      this.game.shotClock.resetShotClockOnNewPossession()
       this.handleNewPossession()
     } else {
       this.handleNewDefenseSetup()

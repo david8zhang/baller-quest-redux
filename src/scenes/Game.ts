@@ -9,6 +9,7 @@ import { Cursor } from '~/core/Cursor'
 import { Hoop } from '~/core/Hoop'
 import { PlayerTeam } from '~/core/player/PlayerTeam'
 import { ScoreTracker } from '~/core/ScoreTracker'
+import { ShotClock } from '~/core/ShotClock'
 
 export default class Game extends Phaser.Scene {
   public player!: PlayerTeam
@@ -23,6 +24,7 @@ export default class Game extends Phaser.Scene {
   public playerCourtPlayers!: Phaser.GameObjects.Group
   public cpuCourtPlayers!: Phaser.GameObjects.Group
   private scoreTracker!: ScoreTracker
+  public shotClock!: ShotClock
   private static _instance: Game
 
   constructor() {
@@ -57,7 +59,7 @@ export default class Game extends Phaser.Scene {
     this.cpu = new CPUTeam(this)
 
     this.scoreTracker = new ScoreTracker(this)
-
+    this.shotClock = new ShotClock(this)
     this.setupColliders()
     this.setupUI()
   }
@@ -94,9 +96,15 @@ export default class Game extends Phaser.Scene {
 
   handleChangePossession(prevSideWithPossession: Side) {
     this.player.getCourtPlayers().forEach((player) => {
+      if (prevSideWithPossession === Side.PLAYER && player.hasPossession) {
+        player.losePossessionOfBall()
+      }
       player.stop()
     })
     this.cpu.getCourtPlayers().forEach((player) => {
+      if (prevSideWithPossession === Side.CPU && player.hasPossession) {
+        player.losePossessionOfBall()
+      }
       player.stop()
     })
     this.isChangingPossession = true
@@ -114,6 +122,7 @@ export default class Game extends Phaser.Scene {
       this.ball.prevPlayerWithBall = null
       newTeamWithPossession.handleNewPossession()
       newTeamOnDefense.handleNewDefenseSetup()
+      this.shotClock.resetShotClockOnNewPossession()
       this.resetPositioning()
     })
   }

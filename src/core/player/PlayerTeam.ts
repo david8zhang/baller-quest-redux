@@ -88,6 +88,7 @@ export class PlayerTeam extends Team {
   handleOffensiveRebound(side: Side) {
     const playerWithBall = this.game.ball.playerWithBall
     if (side === Side.PLAYER) {
+      this.game.shotClock.resetShotClockOnNewPossession()
       if (playerWithBall) {
         this.setSelectedCourtPlayer(playerWithBall)
       }

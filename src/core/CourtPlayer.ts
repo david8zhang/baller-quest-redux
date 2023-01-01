@@ -256,6 +256,7 @@ export class CourtPlayer {
   }
 
   getPossessionOfBall() {
+    this.game.ball.isRebounding = false
     this.hasPossession = true
     this.game.ball.ballState = BallState.DRIBBLING
     this.sprite.anims.play(ONBALL_ANIMS.idle)
@@ -269,7 +270,10 @@ export class CourtPlayer {
         this.game.handleChangePossession(prevPlayerWithBall.side)
       } else {
         // Handle possession recovery
-        if (this.getCurrState().key === States.CHASE_REBOUND) {
+        if (
+          this.getCurrState().key === States.CHASE_REBOUND ||
+          this.getCurrState().key === States.PLAYER_CONTROL
+        ) {
           this.team.handleOffensiveRebound(this.side)
           this.team.getOtherTeam().handleOffensiveRebound(this.side)
         }

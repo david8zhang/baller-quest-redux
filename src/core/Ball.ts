@@ -28,6 +28,7 @@ export class Ball {
   public playerWithBall: CourtPlayer | null = null
   public floorCollider!: Phaser.Physics.Arcade.Collider
   public ballStateText: Phaser.GameObjects.Text
+  public isRebounding: boolean = false
 
   constructor(game: Game, config: BallConfig) {
     this.game = game
@@ -103,6 +104,7 @@ export class Ball {
           this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.9)
         } else if (this.ballState === BallState.MISSED_SHOT) {
           // Rebound
+          this.isRebounding = true
           this.ballState = BallState.LOOSE
           const missOffset = Phaser.Math.Between(0, 1) > 0 ? -50 : 50
           createArc(
