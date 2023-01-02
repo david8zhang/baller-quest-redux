@@ -3,7 +3,6 @@ import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
 import { State } from '../StateMachine'
-import { States } from '../States'
 
 export class DefendManState extends State {
   public lastUpdatedTimestamp: number = -1

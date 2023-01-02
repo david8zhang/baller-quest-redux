@@ -66,7 +66,11 @@ export class PlayerTeam extends Team {
               this.shootBall()
             }
           } else {
-            this.contestShot()
+            if (this.canBlockShot()) {
+              this.blockShot()
+            } else {
+              this.contestShot()
+            }
           }
           break
         }
@@ -103,13 +107,44 @@ export class PlayerTeam extends Team {
     }
   }
 
+  blockShot() {
+    if (this.selectedCourtPlayer.getCurrState().key !== States.BLOCK_SHOT) {
+      const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+      courtPlayer.isPlayerCommandOverride = true
+      this.selectedCourtPlayer.setState(States.BLOCK_SHOT, (player: PlayerCourtPlayer) => {
+        player.setState(States.PLAYER_CONTROL)
+        player.isPlayerCommandOverride = false
+      })
+    }
+  }
+
   contestShot() {
-    const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
-    courtPlayer.isPlayerCommandOverride = true
-    this.selectedCourtPlayer.setState(States.CONTEST_SHOT, (player: PlayerCourtPlayer) => {
-      player.setState(States.PLAYER_CONTROL)
-      player.isPlayerCommandOverride = false
+    if (this.selectedCourtPlayer.getCurrState().key !== States.CONTEST_SHOT) {
+      const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+      courtPlayer.isPlayerCommandOverride = true
+      this.selectedCourtPlayer.setState(States.CONTEST_SHOT, (player: PlayerCourtPlayer) => {
+        player.setState(States.PLAYER_CONTROL)
+        player.isPlayerCommandOverride = false
+      })
+    }
+  }
+
+  canBlockShot() {
+    const otherTeamPlayers = this.getOtherTeamCourtPlayers()
+    const shooter = otherTeamPlayers.find((p) => {
+      return p.getCurrState().key === States.SHOOTING
     })
+    if (shooter && !shooter.shotReleased) {
+      const selectedCourtPlayer = this.getSelectedCourtPlayer()
+      const distToShooter = Phaser.Math.Distance.Between(
+        selectedCourtPlayer.sprite.x,
+        selectedCourtPlayer.sprite.y,
+        shooter.sprite.x,
+        shooter.sprite.y
+      )
+      return distToShooter < 65
+    }
+    return false
   }
 
   layupBall() {
@@ -318,7 +353,9 @@ export class PlayerTeam extends Team {
   }
 
   public handleNewDefenseSetup(): void {
-    this.defensiveAssignmentMapping = { ...PlayerConstants.DEFENSIVE_ASSIGNMENTS }
+    Object.keys(PlayerConstants.DEFENSIVE_ASSIGNMENTS).forEach((key) => {
+      this.defensiveAssignmentMapping[key] = PlayerConstants.DEFENSIVE_ASSIGNMENTS[key]
+    })
     const playerToSelect = this.getCourtPlayers().find((p) => p.playerId === 'player1')
     this.setSelectedCourtPlayer(playerToSelect!)
   }

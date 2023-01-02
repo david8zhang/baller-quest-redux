@@ -21,7 +21,7 @@ export class ShotClock {
     this.timerEvent = this.game.time.addEvent({
       delay: 1000,
       repeat: -1,
-      // paused: true,
+      paused: true,
       callback: () => {
         if (this.shotTimeSeconds === 0) {
           if (!this.isBallInFlight()) {
@@ -56,6 +56,7 @@ export class ShotClock {
       ballState === BallState.DUNK ||
       ballState === BallState.MISSED_SHOT ||
       ballState === BallState.POST_MADE_SHOT ||
+      ballState === BallState.BLOCKED ||
       this.game.ball.isRebounding
     )
   }

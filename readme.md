@@ -8,9 +8,8 @@
 
 ### Medium Priority
 
-- Blocking shots
-- Steals
 - More offensive sets for enemy
+- Steals
 
 ### Low Priority
 

@@ -19,6 +19,7 @@ export enum BallState {
   DUNK = 'DUNK',
   POST_MADE_SHOT = 'POST_MADE_SHOT',
   BLOCKED = 'BLOCKED',
+  NONE = 'NONE',
 }
 
 export class Ball {

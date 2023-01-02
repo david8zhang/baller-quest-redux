@@ -42,7 +42,9 @@ export class CPUTeam extends Team {
   }
 
   public handleNewDefenseSetup(): void {
-    this.defensiveAssignmentMapping = { ...CPUConstants.DEFENSIVE_ASSIGNMENTS }
+    Object.keys(CPUConstants.DEFENSIVE_ASSIGNMENTS).forEach((key) => {
+      this.defensiveAssignmentMapping[key] = CPUConstants.DEFENSIVE_ASSIGNMENTS[key]
+    })
     return
   }
 
@@ -103,7 +105,6 @@ export class CPUTeam extends Team {
     if (Game.instance.isChangingPossession) {
       return
     }
-
     if (this.hasPossession()) {
       if (!this.currPlay) {
         this.currPlay = this.offensePlays[Phaser.Math.Between(0, this.offensePlays.length - 1)]

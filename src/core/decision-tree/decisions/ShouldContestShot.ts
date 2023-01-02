@@ -23,7 +23,7 @@ export class ShouldContestShot extends TreeNode {
       const state = p.getCurrState()
       return state.key === States.SHOOTING
     })
-    if (shooter) {
+    if (shooter && !shooter.wasShotBlocked) {
       const distToShooter = Phaser.Math.Distance.Between(
         shooter.sprite.x,
         shooter.sprite.y,
