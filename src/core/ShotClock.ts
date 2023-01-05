@@ -6,7 +6,7 @@ export class ShotClock {
   private static DEFAULT_CLOCK_TIME = 24
   private game: Game
   private shotClockText: Phaser.GameObjects.Text
-  private shotTimeSeconds: number = ShotClock.DEFAULT_CLOCK_TIME
+  public shotTimeSeconds: number = ShotClock.DEFAULT_CLOCK_TIME
   private timerEvent: Phaser.Time.TimerEvent
 
   constructor(game: Game) {

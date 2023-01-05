@@ -119,6 +119,7 @@ export default class Game extends Phaser.Scene {
       WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
     )
     this.time.delayedCall(1500, () => {
+      console.log('Went here!')
       this.ball.prevPlayerWithBall = null
       newTeamWithPossession.handleNewPossession()
       newTeamOnDefense.handleNewDefenseSetup()

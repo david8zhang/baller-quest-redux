@@ -1,4 +1,5 @@
 import Game from '~/scenes/Game'
+import { BallState } from '../Ball'
 import { Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Team } from '../Team'
@@ -6,7 +7,7 @@ import { CPUConstants } from './CPUConstants'
 import { CPUCourtPlayer } from './CPUCourtPlayer'
 import { OffensePlay } from './plays/OffensePlay'
 import { PickAndRoll } from './plays/PickAndRoll'
-import { TakeShot } from './plays/TakeShot'
+import { ScreenHandOff } from './plays/ScreenHandOff'
 
 export class CPUTeam extends Team {
   public players: CPUCourtPlayer[] = []
@@ -18,7 +19,7 @@ export class CPUTeam extends Team {
     super(game, Side.CPU)
     this.setupPlayers()
     super.positionPlayers()
-    this.offensePlays = [new TakeShot(this)]
+    this.offensePlays = [new ScreenHandOff(this)]
   }
 
   public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
@@ -27,10 +28,6 @@ export class CPUTeam extends Team {
 
   public getDefensivePositions(): { [key: string]: { row: number; col: number } } {
     return CPUConstants.DEFENSE_POSITIONS_CPU
-  }
-
-  public hasPossession(): boolean {
-    return this.game.ball.playerWithBall !== null && this.game.ball.playerWithBall.side === Side.CPU
   }
 
   public getCourtPlayers() {

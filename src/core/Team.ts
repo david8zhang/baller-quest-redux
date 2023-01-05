@@ -60,11 +60,11 @@ export abstract class Team {
   }
 
   hasPossession(): boolean {
-    const ball = Game.instance.ball
-    if (ball.playerWithBall) {
-      return ball.playerWithBall.side === this.side
+    const ball = this.game.ball
+    if (ball.ballState === BallState.PASS) {
+      return ball.prevPlayerWithBall !== null && ball.prevPlayerWithBall.side === this.side
     }
-    return false
+    return ball.playerWithBall !== null && ball.playerWithBall.side === this.side
   }
 
   public abstract handleOffensiveRebound(side: Side, shouldResetClock?: boolean): void

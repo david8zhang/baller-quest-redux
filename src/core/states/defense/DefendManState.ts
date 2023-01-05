@@ -9,6 +9,8 @@ export class DefendManState extends State {
   public static DEFENSIVE_SPACING_PERCENTAGE = 0.2
   public manToDefend: CourtPlayer | null = null
 
+  public debounceEvent: Phaser.Time.TimerEvent | null = null
+
   enter(currPlayer: CourtPlayer, team: Team) {
     this.setManToDefend(currPlayer, team)
   }
@@ -26,13 +28,14 @@ export class DefendManState extends State {
         hoop.standSprite.x,
         hoop.standSprite.y
       )
-      if (
-        this.manToDefend.sprite.body.velocity.x === 0 &&
-        this.manToDefend.sprite.body.velocity.y === 0
-      ) {
-        currPlayer.stop()
+      const pointToMoveTo = line.getPoint(DefendManState.DEFENSIVE_SPACING_PERCENTAGE)
+      if (currPlayer.isAtPoint(pointToMoveTo)) {
+        currPlayer.sprite.setVelocity(0, 0)
+        if (Date.now() - this.lastUpdatedTimestamp > 250) {
+          currPlayer.sprite.play(OFFBALL_ANIMS.idle, true)
+        }
       } else {
-        const pointToMoveTo = line.getPoint(DefendManState.DEFENSIVE_SPACING_PERCENTAGE)
+        this.lastUpdatedTimestamp = Date.now()
         currPlayer.moveTowards(pointToMoveTo)
       }
     }

@@ -14,7 +14,6 @@ export class BlockShotState extends State {
     if (shooter && !shooter.wasShotBlocked) {
       currPlayer.sprite.setFlipX(false)
       currPlayer.sprite.anims.stop()
-      console.log('Block wind up')
       currPlayer.sprite.setTexture('block-front-wind-up')
       currPlayer.sprite.body.checkCollision.none = true
       shooter.wasShotBlocked = true

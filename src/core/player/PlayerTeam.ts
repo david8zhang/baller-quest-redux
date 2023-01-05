@@ -3,6 +3,7 @@ import { BallState } from '../Ball'
 import { getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
+import { PassConfig } from '../states/offense/PassingState'
 import { SetScreenStateConfig } from '../states/offense/SetScreenState'
 import { States } from '../states/States'
 import { Team } from '../Team'
@@ -81,13 +82,20 @@ export class PlayerTeam extends Team {
         case 'Space': {
           if (this.selectedCourtPlayer.canPassBall()) {
             this.passBall()
-          } else {
+          } else if (this.canSwitchPlayer()) {
             this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer!)
           }
           break
         }
       }
     })
+  }
+
+  canSwitchPlayer() {
+    const passingPlayer = this.getCourtPlayers().find((p) => {
+      return p.getCurrState().key === States.PASSING
+    })
+    return passingPlayer === undefined
   }
 
   handleOffensiveRebound(side: Side, shouldResetClock: boolean) {
@@ -221,13 +229,20 @@ export class PlayerTeam extends Team {
       if (this.selectedCourtPlayer.canPassBall()) {
         const playerCourtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
         playerCourtPlayer.isPlayerCommandOverride = true
+
+        const passConfig: PassConfig = {
+          onPassCompleteCb: (player: PlayerCourtPlayer) => {
+            player.isPlayerCommandOverride = false
+            this.setSelectedCourtPlayer(passRecipient)
+          },
+          onPassStartedCb: (player: PlayerCourtPlayer) => {
+            player.stop()
+          },
+        }
         this.selectedCourtPlayer.setState(
           States.PASSING,
           this.passCursor.selectedCourtPlayer,
-          (player: PlayerCourtPlayer) => {
-            player.isPlayerCommandOverride = false
-            this.setSelectedCourtPlayer(passRecipient)
-          }
+          passConfig
         )
       }
     }
@@ -249,12 +264,6 @@ export class PlayerTeam extends Team {
 
   public getDefensivePositions(): { [key: string]: { row: number; col: number } } {
     return PlayerConstants.DEFENSE_POSITIONS_PLAYER
-  }
-
-  public hasPossession(): boolean {
-    return (
-      this.game.ball.playerWithBall !== null && this.game.ball.playerWithBall.side === Side.PLAYER
-    )
   }
 
   getOtherTeamCourtPlayers() {

@@ -181,7 +181,12 @@ export class CourtPlayer {
 
   canPassBall() {
     const state = this.getCurrState().key
-    return this.hasPossession && state !== States.SHOOTING
+    return (
+      this.hasPossession &&
+      state !== States.SHOOTING &&
+      state !== States.PASSING &&
+      Game.instance.ball.ballState !== BallState.PASS
+    )
   }
 
   isMoving() {
@@ -203,7 +208,7 @@ export class CourtPlayer {
     if (this.game.ball.ballState === BallState.PASS) {
       if (
         this.getCurrState().key !== States.PASSING &&
-        this.game.ball.prevPlayerWithBall!.side === this.side
+        (!this.game.ball.prevPlayerWithBall || this.game.ball.prevPlayerWithBall.side === this.side)
       ) {
         // Make sure that the player who is passing can't regain posssession of the ball mid-pass
         this.getPossessionOfBall(this.game.ball.ballState)
@@ -362,12 +367,12 @@ export class CourtPlayer {
       this.sprite.setFlipX(xVelocity > 0)
       const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.left : OFFBALL_ANIMS.run.left
       if (this.sprite.anims.getName() !== animToPlay) {
-        this.sprite.play(animToPlay)
+        this.sprite.play(animToPlay, true)
       }
     } else if (Math.abs(yVelocity) > Math.abs(xVelocity)) {
       const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.up : OFFBALL_ANIMS.run.up
       if (this.sprite.anims.getName() !== animToPlay) {
-        this.sprite.play(animToPlay)
+        this.sprite.play(animToPlay, true)
       }
     }
   }

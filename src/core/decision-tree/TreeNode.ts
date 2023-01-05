@@ -1,3 +1,4 @@
+import { PlayTypes } from '../cpu/plays/PlayTypes'
 import { States } from '../states/States'
 import { Blackboard } from './Blackboard'
 import { Decision } from './Decision'
@@ -11,5 +12,5 @@ export abstract class TreeNode {
     this.blackboard = blackboard
   }
 
-  public abstract process(): Decision | States
+  public abstract process(): Decision | States | PlayTypes
 }

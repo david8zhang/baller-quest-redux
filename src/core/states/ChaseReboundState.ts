@@ -6,10 +6,12 @@ import { State } from './StateMachine'
 
 export class ChaseReboundState extends State {
   execute(currPlayer: CourtPlayer, team: Team) {
-    const ball = Game.instance.ball
-    currPlayer.moveTowards({
-      x: ball.sprite.x,
-      y: ball.sprite.y,
-    })
+    if (team.side !== Side.PLAYER) {
+      const ball = Game.instance.ball
+      currPlayer.moveTowards({
+        x: ball.sprite.x,
+        y: ball.sprite.y,
+      })
+    }
   }
 }

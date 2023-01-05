@@ -75,7 +75,7 @@ export class LayupState extends State {
     ball.show()
     Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
     const shotPercentage = this.calculateShotSuccessPercentage(currPlayer, team)
-    const isMiss = Phaser.Math.Between(0, 100) < shotPercentage
+    const isMiss = Phaser.Math.Between(0, 100) > shotPercentage
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT

@@ -62,9 +62,7 @@ export class PickAndRoll extends OffensePlay {
         timeout: 5000,
         onReachedPointCB: () => {
           const driveToBasketConfig = {
-            onDriveSuccess: () => {
-              this.reset()
-            },
+            onDriveSuccess: () => {},
             onDriveFailed: () => {
               ballHandler.setState(States.GO_BACK_TO_SPOT, () => {
                 this.reset()

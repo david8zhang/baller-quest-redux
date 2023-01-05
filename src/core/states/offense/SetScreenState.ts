@@ -1,3 +1,4 @@
+import { Direction } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -12,25 +13,31 @@ export enum ScreenDirection {
 export interface SetScreenStateConfig {
   isScreeningCallback: Function
   onScreenFinishedCallback: Function
+  screenTargetPlayer?: CourtPlayer
 }
 
 export class SetScreenState extends State {
   public startedScreenTimestamp = -1
   public static SCREEN_DURATION = 5000
-  public static TRAVEL_DURATION = 2000
+  public static TRAVEL_DURATION = 1000
 
   public isScreeningCallback: Function | null = null
   public onScreenFinishedCallback: Function | null = null
+  public screenTarget: CourtPlayer | null = null
   public screenPosition: { x: number; y: number } | null = null
+  public screenDirection!: ScreenDirection
   public isAtScreenPosition: boolean = false
   private travelTimeExpired: boolean = false
 
   enter(currPlayer: CourtPlayer, team: Team, config: SetScreenStateConfig) {
     this.isScreeningCallback = config.isScreeningCallback
     this.onScreenFinishedCallback = config.onScreenFinishedCallback
+    if (config.screenTargetPlayer) {
+      this.screenTarget = config.screenTargetPlayer
+    }
   }
 
-  execute(currPlayer: CourtPlayer, team: Team, callback?: Function) {
+  execute(currPlayer: CourtPlayer, team: Team) {
     if (this.startedScreenTimestamp != -1) {
       const currTimestamp = Date.now()
       if (this.screenPosition) {
@@ -45,21 +52,24 @@ export class SetScreenState extends State {
             currPlayer.setState(States.GO_BACK_TO_SPOT, this.onScreenFinishedCallback)
           }
         } else {
-          if (currTimestamp - this.startedScreenTimestamp > SetScreenState.TRAVEL_DURATION) {
-            this.travelTimeExpired = true
-            currPlayer.stop()
+          if (!currPlayer.sprite.body.touching.none) {
+            if (currTimestamp - this.startedScreenTimestamp > SetScreenState.TRAVEL_DURATION) {
+              this.travelTimeExpired = true
+              currPlayer.stop()
+            }
           }
         }
       }
     } else {
-      const ballHandler = Game.instance.ball.playerWithBall
-      if (ballHandler) {
+      const screenTarget = this.screenTarget ? this.screenTarget : Game.instance.ball.playerWithBall
+      if (screenTarget) {
         this.startedScreenTimestamp = Date.now()
         const direction =
-          currPlayer.sprite.x >= ballHandler?.sprite.x
+          currPlayer.sprite.x >= screenTarget?.sprite.x
             ? ScreenDirection.RIGHT
             : ScreenDirection.LEFT
-        const defenderForBallHandler = team.getDefenderForPlayer(ballHandler)
+        this.screenDirection = direction
+        const defenderForBallHandler = team.getDefenderForPlayer(screenTarget)
         if (defenderForBallHandler) {
           if (!this.screenPosition) {
             this.screenPosition = {
