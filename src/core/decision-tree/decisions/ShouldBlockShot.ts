@@ -1,3 +1,4 @@
+import { Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
@@ -14,6 +15,11 @@ export class ShouldBlockShot extends TreeNode {
   public process(): Decision | States {
     const currPlayer = this.blackboard.getData(BlackboardKeys.CURR_PLAYER) as CourtPlayer
     const team = this.blackboard.getData(BlackboardKeys.CURR_TEAM) as Team
+
+    if (team.side === Side.PLAYER) {
+      return Decision.STOP
+    }
+
     const otherTeamPlayers = team.getOtherTeamCourtPlayers()
     const shooter = otherTeamPlayers.find((p) => {
       return p.getCurrState().key === States.SHOOTING

@@ -11,6 +11,7 @@ export class Court {
   public grid: Phaser.GameObjects.Rectangle[][] = []
   public onDebugToggleHooks: Function[] = []
   public threePointDetectorCircle!: Phaser.Geom.Ellipse
+  public behindBackboardWallSprite!: Phaser.Physics.Arcade.Sprite
 
   constructor(game: Game) {
     this.game = game
@@ -36,14 +37,14 @@ export class Court {
   }
 
   setupWallSprite() {
-    const backcourtWallSprite = this.game.physics.add
+    this.behindBackboardWallSprite = this.game.physics.add
       .sprite(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2 - 60, '')
       .setVisible(false)
       .setDisplaySize(WINDOW_WIDTH, 5)
       .setDebug(true, true, 0x00ff00)
       .setImmovable(true)
-    this.game.physics.add.collider(backcourtWallSprite, this.game.playerCourtPlayers)
-    this.game.physics.add.collider(backcourtWallSprite, this.game.cpuCourtPlayers)
+    // this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.playerCourtPlayers)
+    // this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.cpuCourtPlayers)
   }
 
   handleDebugToggleInput() {

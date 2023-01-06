@@ -11,12 +11,13 @@ import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
 import { OffensePlay } from './OffensePlay'
+import { PlayTypes } from './PlayTypes'
 
 export class ScreenHandOff extends OffensePlay {
   public drivingToBasket: boolean = false
 
   constructor(team: Team) {
-    super(team)
+    super(team, PlayTypes.SCREEN_HAND_OFF)
   }
 
   reset() {

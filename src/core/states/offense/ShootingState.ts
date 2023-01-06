@@ -1,5 +1,5 @@
 import { BallState } from '~/core/Ball'
-import { createArc, getClosestPlayer } from '~/core/Constants'
+import { calculateShotSuccessPercentage, createArc } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -14,14 +14,14 @@ export enum ShotCoverage {
 }
 
 export class ShootingState extends State {
-  private static THREE_POINT_PERCENTAGES = {
+  public static THREE_POINT_PERCENTAGES = {
     [ShotCoverage.WIDE_OPEN]: 50,
     [ShotCoverage.OPEN]: 40,
     [ShotCoverage.CONTESTED]: 10,
     [ShotCoverage.SMOTHERED]: 1,
   }
 
-  private static MID_RANGE_PERCENTAGES = {
+  public static MID_RANGE_PERCENTAGES = {
     [ShotCoverage.WIDE_OPEN]: 75,
     [ShotCoverage.OPEN]: 60,
     [ShotCoverage.CONTESTED]: 20,
@@ -104,12 +104,8 @@ export class ShootingState extends State {
       arcTime = 1.5
     }
 
-    const percentageSuccess = this.calculateShotSuccessPercentage(
-      currPlayer,
-      team,
-      isThreePointShot
-    )
-    const isMiss = Phaser.Math.Between(0, 100) > percentageSuccess
+    const percentageSuccess = calculateShotSuccessPercentage(currPlayer, team, isThreePointShot)
+    const isMiss = Phaser.Math.Between(0, 100) > percentageSuccess.percentage
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT
@@ -133,40 +129,6 @@ export class ShootingState extends State {
       },
       arcTime
     )
-  }
-
-  calculateShotSuccessPercentage(currPlayer: CourtPlayer, team: Team, isThreePointShot: boolean) {
-    const shotContesters = team.getOtherTeamCourtPlayers().filter((p) => {
-      return p.getCurrState().key === States.CONTEST_SHOT
-    })
-    const closestContester = getClosestPlayer(currPlayer, shotContesters)
-    let shotCoverage: ShotCoverage = ShotCoverage.SMOTHERED
-    if (closestContester) {
-      const distToClosestContester = Phaser.Math.Distance.Between(
-        currPlayer.sprite.x,
-        currPlayer.sprite.y,
-        closestContester.sprite.x,
-        closestContester.sprite.y
-      )
-      if (distToClosestContester > 100) {
-        shotCoverage = ShotCoverage.WIDE_OPEN
-      }
-      if (distToClosestContester <= 100 && distToClosestContester > 80) {
-        shotCoverage = ShotCoverage.OPEN
-      }
-      if (distToClosestContester <= 80 && distToClosestContester > 65) {
-        shotCoverage = ShotCoverage.CONTESTED
-      }
-    } else {
-      shotCoverage = ShotCoverage.WIDE_OPEN
-    }
-    const percentagesConfig = isThreePointShot
-      ? ShootingState.THREE_POINT_PERCENTAGES
-      : ShootingState.MID_RANGE_PERCENTAGES
-
-    console.log(isThreePointShot ? 'Three Pointer!' : 'Two Pointer')
-    console.log('Shot Coverage: ', shotCoverage)
-    return percentagesConfig[shotCoverage]
   }
 
   exit(currPlayer: CourtPlayer) {

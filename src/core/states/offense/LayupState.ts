@@ -72,6 +72,7 @@ export class LayupState extends State {
 
   launchBallTowardsHoop(currPlayer: CourtPlayer, team: Team) {
     const ball = Game.instance.ball
+    const arcTime = 0.7
     ball.show()
     Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
     const shotPercentage = this.calculateShotSuccessPercentage(currPlayer, team)
@@ -84,13 +85,18 @@ export class LayupState extends State {
     } else {
       ball.ballState = BallState.MADE_TWO_POINT_SHOT
     }
+
+    Game.instance.time.delayedCall(arcTime * 500, () => {
+      Game.instance.ball.sprite.setDepth(Game.instance.hoop.rimSprite.depth - 1)
+    })
+
     createArc(
       ball.sprite,
       {
         x: posToLandX,
         y: Game.instance.hoop.rimSprite.y - 20,
       },
-      0.7
+      arcTime
     )
   }
 

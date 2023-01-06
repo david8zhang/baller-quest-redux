@@ -27,6 +27,7 @@ export class BlockShotState extends State {
       )
       createArc(currPlayer.sprite, lineToShooter.getPoint(0.5), jumpTime)
       Game.instance.time.delayedCall(jumpTime * 485, () => {
+        Game.instance.ball.ballState = BallState.BLOCKED
         currPlayer.sprite.setTexture('block-front-swing')
         this.launchBallBackwardsAfterBlock(currPlayer, shooter)
       })
@@ -67,16 +68,14 @@ export class BlockShotState extends State {
     const ball = Game.instance.ball
     ball.sprite.setPosition(shooter.sprite.x, shooter.sprite.y - shooter.sprite.displayHeight / 2)
     ball.sprite.setDepth(shooter.sprite.depth + 1)
-    ball.blockShotFloor.setPosition(point.x, point.y)
+    ball.blockShotFloor.setPosition(
+      point.x,
+      Math.max(point.y, Game.instance.court.behindBackboardWallSprite.y + 25)
+    )
     ball.blockShotFloorCollider.active = true
     ball.show()
     const blockArcDuration = 1
     createArc(ball.sprite, point, blockArcDuration)
-    Game.instance.time.delayedCall(blockArcDuration * 750, () => {
-      const prevShooterState = shooter.getCurrState().key as States
-      shooter.setState(States.FUMBLE, prevShooterState)
-      ball.ballState = BallState.BLOCKED
-    })
     Game.instance.time.delayedCall(blockArcDuration * 1000, () => {
       shooter.wasShotBlocked = false
     })

@@ -19,7 +19,8 @@ export interface SetScreenStateConfig {
 export class SetScreenState extends State {
   public startedScreenTimestamp = -1
   public static SCREEN_DURATION = 5000
-  public static TRAVEL_DURATION = 1000
+  public static BLOCK_DURATION = 1000
+  public static TRAVEL_DURATION = 3000
 
   public isScreeningCallback: Function | null = null
   public onScreenFinishedCallback: Function | null = null
@@ -53,9 +54,14 @@ export class SetScreenState extends State {
           }
         } else {
           if (!currPlayer.sprite.body.touching.none) {
-            if (currTimestamp - this.startedScreenTimestamp > SetScreenState.TRAVEL_DURATION) {
+            if (currTimestamp - this.startedScreenTimestamp > SetScreenState.BLOCK_DURATION) {
               this.travelTimeExpired = true
               currPlayer.stop()
+            }
+          } else {
+            if (currTimestamp - this.startedScreenTimestamp > SetScreenState.TRAVEL_DURATION) {
+              this.travelTimeExpired = true
+              currPlayer.stop
             }
           }
         }

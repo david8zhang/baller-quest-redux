@@ -1,4 +1,7 @@
 import { CourtPlayer } from './CourtPlayer'
+import { ShootingState, ShotCoverage } from './states/offense/ShootingState'
+import { States } from './states/States'
+import { Team } from './Team'
 
 export const WINDOW_WIDTH = 864
 export const WINDOW_HEIGHT = 640
@@ -31,6 +34,45 @@ export const createArc = (
   const yVelocity = (landingPosition.y - sprite.y - 490 * Math.pow(duration, 2)) / duration
   sprite.setVelocity(xVelocity, yVelocity)
   sprite.setGravityY(980)
+}
+
+export const calculateShotSuccessPercentage = (
+  currPlayer: CourtPlayer,
+  team: Team,
+  isThreePointShot: boolean
+) => {
+  const shotContesters = team.getOtherTeamCourtPlayers()
+  const closestContester = getClosestPlayer(currPlayer, shotContesters)
+  let shotCoverage: ShotCoverage = ShotCoverage.SMOTHERED
+  if (closestContester) {
+    const distToClosestContester = Phaser.Math.Distance.Between(
+      currPlayer.sprite.x,
+      currPlayer.sprite.y,
+      closestContester.sprite.x,
+      closestContester.sprite.y
+    )
+    if (distToClosestContester > 100) {
+      shotCoverage = ShotCoverage.WIDE_OPEN
+    }
+    if (distToClosestContester <= 100 && distToClosestContester > 80) {
+      shotCoverage = ShotCoverage.OPEN
+    }
+    if (distToClosestContester <= 80 && distToClosestContester > 65) {
+      shotCoverage = ShotCoverage.CONTESTED
+    }
+  } else {
+    shotCoverage = ShotCoverage.WIDE_OPEN
+  }
+  const percentagesConfig = isThreePointShot
+    ? ShootingState.THREE_POINT_PERCENTAGES
+    : ShootingState.MID_RANGE_PERCENTAGES
+
+  console.log(isThreePointShot ? 'Three Pointer!' : 'Two Pointer')
+  console.log('Shot Coverage: ', shotCoverage)
+  return {
+    coverage: shotCoverage,
+    percentage: percentagesConfig[shotCoverage],
+  }
 }
 
 export const SORT_ORDER = {

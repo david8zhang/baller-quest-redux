@@ -13,21 +13,7 @@ export class HasPossession extends TreeNode {
   }
 
   public process(): Decision | States {
-    const ball = Game.instance.ball
     const team = this.blackboard.getData(BlackboardKeys.CURR_TEAM) as Team
-    if (
-      ball.ballState === BallState.PASS ||
-      ball.ballState === BallState.MADE_TWO_POINT_SHOT ||
-      ball.ballState === BallState.MADE_THREE_POINT_SHOT ||
-      ball.ballState === BallState.MISSED_SHOT
-    ) {
-      const prevPlayerWithBall = ball.prevPlayerWithBall
-      if (prevPlayerWithBall) {
-        return prevPlayerWithBall.side === team.side ? Decision.PROCEED : Decision.STOP
-      } else {
-        return Decision.STOP
-      }
-    }
     return team.hasPossession() ? Decision.PROCEED : Decision.STOP
   }
 }

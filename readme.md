@@ -16,3 +16,9 @@
 - Offball movement for player
 - Hoop animation on made shots
 - Depth sorting
+
+### Bugs
+
+- Set screen bug where team mate keeps running forever
+- Players can move behind the backboard
+- Run side animations during defend man state are wonky

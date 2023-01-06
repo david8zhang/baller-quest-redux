@@ -6,12 +6,13 @@ import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
 import { OffensePlay } from './OffensePlay'
+import { PlayTypes } from './PlayTypes'
 
 export class PickAndRoll extends OffensePlay {
   public isDrivingAroundScreen: boolean = false
 
   constructor(team: Team) {
-    super(team)
+    super(team, PlayTypes.PICK_AND_ROLL)
   }
 
   reset() {
