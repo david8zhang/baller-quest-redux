@@ -107,6 +107,14 @@ export class PlayerTeam extends Team {
       if (playerWithBall) {
         this.setSelectedCourtPlayer(playerWithBall)
       }
+      const nonBallHandlers = this.getCourtPlayers().filter((p) => p !== playerWithBall)
+      nonBallHandlers.forEach((p: CourtPlayer) => {
+        const playerCourtPlayer = p as PlayerCourtPlayer
+        playerCourtPlayer.isPlayerCommandOverride = true
+        playerCourtPlayer.setState(States.GO_BACK_TO_SPOT, () => {
+          playerCourtPlayer.isPlayerCommandOverride = false
+        })
+      })
     } else {
       if (playerWithBall) {
         const closestPlayerToRebounder = getClosestPlayer(playerWithBall, this.getCourtPlayers())
@@ -285,6 +293,7 @@ export class PlayerTeam extends Team {
           side: Side.PLAYER,
           playerId,
           team: this,
+          attributes: PlayerConstants.PLAYER_STATS[playerId],
         })
         if (index === 0) {
           this.selectedCourtPlayer = newPlayer
@@ -332,7 +341,10 @@ export class PlayerTeam extends Team {
     const upDown = this.keyArrowUp.isDown
     const downDown = this.keyArrowDown.isDown
 
-    const speed = this.sprintMeter.getSpeed()
+    const speed = this.hasPossession()
+      ? this.selectedCourtPlayer.getOffSpeedFromAttr()
+      : this.selectedCourtPlayer.getDefSpeedFromAttr()
+
     let velocityX = 0
     let velocityY = 0
     if (leftDown || rightDown) {

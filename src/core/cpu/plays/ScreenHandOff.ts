@@ -1,4 +1,4 @@
-import { getClosestPlayer } from '~/core/Constants'
+import { getClosestPlayer, getMostOpenPassRecipient } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { DribbleToPointStateConfig } from '~/core/states/offense/DribbleToPointState'
 import { PassConfig } from '~/core/states/offense/PassingState'
@@ -22,8 +22,7 @@ export class ScreenHandOff extends OffensePlay {
 
   reset() {
     this.drivingToBasket = false
-    this.isRunning = false
-    super.terminate()
+    super.reset()
   }
 
   public execute(): void {
@@ -91,9 +90,12 @@ export class ScreenHandOff extends OffensePlay {
         const driveToBasketConfig = {
           onDriveSuccess: () => {},
           onDriveFailed: () => {
-            receiver.setState(States.GO_BACK_TO_SPOT, () => {
-              this.reset()
-            })
+            const shouldPass = Phaser.Math.Between(0, 1) == 0
+            if (shouldPass) {
+              this.passOut(receiver)
+            } else {
+              this.goBackToSpot(receiver)
+            }
           },
           timeout: 4000,
         }
@@ -105,5 +107,29 @@ export class ScreenHandOff extends OffensePlay {
       point,
     }
     receiver.setState(States.DRIBBLE_TO_POINT, config)
+  }
+
+  passOut(player: CourtPlayer) {
+    const teammates = this.team.getCourtPlayers().filter((p) => {
+      return p !== player
+    })
+    const passRecipient = getMostOpenPassRecipient(teammates, this.team)
+    const passConfig: PassConfig = {
+      onPassCompleteCb: () => {
+        player.setState(States.GO_BACK_TO_SPOT, () => {
+          this.reset()
+        })
+      },
+      onPassStartedCb: () => {
+        player.stop()
+      },
+    }
+    player.setState(States.PASSING, passRecipient, passConfig)
+  }
+
+  goBackToSpot(player: CourtPlayer) {
+    player.setState(States.GO_BACK_TO_SPOT, () => {
+      this.reset()
+    })
   }
 }

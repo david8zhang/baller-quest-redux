@@ -25,11 +25,7 @@ export class CPUCourtPlayer extends CourtPlayer {
     if (Game.instance.ball.ballState === BallState.LOOSE) {
       return true
     }
-    return (
-      (cpuTeam.currPlay === null || cpuTeam.currPlay.playType === PlayTypes.FREELANCE) &&
-      !this.isShooting() &&
-      !this.isBlockingOrContesting()
-    )
+    return cpuTeam.currPlay === null && !this.isShooting() && !this.isBlockingOrContesting()
   }
 
   processCourtPlayerBehaviorTree() {

@@ -86,7 +86,7 @@ export class SetScreenState extends State {
               y: defenderForBallHandler.sprite.y + 5,
             }
           }
-          currPlayer.moveTowards(this.screenPosition)
+          currPlayer.moveTowards(this.screenPosition, currPlayer.getOffSpeedFromAttr())
         }
       }
     }

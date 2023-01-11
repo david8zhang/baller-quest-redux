@@ -36,7 +36,7 @@ export class DefendManState extends State {
         }
       } else {
         this.lastUpdatedTimestamp = Date.now()
-        currPlayer.moveTowards(pointToMoveTo)
+        currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr())
       }
     }
   }

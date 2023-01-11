@@ -41,7 +41,7 @@ export class ShotClock {
     this.shotTimeSeconds = ShotClock.DEFAULT_CLOCK_TIME
     this.shotClockText.setText(`${this.shotTimeSeconds.toString()}`)
     this.shotClockText.setPosition(WINDOW_WIDTH - this.shotClockText.displayWidth - 20, 20)
-    this.timerEvent.paused = false
+    // this.timerEvent.paused = false
   }
 
   reboundShotClockReset() {
@@ -56,7 +56,6 @@ export class ShotClock {
       ballState === BallState.DUNK ||
       ballState === BallState.MISSED_SHOT ||
       ballState === BallState.POST_MADE_SHOT ||
-      ballState === BallState.BLOCKED ||
       this.game.ball.isRebounding
     )
   }

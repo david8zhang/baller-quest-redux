@@ -9,6 +9,7 @@ import {
   Side,
   SORT_ORDER,
 } from './Constants'
+import { CourtPlayerAttributeMapper } from './CourtPlayerAttributeMapper'
 import { createDecisionTree } from './CourtPlayerDecisionTree'
 import { Blackboard } from './decision-tree/Blackboard'
 import { TreeNode } from './decision-tree/TreeNode'
@@ -33,11 +34,21 @@ import { StateMachine } from './states/StateMachine'
 import { States } from './states/States'
 import { Team } from './Team'
 
+export interface PlayerAttributes {
+  offSpeed: number
+  defSpeed: number
+  shooting: number
+  block: number
+  contest: number
+}
+
 export interface CourtPlayerConfig {
   position: {
     x: number
     y: number
   }
+  // all attributes are numbers between 1 and 5
+  attributes: PlayerAttributes
   side: Side
   playerId: string
   tint?: number
@@ -61,6 +72,7 @@ export class CourtPlayer {
   protected decisionTree!: TreeNode
   protected blackboard: Blackboard
   protected raycastIntersectRect: Phaser.Geom.Rectangle
+  protected attributes: PlayerAttributes
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -119,8 +131,19 @@ export class CourtPlayer {
       })
       .setDepth(SORT_ORDER.ui)
     this.blackboard = new Blackboard()
+    this.attributes = config.attributes
     this.setupDecisionTree()
   }
+
+  getOffSpeedFromAttr() {
+    return CourtPlayerAttributeMapper.getOffensiveMovementSpeedFromAttr(this.attributes.offSpeed)
+  }
+  getDefSpeedFromAttr() {
+    return CourtPlayerAttributeMapper.getOffensiveMovementSpeedFromAttr(this.attributes.defSpeed)
+  }
+  getShotPctFromAttr() {}
+  getBlockSuccessPctFromAttr() {}
+  getShotContestSuccessPctFromAttr() {}
 
   canDunkBall() {
     const state = this.getCurrState().key
@@ -330,7 +353,7 @@ export class CourtPlayer {
     return distance <= 5
   }
 
-  moveTowards(target: { x: number; y: number }) {
+  moveTowards(target: { x: number; y: number }, speed: number) {
     const distance = getDistanceBetween(
       {
         x: this.sprite.x,
@@ -356,7 +379,7 @@ export class CourtPlayer {
         }
       )
       const velocityVector = new Phaser.Math.Vector2()
-      this.game.physics.velocityFromRotation(angle, COURT_PLAYER_SPEED, velocityVector)
+      this.game.physics.velocityFromRotation(angle, speed, velocityVector)
       this.playRunAnimationForVelocity(velocityVector.x, velocityVector.y)
       this.sprite.setVelocity(velocityVector.x, velocityVector.y)
     }

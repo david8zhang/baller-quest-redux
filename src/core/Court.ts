@@ -43,8 +43,12 @@ export class Court {
       .setDisplaySize(WINDOW_WIDTH, 5)
       .setDebug(true, true, 0x00ff00)
       .setImmovable(true)
-    // this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.playerCourtPlayers)
-    // this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.cpuCourtPlayers)
+
+    this.behindBackboardWallSprite.body.checkCollision.up = false
+    this.behindBackboardWallSprite.body.checkCollision.down = true
+
+    this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.playerCourtPlayers)
+    this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.cpuCourtPlayers)
   }
 
   handleDebugToggleInput() {

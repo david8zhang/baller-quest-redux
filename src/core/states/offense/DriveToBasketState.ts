@@ -43,10 +43,13 @@ export class DriveToBasketState extends State {
             currPlayer.setState(States.SHOOTING)
           }
         } else {
-          currPlayer.moveTowards({
-            x: hoop.x,
-            y: hoop.y,
-          })
+          currPlayer.moveTowards(
+            {
+              x: hoop.x,
+              y: hoop.y,
+            },
+            currPlayer.getOffSpeedFromAttr()
+          )
         }
       }
     }

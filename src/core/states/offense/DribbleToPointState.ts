@@ -33,7 +33,7 @@ export class DribbleToPointState extends State {
       } else {
         if (this.startedDribblingTimestamp == -1) {
           this.startedDribblingTimestamp = currTimestamp
-          currPlayer.moveTowards(this.point)
+          currPlayer.moveTowards(this.point, currPlayer.getOffSpeedFromAttr())
         } else {
           if (currTimestamp - this.startedDribblingTimestamp >= this.timeout) {
             currPlayer.stop()
@@ -41,7 +41,7 @@ export class DribbleToPointState extends State {
               this.failedToReachPointCB()
             }
           } else {
-            currPlayer.moveTowards(this.point)
+            currPlayer.moveTowards(this.point, currPlayer.getOffSpeedFromAttr())
           }
         }
       }

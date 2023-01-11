@@ -29,7 +29,7 @@ export class GoBackToSpotState extends State {
       }
       currPlayer.setState(States.IDLE)
     } else {
-      currPlayer.moveTowards(worldPosition)
+      currPlayer.moveTowards(worldPosition, currPlayer.getOffSpeedFromAttr())
     }
   }
 }

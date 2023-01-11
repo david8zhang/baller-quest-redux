@@ -4,20 +4,11 @@
 
 ## TODO:
 
-### High Priority
+- Different sprites for CPU v.s. Player
+- Animations for defending
+- Dribbling around defenders
 
-### Medium Priority
-
-- More offensive sets for enemy
-- Steals
-
-### Low Priority
-
-- Offball movement for player
-- Hoop animation on made shots
-- Depth sorting
-
-### Bugs
+## Bugs
 
 - Set screen bug where team mate keeps running forever
 - Players can move behind the backboard

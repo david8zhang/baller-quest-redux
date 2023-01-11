@@ -1,4 +1,28 @@
 export class PlayerConstants {
+  public static PLAYER_STATS = {
+    player1: {
+      offSpeed: 3,
+      defSpeed: 3,
+      shooting: 3,
+      block: 3,
+      contest: 3,
+    },
+    player2: {
+      offSpeed: 4,
+      defSpeed: 2,
+      shooting: 4,
+      block: 1,
+      contest: 1,
+    },
+    player3: {
+      offSpeed: 2,
+      defSpeed: 4,
+      shooting: 1,
+      block: 3,
+      contest: 4,
+    },
+  }
+
   public static DEFENSIVE_ASSIGNMENTS = {
     player1: 'cpu1',
     player2: 'cpu2',

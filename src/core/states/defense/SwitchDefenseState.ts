@@ -33,7 +33,7 @@ export class SwitchDefenseState extends State {
         if (currPlayer.isAtPoint(pointToMoveTo)) {
           currPlayer.stop()
         } else {
-          currPlayer.moveTowards(pointToMoveTo)
+          currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr())
         }
       }
     }

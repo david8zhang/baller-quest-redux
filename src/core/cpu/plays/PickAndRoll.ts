@@ -1,6 +1,7 @@
-import { getClosestPlayer } from '~/core/Constants'
+import { getClosestPlayer, getMostOpenPassRecipient } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { DribbleToPointStateConfig } from '~/core/states/offense/DribbleToPointState'
+import { PassConfig } from '~/core/states/offense/PassingState'
 import { ScreenDirection, SetScreenStateConfig } from '~/core/states/offense/SetScreenState'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
@@ -17,8 +18,7 @@ export class PickAndRoll extends OffensePlay {
 
   reset() {
     this.isDrivingAroundScreen = false
-    this.isRunning = false
-    super.terminate()
+    super.reset()
   }
 
   public execute(): void {
@@ -65,9 +65,12 @@ export class PickAndRoll extends OffensePlay {
           const driveToBasketConfig = {
             onDriveSuccess: () => {},
             onDriveFailed: () => {
-              ballHandler.setState(States.GO_BACK_TO_SPOT, () => {
-                this.reset()
-              })
+              const shouldPass = Phaser.Math.Between(0, 1) == 0
+              if (shouldPass) {
+                this.passOut(ballHandler)
+              } else {
+                this.goBackToSpot(ballHandler)
+              }
             },
             timeout: 4000,
           }
@@ -80,5 +83,29 @@ export class PickAndRoll extends OffensePlay {
       }
       ballHandler.setState(States.DRIBBLE_TO_POINT, config)
     }
+  }
+
+  passOut(player: CourtPlayer) {
+    const teammates = this.team.getCourtPlayers().filter((p) => {
+      return p !== player
+    })
+    const passRecipient = getMostOpenPassRecipient(teammates, this.team)
+    const passConfig: PassConfig = {
+      onPassCompleteCb: () => {
+        player.setState(States.GO_BACK_TO_SPOT, () => {
+          this.reset()
+        })
+      },
+      onPassStartedCb: () => {
+        player.stop()
+      },
+    }
+    player.setState(States.PASSING, passRecipient, passConfig)
+  }
+
+  goBackToSpot(player: CourtPlayer) {
+    player.setState(States.GO_BACK_TO_SPOT, () => {
+      this.reset()
+    })
   }
 }

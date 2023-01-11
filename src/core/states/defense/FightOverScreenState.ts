@@ -23,7 +23,7 @@ export class FightOverScreenState extends State {
       if (currPlayer.isAtPoint(pointToMoveTo)) {
         currPlayer.stop()
       } else {
-        currPlayer.moveTowards(pointToMoveTo)
+        currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr())
       }
     } else {
       currPlayer.stop()

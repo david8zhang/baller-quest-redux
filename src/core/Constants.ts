@@ -1,11 +1,10 @@
+import Game from '~/scenes/Game'
 import { CourtPlayer } from './CourtPlayer'
 import { ShootingState, ShotCoverage } from './states/offense/ShootingState'
-import { States } from './states/States'
 import { Team } from './Team'
 
 export const WINDOW_WIDTH = 864
 export const WINDOW_HEIGHT = 640
-
 export const LAYUP_DISTANCE = 180
 
 export enum Side {
@@ -34,6 +33,31 @@ export const createArc = (
   const yVelocity = (landingPosition.y - sprite.y - 490 * Math.pow(duration, 2)) / duration
   sprite.setVelocity(xVelocity, yVelocity)
   sprite.setGravityY(980)
+}
+
+export const getMostOpenPassRecipient = (teammates: CourtPlayer[], team: Team) => {
+  let recipient: CourtPlayer | null = null
+  let bestShotCoverage: ShotCoverage | null = null
+
+  // Check if team mates are open
+  for (let i = 0; i < teammates.length; i++) {
+    const teammate = teammates[i]
+    const isThreePointShot = Game.instance.court.isThreePointShot(teammate.x, teammate.y)
+    const shotPercentageData = calculateShotSuccessPercentage(teammate, team, isThreePointShot)
+    if (shotPercentageData.coverage === ShotCoverage.OPEN) {
+      if (!recipient) {
+        recipient = teammate
+        bestShotCoverage = ShotCoverage.OPEN
+      }
+    }
+    if (shotPercentageData.coverage === ShotCoverage.WIDE_OPEN) {
+      if (!recipient || bestShotCoverage === ShotCoverage.OPEN) {
+        recipient = teammate
+        bestShotCoverage = ShotCoverage.WIDE_OPEN
+      }
+    }
+  }
+  return recipient
 }
 
 export const calculateShotSuccessPercentage = (
@@ -66,9 +90,6 @@ export const calculateShotSuccessPercentage = (
   const percentagesConfig = isThreePointShot
     ? ShootingState.THREE_POINT_PERCENTAGES
     : ShootingState.MID_RANGE_PERCENTAGES
-
-  console.log(isThreePointShot ? 'Three Pointer!' : 'Two Pointer')
-  console.log('Shot Coverage: ', shotCoverage)
   return {
     coverage: shotCoverage,
     percentage: percentagesConfig[shotCoverage],

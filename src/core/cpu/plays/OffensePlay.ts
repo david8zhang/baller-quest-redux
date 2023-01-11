@@ -13,13 +13,9 @@ export abstract class OffensePlay {
     this.playType = playType
   }
 
-  reset() {
-    this.isRunning = false
-  }
-
   public abstract execute(): void
 
-  public terminate() {
+  public reset() {
     this.isRunning = false
     const courtPlayers = this.team.getCourtPlayers()
     courtPlayers.forEach((p) => {
