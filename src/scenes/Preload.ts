@@ -22,8 +22,8 @@ export class Preload extends Phaser.Scene {
   }
 
   loadBlockAnimations() {
-    this.load.image('block-front-wind-up', 'animations/block/block-front/block-wind-up.png')
-    this.load.image('block-front-swing', 'animations/block/block-front/block-swing.png')
+    this.load.image('block-front-wind-up', 'animations/block/block-front/block-wind-up-player.png')
+    this.load.image('block-front-swing', 'animations/block/block-front/block-swing-player.png')
   }
 
   loadCourtAnimations() {
@@ -31,18 +31,18 @@ export class Preload extends Phaser.Scene {
   }
 
   loadPassAnimations() {
-    this.load.image('pass-front-wind-up', 'animations/pass/pass-front/pass-wind-up.png')
-    this.load.image('pass-front-release', 'animations/pass/pass-front/pass-release.png')
+    this.load.image('pass-front-wind-up', 'animations/pass/pass-front/pass-wind-up-player.png')
+    this.load.image('pass-front-release', 'animations/pass/pass-front/pass-release-player.png')
 
-    this.load.image('pass-back-wind-up', 'animations/pass/pass-back/pass-wind-up.png')
-    this.load.image('pass-back-release', 'animations/pass/pass-back/pass-release.png')
+    this.load.image('pass-back-wind-up', 'animations/pass/pass-back/pass-wind-up-player.png')
+    this.load.image('pass-back-release', 'animations/pass/pass-back/pass-release-player.png')
 
-    this.load.image('pass-side-wind-up', 'animations/pass/pass-side/pass-wind-up.png')
-    this.load.image('pass-side-release', 'animations/pass/pass-side/pass-release.png')
+    this.load.image('pass-side-wind-up', 'animations/pass/pass-side/pass-wind-up-player.png')
+    this.load.image('pass-side-release', 'animations/pass/pass-side/pass-release-player.png')
   }
 
   loadContestAnimations() {
-    this.load.image('contest-front', 'animations/contest/contest-front.png')
+    this.load.image('contest-front', 'animations/contest/contest-front-player.png')
   }
 
   loadRunAnimations() {
@@ -78,19 +78,36 @@ export class Preload extends Phaser.Scene {
 
   loadShootAnimations() {
     // Shoot front
-    this.load.image('shoot-jump-front', 'animations/shoot/shoot-front/shoot-jump-front.png')
-    this.load.image('shoot-flick-front', 'animations/shoot/shoot-front/shoot-flick-front.png')
+    this.load.image(
+      'shoot-jump-front-player',
+      'animations/shoot/shoot-front/shoot-jump-front-player.png'
+    )
+    this.load.image(
+      'shoot-flick-front-player',
+      'animations/shoot/shoot-front/shoot-flick-front-player.png'
+    )
 
     // Shoot side
-    this.load.image('shoot-side-wind', 'animations/shoot/shoot-side/shoot-side-wind.png')
-    this.load.image('shoot-side-release', 'animations/shoot/shoot-side/shoot-side-release.png')
-    this.load.image('shoot-side-follow', 'animations/shoot/shoot-side/shoot-side-follow.png')
+    this.load.image(
+      'shoot-side-wind-player',
+      'animations/shoot/shoot-side/shoot-side-wind-player.png'
+    )
+    this.load.image(
+      'shoot-side-release-player',
+      'animations/shoot/shoot-side/shoot-side-release-player.png'
+    )
   }
 
   loadDunkAnimations() {
-    this.load.image('dunk-arm-out-front', 'animations/dunk/dunk-front/dunk-arm-out-front.png')
-    this.load.image('dunk-finish-front', 'animations/dunk/dunk-front/dunk-finish-front.png')
-    this.load.image('dunk-wind-up-front', 'animations/dunk/dunk-front/dunk-wind-up-front.png')
+    this.load.image(
+      'dunk-arm-out-front',
+      'animations/dunk/dunk-front/dunk-arm-out-front-player.png'
+    )
+    this.load.image('dunk-finish-front', 'animations/dunk/dunk-front/dunk-finish-front-player.png')
+    this.load.image(
+      'dunk-wind-up-front',
+      'animations/dunk/dunk-front/dunk-wind-up-front-player.png'
+    )
   }
 
   loadIdleAnimations() {

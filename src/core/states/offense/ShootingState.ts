@@ -49,9 +49,9 @@ export class ShootingState extends State {
     }
 
     if (isSide) {
-      currPlayer.sprite.setTexture('shoot-side-wind')
+      currPlayer.sprite.setTexture('shoot-side-wind-player')
     } else {
-      currPlayer.sprite.setTexture('shoot-jump-front')
+      currPlayer.sprite.setTexture('shoot-jump-front-player')
     }
     const isThreePointShot = Game.instance.court.isThreePointShot(
       currPlayer.sprite.x,
@@ -61,11 +61,11 @@ export class ShootingState extends State {
     Game.instance.time.delayedCall(jumpTime * 975 * 0.45, () => {
       currPlayer.shotReleased = true
       if (isSide) {
-        currPlayer.sprite.setTexture('shoot-side-release')
+        currPlayer.sprite.setTexture('shoot-side-release-player')
         const xOffset = isFlipped ? 10 : -10
         Game.instance.ball.setPosition(currPlayer.sprite.x + xOffset, currPlayer.sprite.y - 28)
       } else {
-        currPlayer.sprite.setTexture('shoot-flick-front')
+        currPlayer.sprite.setTexture('shoot-flick-front-player')
         Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
       }
       Game.instance.ball.giveUpPossession()
