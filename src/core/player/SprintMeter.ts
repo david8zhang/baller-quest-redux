@@ -28,7 +28,6 @@ export class SprintMeter {
   }
 
   public getSpeed() {
-    // return 50
     if (this.isSprinting) {
       if (this.sprintDuration >= 25 && this.sprintDuration < 75) {
         return COURT_PLAYER_SPRINT_SPEED

@@ -91,7 +91,6 @@ export default class Game extends Phaser.Scene {
     }
     this.physics.add.overlap(this.ball.sprite, this.playerCourtPlayers, playerBallCollisionHandler)
     this.physics.add.overlap(this.ball.sprite, this.cpuCourtPlayers, playerBallCollisionHandler)
-    this.physics.add.collider(this.playerCourtPlayers, this.cpuCourtPlayers)
   }
 
   handleChangePossession(prevSideWithPossession: Side) {

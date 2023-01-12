@@ -47,32 +47,32 @@ export class Preload extends Phaser.Scene {
 
   loadRunAnimations() {
     this.load.atlas(
-      'run-side',
-      'animations/run/run-side/run-side.png',
-      'animations/run/run-side/run-side.json'
+      'run-side-player',
+      'animations/run/run-side/run-side-player.png',
+      'animations/run/run-side/run-side-player.json'
     )
     this.load.atlas(
-      'run-with-ball-side',
-      'animations/run/run-with-ball-side/run-with-ball-side.png',
-      'animations/run/run-with-ball-side/run-with-ball-side.json'
+      'run-with-ball-side-player',
+      'animations/run/run-with-ball-side/run-with-ball-side-player.png',
+      'animations/run/run-with-ball-side/run-with-ball-side-player.json'
     )
     this.load.atlas(
-      'run-with-ball-front',
-      'animations/run/run-with-ball-front/run-with-ball-front.png',
-      'animations/run/run-with-ball-front/run-with-ball-front.json'
+      'run-with-ball-front-player',
+      'animations/run/run-with-ball-front/run-with-ball-front-player.png',
+      'animations/run/run-with-ball-front/run-with-ball-front-player.json'
     )
     this.load.atlas(
-      'run-front',
-      'animations/run/run-front/run-front.png',
-      'animations/run/run-front/run-front.json'
+      'run-front-player',
+      'animations/run/run-front/run-front-player.png',
+      'animations/run/run-front/run-front-player.json'
     )
   }
 
   loadDribbleAnimations() {
     this.load.atlas(
-      'dribble-front',
-      'animations/dribble/dribble-front/dribble-front.png',
-      'animations/dribble/dribble-front/dribble-front.json'
+      'dribble-front-player',
+      'animations/dribble/dribble-front/dribble-front-player.png',
+      'animations/dribble/dribble-front/dribble-front-player.json'
     )
   }
 
@@ -95,9 +95,9 @@ export class Preload extends Phaser.Scene {
 
   loadIdleAnimations() {
     this.load.atlas(
-      'idle-front',
-      'animations/idle/idle-front/idle-front.png',
-      'animations/idle/idle-front/idle-front.json'
+      'idle-front-player',
+      'animations/idle/idle-front/idle-front-player.png',
+      'animations/idle/idle-front/idle-front-player.json'
     )
   }
 

@@ -8,6 +8,7 @@ import {
   ONBALL_ANIMS,
   Side,
   SORT_ORDER,
+  WINDOW_WIDTH,
 } from './Constants'
 import { CourtPlayerAttributeMapper } from './CourtPlayerAttributeMapper'
 import { createDecisionTree } from './CourtPlayerDecisionTree'
@@ -74,6 +75,8 @@ export class CourtPlayer {
   protected raycastIntersectRect: Phaser.Geom.Rectangle
   protected attributes: PlayerAttributes
 
+  public graphics: Phaser.GameObjects.Graphics
+
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
     const { position, side, tint, playerId, team } = config
@@ -133,6 +136,9 @@ export class CourtPlayer {
     this.blackboard = new Blackboard()
     this.attributes = config.attributes
     this.setupDecisionTree()
+
+    this.graphics = this.game.add.graphics()
+    this.graphics.lineStyle(1, 0x00ff00)
   }
 
   getOffSpeedFromAttr() {
@@ -378,6 +384,7 @@ export class CourtPlayer {
           y: target.y,
         }
       )
+
       const velocityVector = new Phaser.Math.Vector2()
       this.game.physics.velocityFromRotation(angle, speed, velocityVector)
       this.playRunAnimationForVelocity(velocityVector.x, velocityVector.y)

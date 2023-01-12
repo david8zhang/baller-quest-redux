@@ -148,7 +148,7 @@
   "meta": {
     "app": "http://free-tex-packer.com",
     "version": "0.6.6",
-    "image": "run-front.png",
+    "image": "run-side-player.png",
     "format": "RGBA8888",
     "size": {
       "w": 96,

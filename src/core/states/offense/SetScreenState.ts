@@ -1,4 +1,4 @@
-import { Direction } from '~/core/Constants'
+import { Direction, Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -29,6 +29,7 @@ export class SetScreenState extends State {
   public screenDirection!: ScreenDirection
   public isAtScreenPosition: boolean = false
   private travelTimeExpired: boolean = false
+  private screenCollider!: Phaser.Physics.Arcade.Collider
 
   enter(currPlayer: CourtPlayer, team: Team, config: SetScreenStateConfig) {
     this.isScreeningCallback = config.isScreeningCallback
@@ -36,6 +37,12 @@ export class SetScreenState extends State {
     if (config.screenTargetPlayer) {
       this.screenTarget = config.screenTargetPlayer
     }
+
+    const otherPlayers =
+      currPlayer.side === Side.PLAYER
+        ? Game.instance.cpuCourtPlayers
+        : Game.instance.playerCourtPlayers
+    this.screenCollider = Game.instance.physics.add.collider(currPlayer.sprite, otherPlayers)
   }
 
   execute(currPlayer: CourtPlayer, team: Team) {
@@ -93,6 +100,9 @@ export class SetScreenState extends State {
   }
 
   exit() {
+    if (this.screenCollider) {
+      this.screenCollider.destroy()
+    }
     this.travelTimeExpired = false
     this.isAtScreenPosition = false
     this.startedScreenTimestamp = -1

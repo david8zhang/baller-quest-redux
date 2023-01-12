@@ -104,22 +104,22 @@ export const SORT_ORDER = {
 }
 
 export const OFFBALL_ANIMS = {
-  idle: 'idle-front',
+  idle: 'idle-front-player',
   run: {
-    [Direction.UP]: 'run-front',
-    [Direction.DOWN]: 'run-front',
-    [Direction.LEFT]: 'run-side',
-    [Direction.RIGHT]: 'run-side',
+    [Direction.UP]: 'run-front-player',
+    [Direction.DOWN]: 'run-front-player',
+    [Direction.LEFT]: 'run-side-player',
+    [Direction.RIGHT]: 'run-side-player',
   },
 }
 
 export const ONBALL_ANIMS = {
-  idle: 'dribble-front',
+  idle: 'dribble-front-player',
   run: {
-    [Direction.UP]: 'run-with-ball-front',
-    [Direction.DOWN]: 'run-with-ball-front',
-    [Direction.LEFT]: 'run-with-ball-side',
-    [Direction.RIGHT]: 'run-with-ball-side',
+    [Direction.UP]: 'run-with-ball-front-player',
+    [Direction.DOWN]: 'run-with-ball-front-player',
+    [Direction.LEFT]: 'run-with-ball-side-player',
+    [Direction.RIGHT]: 'run-with-ball-side-player',
   },
 }
 

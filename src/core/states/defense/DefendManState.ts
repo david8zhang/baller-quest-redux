@@ -5,11 +5,17 @@ import Game from '~/scenes/Game'
 import { State } from '../StateMachine'
 
 export class DefendManState extends State {
+  public lastBlockedTimestamp: number = -1
   public lastUpdatedTimestamp: number = -1
   public static DEFENSIVE_SPACING_PERCENTAGE = 0.2
   public manToDefend: CourtPlayer | null = null
 
   public debounceEvent: Phaser.Time.TimerEvent | null = null
+
+  exit() {
+    this.lastBlockedTimestamp = -1
+    this.lastUpdatedTimestamp = -1
+  }
 
   enter(currPlayer: CourtPlayer, team: Team) {
     this.setManToDefend(currPlayer, team)

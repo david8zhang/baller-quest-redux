@@ -1,7 +1,7 @@
 export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => {
   anims.create({
-    key: 'idle-front',
-    frames: anims.generateFrameNames('idle-front', {
+    key: 'idle-front-player',
+    frames: anims.generateFrameNames('idle-front-player', {
       start: 0,
       end: 2,
       suffix: '.png',
@@ -11,8 +11,8 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
-    key: 'dribble-front',
-    frames: anims.generateFrameNames('dribble-front', {
+    key: 'dribble-front-player',
+    frames: anims.generateFrameNames('dribble-front-player', {
       start: 0,
       end: 3,
       suffix: '.png',
@@ -22,8 +22,8 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
-    key: 'run-with-ball-side',
-    frames: anims.generateFrameNames('run-with-ball-side', {
+    key: 'run-with-ball-side-player',
+    frames: anims.generateFrameNames('run-with-ball-side-player', {
       start: 0,
       end: 5,
       suffix: '.png',
@@ -33,8 +33,8 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
-    key: 'run-side',
-    frames: anims.generateFrameNames('run-side', {
+    key: 'run-side-player',
+    frames: anims.generateFrameNames('run-side-player', {
       start: 0,
       end: 5,
       suffix: '.png',
@@ -44,8 +44,8 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
-    key: 'run-with-ball-front',
-    frames: anims.generateFrameNames('run-with-ball-front', {
+    key: 'run-with-ball-front-player',
+    frames: anims.generateFrameNames('run-with-ball-front-player', {
       start: 0,
       end: 5,
       suffix: '.png',
@@ -55,8 +55,8 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
-    key: 'run-front',
-    frames: anims.generateFrameNames('run-front', {
+    key: 'run-front-player',
+    frames: anims.generateFrameNames('run-front-player', {
       start: 0,
       end: 5,
       suffix: '.png',
