@@ -22,8 +22,17 @@ export class Preload extends Phaser.Scene {
   }
 
   loadBlockAnimations() {
-    this.load.image('block-front-wind-up', 'animations/block/block-front/block-wind-up-player.png')
-    this.load.image('block-front-swing', 'animations/block/block-front/block-swing-player.png')
+    this.load.image(
+      'block-front-wind-up-player',
+      'animations/block/block-front/block-wind-up-player.png'
+    )
+    this.load.image(
+      'block-front-swing-player',
+      'animations/block/block-front/block-swing-player.png'
+    )
+
+    this.load.image('block-front-wind-up-cpu', 'animations/block/block-front/block-wind-up-cpu.png')
+    this.load.image('block-front-swing-cpu', 'animations/block/block-front/block-swing-cpu.png')
   }
 
   loadCourtAnimations() {
@@ -31,18 +40,34 @@ export class Preload extends Phaser.Scene {
   }
 
   loadPassAnimations() {
-    this.load.image('pass-front-wind-up', 'animations/pass/pass-front/pass-wind-up-player.png')
-    this.load.image('pass-front-release', 'animations/pass/pass-front/pass-release-player.png')
+    this.load.image(
+      'pass-front-wind-up-player',
+      'animations/pass/pass-front/pass-wind-up-player.png'
+    )
+    this.load.image(
+      'pass-front-release-player',
+      'animations/pass/pass-front/pass-release-player.png'
+    )
 
-    this.load.image('pass-back-wind-up', 'animations/pass/pass-back/pass-wind-up-player.png')
-    this.load.image('pass-back-release', 'animations/pass/pass-back/pass-release-player.png')
+    this.load.image('pass-back-wind-up-player', 'animations/pass/pass-back/pass-wind-up-player.png')
+    this.load.image('pass-back-release-player', 'animations/pass/pass-back/pass-release-player.png')
 
-    this.load.image('pass-side-wind-up', 'animations/pass/pass-side/pass-wind-up-player.png')
-    this.load.image('pass-side-release', 'animations/pass/pass-side/pass-release-player.png')
+    this.load.image('pass-side-wind-up-player', 'animations/pass/pass-side/pass-wind-up-player.png')
+    this.load.image('pass-side-release-player', 'animations/pass/pass-side/pass-release-player.png')
+
+    this.load.image('pass-front-wind-up-cpu', 'animations/pass/pass-front/pass-wind-up-cpu.png')
+    this.load.image('pass-front-release-cpu', 'animations/pass/pass-front/pass-release-cpu.png')
+
+    this.load.image('pass-back-wind-up-cpu', 'animations/pass/pass-back/pass-wind-up-cpu.png')
+    this.load.image('pass-back-release-cpu', 'animations/pass/pass-back/pass-release-cpu.png')
+
+    this.load.image('pass-side-wind-up-cpu', 'animations/pass/pass-side/pass-wind-up-cpu.png')
+    this.load.image('pass-side-release-cpu', 'animations/pass/pass-side/pass-release-cpu.png')
   }
 
   loadContestAnimations() {
-    this.load.image('contest-front', 'animations/contest/contest-front-player.png')
+    this.load.image('contest-front-player', 'animations/contest/contest-front-player.png')
+    this.load.image('contest-front-cpu', 'animations/contest/contest-front-cpu.png')
   }
 
   loadRunAnimations() {
@@ -66,6 +91,27 @@ export class Preload extends Phaser.Scene {
       'animations/run/run-front/run-front-player.png',
       'animations/run/run-front/run-front-player.json'
     )
+
+    this.load.atlas(
+      'run-side-cpu',
+      'animations/run/run-side/run-side-cpu.png',
+      'animations/run/run-side/run-side-cpu.json'
+    )
+    this.load.atlas(
+      'run-with-ball-side-cpu',
+      'animations/run/run-with-ball-side/run-with-ball-side-cpu.png',
+      'animations/run/run-with-ball-side/run-with-ball-side-cpu.json'
+    )
+    this.load.atlas(
+      'run-with-ball-front-cpu',
+      'animations/run/run-with-ball-front/run-with-ball-front-cpu.png',
+      'animations/run/run-with-ball-front/run-with-ball-front-cpu.json'
+    )
+    this.load.atlas(
+      'run-front-cpu',
+      'animations/run/run-front/run-front-cpu.png',
+      'animations/run/run-front/run-front-cpu.json'
+    )
   }
 
   loadDribbleAnimations() {
@@ -73,6 +119,11 @@ export class Preload extends Phaser.Scene {
       'dribble-front-player',
       'animations/dribble/dribble-front/dribble-front-player.png',
       'animations/dribble/dribble-front/dribble-front-player.json'
+    )
+    this.load.atlas(
+      'dribble-front-cpu',
+      'animations/dribble/dribble-front/dribble-front-cpu.png',
+      'animations/dribble/dribble-front/dribble-front-cpu.json'
     )
   }
 
@@ -86,8 +137,6 @@ export class Preload extends Phaser.Scene {
       'shoot-flick-front-player',
       'animations/shoot/shoot-front/shoot-flick-front-player.png'
     )
-
-    // Shoot side
     this.load.image(
       'shoot-side-wind-player',
       'animations/shoot/shoot-side/shoot-side-wind-player.png'
@@ -96,17 +145,42 @@ export class Preload extends Phaser.Scene {
       'shoot-side-release-player',
       'animations/shoot/shoot-side/shoot-side-release-player.png'
     )
+
+    // Shoot side
+    this.load.image('shoot-side-wind-cpu', 'animations/shoot/shoot-side/shoot-side-wind-cpu.png')
+    this.load.image(
+      'shoot-side-release-cpu',
+      'animations/shoot/shoot-side/shoot-side-release-cpu.png'
+    )
+    this.load.image('shoot-jump-front-cpu', 'animations/shoot/shoot-front/shoot-jump-front-cpu.png')
+    this.load.image(
+      'shoot-flick-front-cpu',
+      'animations/shoot/shoot-front/shoot-flick-front-cpu.png'
+    )
   }
 
   loadDunkAnimations() {
     this.load.image(
-      'dunk-arm-out-front',
+      'dunk-arm-out-front-player',
       'animations/dunk/dunk-front/dunk-arm-out-front-player.png'
     )
-    this.load.image('dunk-finish-front', 'animations/dunk/dunk-front/dunk-finish-front-player.png')
     this.load.image(
-      'dunk-wind-up-front',
+      'dunk-finish-front-player',
+      'animations/dunk/dunk-front/dunk-finish-front-player.png'
+    )
+    this.load.image(
+      'dunk-wind-up-front-player',
       'animations/dunk/dunk-front/dunk-wind-up-front-player.png'
+    )
+
+    this.load.image(
+      'dunk-arm-out-front-cpu',
+      'animations/dunk/dunk-front/dunk-arm-out-front-cpu.png'
+    )
+    this.load.image('dunk-finish-front-cpu', 'animations/dunk/dunk-front/dunk-finish-front-cpu.png')
+    this.load.image(
+      'dunk-wind-up-front-cpu',
+      'animations/dunk/dunk-front/dunk-wind-up-front-cpu.png'
     )
   }
 
@@ -116,12 +190,39 @@ export class Preload extends Phaser.Scene {
       'animations/idle/idle-front/idle-front-player.png',
       'animations/idle/idle-front/idle-front-player.json'
     )
+    this.load.atlas(
+      'idle-front-cpu',
+      'animations/idle/idle-front/idle-front-cpu.png',
+      'animations/idle/idle-front/idle-front-cpu.json'
+    )
   }
 
   loadLayupAnimations() {
-    this.load.image('layup-gather-front', 'animations/layup/layup-front/layup-gather-front.png')
-    this.load.image('layup-arm-out-front', 'animations/layup/layup-front/layup-arm-out-front.png')
-    this.load.image('layup-flick-front', 'animations/layup/layup-front/layup-flick-front.png')
+    this.load.image(
+      'layup-gather-front-player',
+      'animations/layup/layup-front/layup-gather-front-player.png'
+    )
+    this.load.image(
+      'layup-arm-out-front-player',
+      'animations/layup/layup-front/layup-arm-out-front-player.png'
+    )
+    this.load.image(
+      'layup-flick-front-player',
+      'animations/layup/layup-front/layup-flick-front-player.png'
+    )
+
+    this.load.image(
+      'layup-gather-front-cpu',
+      'animations/layup/layup-front/layup-gather-front-cpu.png'
+    )
+    this.load.image(
+      'layup-arm-out-front-cpu',
+      'animations/layup/layup-front/layup-arm-out-front-cpu.png'
+    )
+    this.load.image(
+      'layup-flick-front-cpu',
+      'animations/layup/layup-front/layup-flick-front-cpu.png'
+    )
   }
 
   create() {

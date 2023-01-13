@@ -11,5 +11,4 @@
 ## Bugs
 
 - Set screen bug where team mate keeps running forever
-- Players can move behind the backboard
-- Run side animations during defend man state are wonky
+- Defensive switch mix-up: Call for a screen, then while defense is switching, pass to another player (causing enemy to mistakenly double-team)

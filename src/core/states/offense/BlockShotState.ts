@@ -1,5 +1,5 @@
 import { BallState } from '~/core/Ball'
-import { createArc } from '~/core/Constants'
+import { createArc, Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -11,10 +11,11 @@ export class BlockShotState extends State {
     const shooter = team.getOtherTeamCourtPlayers().find((player) => {
       return player.getCurrState().key === States.SHOOTING
     })
+    const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
     if (shooter && !shooter.wasShotBlocked) {
       currPlayer.sprite.setFlipX(false)
       currPlayer.sprite.anims.stop()
-      currPlayer.sprite.setTexture('block-front-wind-up')
+      currPlayer.sprite.setTexture(`block-front-wind-up-${suffix}`)
       currPlayer.sprite.body.checkCollision.none = true
       shooter.wasShotBlocked = true
       const jumpTime = 0.7
@@ -28,7 +29,7 @@ export class BlockShotState extends State {
       createArc(currPlayer.sprite, lineToShooter.getPoint(0.5), jumpTime)
       Game.instance.time.delayedCall(jumpTime * 485, () => {
         Game.instance.ball.ballState = BallState.BLOCKED
-        currPlayer.sprite.setTexture('block-front-swing')
+        currPlayer.sprite.setTexture(`block-front-swing-${suffix}`)
         this.launchBallBackwardsAfterBlock(currPlayer, shooter)
       })
 

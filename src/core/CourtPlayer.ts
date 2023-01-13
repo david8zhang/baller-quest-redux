@@ -1,14 +1,12 @@
 import Game from '~/scenes/Game'
 import { BallState } from './Ball'
 import {
-  COURT_PLAYER_SPEED,
   getDistanceBetween,
   LAYUP_DISTANCE,
   OFFBALL_ANIMS,
   ONBALL_ANIMS,
   Side,
   SORT_ORDER,
-  WINDOW_WIDTH,
 } from './Constants'
 import { CourtPlayerAttributeMapper } from './CourtPlayerAttributeMapper'
 import { createDecisionTree } from './CourtPlayerDecisionTree'
@@ -92,7 +90,10 @@ export class CourtPlayer {
     this.sprite.setPushable(false)
     this.sprite.body.setSize(10, 15)
     this.sprite.body.offset.y = 16
-    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle)
+
+    const anim = this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle
+    const suffix = this.side === Side.CPU ? 'cpu' : 'player'
+    this.sprite.anims.play(`${anim}-${suffix}`)
     this.sprite.setData('ref', this)
     this.sprite.setCollideWorldBounds(true)
 
@@ -299,7 +300,8 @@ export class CourtPlayer {
 
   losePossessionOfBall() {
     this.hasPossession = false
-    this.sprite.anims.play(OFFBALL_ANIMS.idle)
+    const suffix = this.side === Side.CPU ? 'cpu' : 'player'
+    this.sprite.anims.play(`${OFFBALL_ANIMS.idle}-${suffix}`)
   }
 
   getPossessionOfBall(prevBallState: BallState) {
@@ -307,7 +309,9 @@ export class CourtPlayer {
     this.game.ball.isRebounding = false
     this.hasPossession = true
     this.game.ball.ballState = BallState.DRIBBLING
-    this.sprite.anims.play(ONBALL_ANIMS.idle)
+
+    const suffix = this.side === Side.CPU ? 'cpu' : 'player'
+    this.sprite.anims.play(`${ONBALL_ANIMS.idle}-${suffix}`)
     this.game.ball.hide()
     this.game.ball.setPosition(this.sprite.x, this.sprite.y)
     this.game.ball.sprite.setGravity(0)
@@ -338,7 +342,9 @@ export class CourtPlayer {
   stop() {
     this.sprite.setVelocity(0, 0)
     this.sprite.setFlipX(false)
-    this.sprite.anims.play(this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle, true)
+    const anims = this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle
+    const suffix = this.side === Side.CPU ? 'cpu' : 'player'
+    this.sprite.anims.play(`${anims}-${suffix}`, true)
   }
 
   setVelocityX(xVelocity: number) {
@@ -397,12 +403,14 @@ export class CourtPlayer {
       this.sprite.setFlipX(xVelocity > 0)
       const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.left : OFFBALL_ANIMS.run.left
       if (this.sprite.anims.getName() !== animToPlay) {
-        this.sprite.play(animToPlay, true)
+        const suffix = this.side === Side.CPU ? 'cpu' : 'player'
+        this.sprite.play(`${animToPlay}-${suffix}`, true)
       }
     } else if (Math.abs(yVelocity) > Math.abs(xVelocity)) {
       const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.up : OFFBALL_ANIMS.run.up
       if (this.sprite.anims.getName() !== animToPlay) {
-        this.sprite.play(animToPlay, true)
+        const suffix = this.side === Side.CPU ? 'cpu' : 'player'
+        this.sprite.play(`${animToPlay}-${suffix}`, true)
       }
     }
   }

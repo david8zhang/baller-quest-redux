@@ -1,5 +1,5 @@
 import { BallState } from '~/core/Ball'
-import { createArc, getClosestPlayer, SORT_ORDER } from '~/core/Constants'
+import { createArc, getClosestPlayer, Side, SORT_ORDER } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -12,7 +12,8 @@ export class LayupState extends State {
     const hoop = Game.instance.hoop.standSprite
     const jumpDuration = 0.8
     currPlayer.sprite.anims.stop()
-    currPlayer.sprite.setTexture('layup-gather-front')
+    const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
+    currPlayer.sprite.setTexture(`layup-gather-front-${suffix}`)
     createArc(
       currPlayer.sprite,
       {
@@ -23,12 +24,12 @@ export class LayupState extends State {
     )
     currPlayer.sprite.setDepth(SORT_ORDER.ui)
     Game.instance.time.delayedCall(975 * jumpDuration * 0.25, () => {
-      currPlayer.sprite.setTexture('layup-arm-out-front')
+      currPlayer.sprite.setTexture(`layup-arm-out-front-${suffix}`)
     })
 
     Game.instance.time.delayedCall(975 * jumpDuration * 0.5, () => {
       currPlayer.shotReleased = true
-      currPlayer.sprite.setTexture('layup-flick-front')
+      currPlayer.sprite.setTexture(`layup-flick-front-${suffix}`)
       currPlayer.hasPossession = false
       Game.instance.ball.giveUpPossession()
       this.launchBallTowardsHoop(currPlayer, team)

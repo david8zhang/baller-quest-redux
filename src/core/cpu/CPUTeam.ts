@@ -8,6 +8,7 @@ import { CPUConstants } from './CPUConstants'
 import { CPUCourtPlayer } from './CPUCourtPlayer'
 import { OffensePlay } from './plays/OffensePlay'
 import { PickAndRoll } from './plays/PickAndRoll'
+import { ScreenHandOff } from './plays/ScreenHandOff'
 
 export class CPUTeam extends Team {
   public players: CPUCourtPlayer[] = []
@@ -21,7 +22,7 @@ export class CPUTeam extends Team {
     super(game, Side.CPU)
     this.setupPlayers()
     super.positionPlayers()
-    this.offensePlays = [new PickAndRoll(this)]
+    this.offensePlays = [new ScreenHandOff(this)]
   }
 
   public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
@@ -128,7 +129,6 @@ export class CPUTeam extends Team {
           y: 0,
         },
         side: Side.CPU,
-        tint: 0xff0000,
         playerId: key,
         team: this,
         attributes: CPUConstants.PLAYER_STATS[key],

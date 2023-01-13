@@ -1,4 +1,4 @@
-import { createArc } from '~/core/Constants'
+import { createArc, Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -14,7 +14,8 @@ export class ContestShotState extends State {
     Game.instance.time.delayedCall(50, () => {
       currPlayer.stop()
       currPlayer.sprite.anims.stop()
-      currPlayer.sprite.setTexture('contest-front')
+      const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
+      currPlayer.sprite.setTexture(`contest-front-${suffix}`)
       currPlayer.sprite.body.checkCollision.none = true
       const jumpTime = 0.7
 

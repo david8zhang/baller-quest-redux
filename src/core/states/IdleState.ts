@@ -1,4 +1,4 @@
-import { OFFBALL_ANIMS, ONBALL_ANIMS } from '../Constants'
+import { OFFBALL_ANIMS, ONBALL_ANIMS, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { State } from './StateMachine'
 
@@ -8,7 +8,8 @@ export class IdleState extends State {
     currPlayer.sprite.setGravityY(0)
     const animToPlay = currPlayer.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle
     if (currPlayer.sprite.anims.currentAnim.key !== animToPlay) {
-      currPlayer.sprite.anims.play(animToPlay)
+      const side = currPlayer.side === Side.CPU ? 'cpu' : 'player'
+      currPlayer.sprite.anims.play(`${animToPlay}-${side}`)
     }
   }
 }

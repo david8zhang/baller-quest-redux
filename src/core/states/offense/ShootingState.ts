@@ -1,5 +1,5 @@
 import { BallState } from '~/core/Ball'
-import { calculateShotSuccessPercentage, createArc } from '~/core/Constants'
+import { calculateShotSuccessPercentage, createArc, Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -47,11 +47,11 @@ export class ShootingState extends State {
     } else {
       currPlayer.sprite.setFlipX(false)
     }
-
+    const animSuffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
     if (isSide) {
-      currPlayer.sprite.setTexture('shoot-side-wind-player')
+      currPlayer.sprite.setTexture(`shoot-side-wind-${animSuffix}`)
     } else {
-      currPlayer.sprite.setTexture('shoot-jump-front-player')
+      currPlayer.sprite.setTexture(`shoot-jump-front-${animSuffix}`)
     }
     const isThreePointShot = Game.instance.court.isThreePointShot(
       currPlayer.sprite.x,
@@ -61,11 +61,11 @@ export class ShootingState extends State {
     Game.instance.time.delayedCall(jumpTime * 975 * 0.45, () => {
       currPlayer.shotReleased = true
       if (isSide) {
-        currPlayer.sprite.setTexture('shoot-side-release-player')
+        currPlayer.sprite.setTexture(`shoot-side-release-${animSuffix}`)
         const xOffset = isFlipped ? 10 : -10
         Game.instance.ball.setPosition(currPlayer.sprite.x + xOffset, currPlayer.sprite.y - 28)
       } else {
-        currPlayer.sprite.setTexture('shoot-flick-front-player')
+        currPlayer.sprite.setTexture(`shoot-flick-front-${animSuffix}`)
         Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
       }
       Game.instance.ball.giveUpPossession()

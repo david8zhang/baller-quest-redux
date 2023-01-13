@@ -1,4 +1,4 @@
-import { COURT_PLAYER_SPEED, getClosestPlayer, OFFBALL_ANIMS } from '~/core/Constants'
+import { OFFBALL_ANIMS, Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -38,7 +38,8 @@ export class DefendManState extends State {
       if (currPlayer.isAtPoint(pointToMoveTo)) {
         currPlayer.sprite.setVelocity(0, 0)
         if (Date.now() - this.lastUpdatedTimestamp > 250) {
-          currPlayer.sprite.play(OFFBALL_ANIMS.idle, true)
+          const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
+          currPlayer.sprite.play(`${OFFBALL_ANIMS.idle}-${suffix}`, true)
         }
       } else {
         this.lastUpdatedTimestamp = Date.now()

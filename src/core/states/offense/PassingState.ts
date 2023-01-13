@@ -1,4 +1,5 @@
 import { BallState } from '~/core/Ball'
+import { Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -66,9 +67,12 @@ export class PassingState extends State {
     currPlayer.sprite.setVelocity(0, 0)
     currPlayer.sprite.anims.stop()
     currPlayer.sprite.setFlipX(animConfig.flipX)
-    currPlayer.sprite.setTexture(animConfig.anims['wind-up'])
+
+    const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
+
+    currPlayer.sprite.setTexture(`${animConfig.anims['wind-up']}-${suffix}`)
     Game.instance.time.delayedCall(100, () => {
-      currPlayer.sprite.setTexture(animConfig.anims['release'])
+      currPlayer.sprite.setTexture(`${animConfig.anims['release']}-${suffix}`)
       currPlayer.hasPossession = false
       const ball = Game.instance.ball
       ball.setPosition(currPlayer.x, currPlayer.y)

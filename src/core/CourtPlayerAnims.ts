@@ -64,4 +64,72 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
     repeat: -1,
     frameRate: 6,
   })
+
+  // CPU Animations
+
+  anims.create({
+    key: 'idle-front-cpu',
+    frames: anims.generateFrameNames('idle-front-cpu', {
+      start: 0,
+      end: 2,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'dribble-front-cpu',
+    frames: anims.generateFrameNames('dribble-front-cpu', {
+      start: 0,
+      end: 3,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'run-with-ball-side-cpu',
+    frames: anims.generateFrameNames('run-with-ball-side-cpu', {
+      start: 0,
+      end: 5,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'run-side-cpu',
+    frames: anims.generateFrameNames('run-side-cpu', {
+      start: 0,
+      end: 5,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'run-with-ball-front-cpu',
+    frames: anims.generateFrameNames('run-with-ball-front-cpu', {
+      start: 0,
+      end: 5,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'run-front-cpu',
+    frames: anims.generateFrameNames('run-front-cpu', {
+      start: 0,
+      end: 5,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
 }
