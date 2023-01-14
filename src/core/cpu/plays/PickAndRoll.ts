@@ -1,8 +1,13 @@
-import { getClosestPlayer, getMostOpenPassRecipient } from '~/core/Constants'
+import {
+  calculateShotSuccessPercentage,
+  getClosestPlayer,
+  getMostOpenPassRecipient,
+} from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { DribbleToPointStateConfig } from '~/core/states/offense/DribbleToPointState'
 import { PassConfig } from '~/core/states/offense/PassingState'
 import { ScreenDirection, SetScreenStateConfig } from '~/core/states/offense/SetScreenState'
+import { ShotCoverage } from '~/core/states/offense/ShootingState'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -22,7 +27,7 @@ export class PickAndRoll extends OffensePlay {
   }
 
   public execute(): void {
-    if (!this.isRunning) {
+    if (!this.isRunning && !this.isPlayFinished) {
       this.isRunning = true
       Game.instance.time.delayedCall(1500, () => {
         this.callForScreen()
@@ -39,7 +44,7 @@ export class PickAndRoll extends OffensePlay {
       const setScreenConfig: SetScreenStateConfig = {
         onScreenFinishedCallback: () => {
           if (!this.isDrivingAroundScreen) {
-            this.reset()
+            this.isPlayFinished = true
           }
         },
         isScreeningCallback: () => {
@@ -63,25 +68,62 @@ export class PickAndRoll extends OffensePlay {
         timeout: 5000,
         onReachedPointCB: () => {
           const driveToBasketConfig = {
-            onDriveSuccess: () => {},
-            onDriveFailed: () => {
-              const shouldPass = Phaser.Math.Between(0, 1) == 0
-              if (shouldPass) {
-                this.passOut(ballHandler)
+            onDriveSuccess: () => {
+              const randNum = Phaser.Math.Between(0, 3)
+              if (randNum === 3) {
+                this.shoot(ballHandler)
               } else {
-                this.goBackToSpot(ballHandler)
+                this.driveToBasket(ballHandler)
               }
+            },
+            onDriveFailed: () => {
+              this.handleDriveFailed(ballHandler)
             },
             timeout: 4000,
           }
           ballHandler.setState(States.DRIVE_TO_BASKET, driveToBasketConfig)
         },
         failedToReachPointCB: () => {
-          this.reset()
+          this.isPlayFinished = true
         },
         point,
       }
       ballHandler.setState(States.DRIBBLE_TO_POINT, config)
+    }
+  }
+
+  shoot(ballHandler: CourtPlayer) {
+    ballHandler.setState(States.SHOOTING, () => {
+      ballHandler.setState(States.IDLE)
+      this.isPlayFinished = true
+    })
+  }
+
+  driveToBasket(ballHandler: CourtPlayer) {
+    if (ballHandler.canLayupBall()) {
+      ballHandler.setState(States.LAYUP, () => {
+        ballHandler.setState(States.IDLE)
+        this.isPlayFinished = true
+      })
+    } else {
+      const shotSuccessData = calculateShotSuccessPercentage(ballHandler, this.team, false)
+      if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
+        ballHandler.setState(States.SHOOTING, () => {
+          ballHandler.setState(States.IDLE)
+          this.isPlayFinished = true
+        })
+      } else {
+        this.handleDriveFailed(ballHandler)
+      }
+    }
+  }
+
+  handleDriveFailed(ballHandler: CourtPlayer) {
+    const shouldPass = Phaser.Math.Between(0, 1) == 0
+    if (shouldPass) {
+      this.passOut(ballHandler)
+    } else {
+      this.goBackToSpot(ballHandler)
     }
   }
 
@@ -93,19 +135,23 @@ export class PickAndRoll extends OffensePlay {
     const passConfig: PassConfig = {
       onPassCompleteCb: () => {
         player.setState(States.GO_BACK_TO_SPOT, () => {
-          this.reset()
+          this.isPlayFinished = true
         })
       },
       onPassStartedCb: () => {
         player.stop()
       },
     }
-    player.setState(States.PASSING, passRecipient, passConfig)
+    if (passRecipient) {
+      player.setState(States.PASSING, passRecipient, passConfig)
+    } else {
+      this.goBackToSpot(player)
+    }
   }
 
   goBackToSpot(player: CourtPlayer) {
     player.setState(States.GO_BACK_TO_SPOT, () => {
-      this.reset()
+      this.isPlayFinished = true
     })
   }
 }

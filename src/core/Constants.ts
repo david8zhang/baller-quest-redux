@@ -105,11 +105,18 @@ export const SORT_ORDER = {
 
 export const OFFBALL_ANIMS = {
   idle: 'idle-front',
+  idleDefend: 'defend-idle',
   run: {
     [Direction.UP]: 'run-front',
     [Direction.DOWN]: 'run-front',
     [Direction.LEFT]: 'run-side',
     [Direction.RIGHT]: 'run-side',
+  },
+  defend: {
+    [Direction.UP]: 'defend-run',
+    [Direction.LEFT]: 'defend-run',
+    [Direction.RIGHT]: 'defend-run',
+    [Direction.DOWN]: 'defend-run',
   },
 }
 

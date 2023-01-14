@@ -7,6 +7,7 @@ export abstract class OffensePlay {
   protected team: Team
   public isRunning: boolean = false
   public playType: PlayTypes
+  public isPlayFinished: boolean = false
 
   constructor(team: Team, playType: PlayTypes) {
     this.team = team
@@ -16,6 +17,7 @@ export abstract class OffensePlay {
   public abstract execute(): void
 
   public reset() {
+    this.isPlayFinished = false
     this.isRunning = false
     const courtPlayers = this.team.getCourtPlayers()
     courtPlayers.forEach((p) => {

@@ -1,5 +1,11 @@
 import Game from '~/scenes/Game'
-import { SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
+import { WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
+
+export enum ShotDistance {
+  POST = 'POST',
+  MID_RANGE = 'MID_RANGE',
+  PERIMETER = 'PERIMETER',
+}
 
 export class Court {
   private game: Game
@@ -11,6 +17,8 @@ export class Court {
   public grid: Phaser.GameObjects.Rectangle[][] = []
   public onDebugToggleHooks: Function[] = []
   public threePointDetectorCircle!: Phaser.Geom.Ellipse
+  public midRangeDetectorCircle!: Phaser.Geom.Ellipse
+  public postDetectorCircle!: Phaser.Geom.Ellipse
   public behindBackboardWallSprite!: Phaser.Physics.Arcade.Sprite
 
   constructor(game: Game) {
@@ -20,15 +28,27 @@ export class Court {
     this.debugFieldGrid()
     this.handleDebugToggleInput()
     this.setupWallSprite()
-    this.setupThreePointDetectorCircle()
+    this.setupShotDistanceDetectorCircles()
   }
 
-  setupThreePointDetectorCircle() {
+  setupShotDistanceDetectorCircles() {
     this.threePointDetectorCircle = new Phaser.Geom.Ellipse(
       WINDOW_WIDTH / 2,
       WINDOW_HEIGHT / 2 - 50,
       600,
       590
+    )
+    this.midRangeDetectorCircle = new Phaser.Geom.Ellipse(
+      WINDOW_WIDTH / 2,
+      WINDOW_HEIGHT / 2 - 50,
+      400,
+      390
+    )
+    this.postDetectorCircle = new Phaser.Geom.Ellipse(
+      WINDOW_WIDTH / 2,
+      WINDOW_HEIGHT / 2 - 50,
+      250,
+      240
     )
   }
 
@@ -49,6 +69,32 @@ export class Court {
 
     this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.playerCourtPlayers)
     this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.cpuCourtPlayers)
+  }
+
+  getRandomLocationOnPerimeter() {
+    const randPct = Phaser.Math.Between(0, 50) / 100
+    return this.threePointDetectorCircle.getPoint(randPct)
+  }
+
+  getRandomLocationInMidRange() {
+    const randPct = Phaser.Math.Between(0, 50) / 100
+    return this.midRangeDetectorCircle.getPoint(randPct)
+  }
+
+  getRandomLocationInPost() {
+    const randPct = Phaser.Math.Between(0, 50) / 100
+    return this.postDetectorCircle.getPoint(randPct)
+  }
+
+  getRandomPointOnCourt() {
+    const randNum = Phaser.Math.Between(0, 2)
+    if (randNum == 0) {
+      return this.getRandomLocationInPost()
+    }
+    if (randNum == 1) {
+      return this.getRandomLocationInMidRange()
+    }
+    return this.getRandomLocationOnPerimeter()
   }
 
   handleDebugToggleInput() {

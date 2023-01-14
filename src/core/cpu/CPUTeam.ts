@@ -22,7 +22,7 @@ export class CPUTeam extends Team {
     super(game, Side.CPU)
     this.setupPlayers()
     super.positionPlayers()
-    this.offensePlays = [new ScreenHandOff(this)]
+    this.offensePlays = [new PickAndRoll(this), new ScreenHandOff(this)]
   }
 
   public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
@@ -155,14 +155,24 @@ export class CPUTeam extends Team {
 
   handlePlayExecution() {
     if (!this.currPlay) {
-      this.currPlay = this.offensePlays[Phaser.Math.Between(0, this.offensePlays.length - 1)]
+      this.selectNextPlay()
     } else {
-      this.currPlay.execute()
+      if (this.currPlay.isPlayFinished) {
+        this.selectNextPlay()
+      } else {
+        this.currPlay.execute()
+      }
     }
   }
 
   selectNextPlay() {
+    this.offensePlays.forEach((play) => {
+      if (play.isPlayFinished) {
+        play.reset()
+      }
+    })
     this.currPlay = this.offensePlays[Phaser.Math.Between(0, this.offensePlays.length - 1)]
+    console.log('[Next CPU Play]: ', this.currPlay.playType)
   }
 
   update() {

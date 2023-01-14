@@ -339,10 +339,14 @@ export class CourtPlayer {
     this.stateMachine.transition(state, ...enterArgs)
   }
 
-  stop() {
+  stop(isDefense: boolean = false) {
     this.sprite.setVelocity(0, 0)
     this.sprite.setFlipX(false)
-    const anims = this.hasPossession ? ONBALL_ANIMS.idle : OFFBALL_ANIMS.idle
+    const anims = this.hasPossession
+      ? ONBALL_ANIMS.idle
+      : isDefense
+      ? OFFBALL_ANIMS.idleDefend
+      : OFFBALL_ANIMS.idle
     const suffix = this.side === Side.CPU ? 'cpu' : 'player'
     this.sprite.anims.play(`${anims}-${suffix}`, true)
   }
@@ -365,7 +369,7 @@ export class CourtPlayer {
     return distance <= 5
   }
 
-  moveTowards(target: { x: number; y: number }, speed: number) {
+  moveTowards(target: { x: number; y: number }, speed: number, isDefense: boolean = false) {
     const distance = getDistanceBetween(
       {
         x: this.sprite.x,
@@ -393,21 +397,29 @@ export class CourtPlayer {
 
       const velocityVector = new Phaser.Math.Vector2()
       this.game.physics.velocityFromRotation(angle, speed, velocityVector)
-      this.playRunAnimationForVelocity(velocityVector.x, velocityVector.y)
+      this.playRunAnimationForVelocity(velocityVector.x, velocityVector.y, isDefense)
       this.sprite.setVelocity(velocityVector.x, velocityVector.y)
     }
   }
 
-  playRunAnimationForVelocity(xVelocity: number, yVelocity: number) {
+  playRunAnimationForVelocity(xVelocity: number, yVelocity: number, isDefense: boolean) {
     if (Math.abs(xVelocity) > Math.abs(yVelocity)) {
       this.sprite.setFlipX(xVelocity > 0)
-      const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.left : OFFBALL_ANIMS.run.left
+      const animToPlay = this.hasPossession
+        ? ONBALL_ANIMS.run.left
+        : isDefense
+        ? OFFBALL_ANIMS.defend.left
+        : OFFBALL_ANIMS.run.left
       if (this.sprite.anims.getName() !== animToPlay) {
         const suffix = this.side === Side.CPU ? 'cpu' : 'player'
         this.sprite.play(`${animToPlay}-${suffix}`, true)
       }
     } else if (Math.abs(yVelocity) > Math.abs(xVelocity)) {
-      const animToPlay = this.hasPossession ? ONBALL_ANIMS.run.up : OFFBALL_ANIMS.run.up
+      const animToPlay = this.hasPossession
+        ? ONBALL_ANIMS.run.up
+        : isDefense
+        ? OFFBALL_ANIMS.defend.up
+        : OFFBALL_ANIMS.run.up
       if (this.sprite.anims.getName() !== animToPlay) {
         const suffix = this.side === Side.CPU ? 'cpu' : 'player'
         this.sprite.play(`${animToPlay}-${suffix}`, true)

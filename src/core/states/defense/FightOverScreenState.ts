@@ -6,27 +6,32 @@ import { State } from '../StateMachine'
 export class FightOverScreenState extends State {
   private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
   public newDefensiveAssignment: CourtPlayer | null = null
+  public didFightOverScreen: boolean = false
 
   execute(currPlayer: CourtPlayer, team: Team) {
-    const currBallHandler = team.game.ball.playerWithBall
+    const currBallHandler =
+      this.newDefensiveAssignment !== null
+        ? this.newDefensiveAssignment
+        : team.game.ball.playerWithBall
     if (currBallHandler) {
-      this.newDefensiveAssignment = currBallHandler
+      if (!this.newDefensiveAssignment) {
+        this.newDefensiveAssignment = currBallHandler
+      }
       const hoop = Game.instance.hoop
       const line = new Phaser.Geom.Line(
-        currBallHandler.sprite.x,
-        currBallHandler.sprite.y,
+        this.newDefensiveAssignment.sprite.x,
+        this.newDefensiveAssignment.sprite.y,
         hoop.standSprite.x,
         hoop.standSprite.y
       )
       const pointToMoveTo = line.getPoint(FightOverScreenState.DEFENSIVE_SPACING_PERCENTAGE)
-
       if (currPlayer.isAtPoint(pointToMoveTo)) {
-        currPlayer.stop()
+        currPlayer.stop(true)
       } else {
         currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr())
       }
     } else {
-      currPlayer.stop()
+      currPlayer.stop(true)
     }
   }
 

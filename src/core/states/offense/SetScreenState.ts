@@ -38,11 +38,13 @@ export class SetScreenState extends State {
       this.screenTarget = config.screenTargetPlayer
     }
 
+    // Turn on screen collider
     const otherPlayers =
       currPlayer.side === Side.PLAYER
         ? Game.instance.cpuCourtPlayers
         : Game.instance.playerCourtPlayers
     this.screenCollider = Game.instance.physics.add.collider(currPlayer.sprite, otherPlayers)
+    this.screenCollider.active = false
   }
 
   execute(currPlayer: CourtPlayer, team: Team) {
@@ -50,6 +52,7 @@ export class SetScreenState extends State {
       const currTimestamp = Date.now()
       if (this.screenPosition) {
         if (currPlayer.isAtPoint(this.screenPosition) || this.travelTimeExpired) {
+          this.screenCollider.active = true
           this.isAtScreenPosition = true
           if (this.isScreeningCallback) {
             this.isScreeningCallback()

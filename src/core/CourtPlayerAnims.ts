@@ -79,6 +79,50 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
+    key: 'defend-idle-cpu',
+    frames: anims.generateFrameNames('defend-idle-cpu', {
+      start: 0,
+      end: 2,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'defend-run-cpu',
+    frames: anims.generateFrameNames('defend-run-cpu', {
+      start: 0,
+      end: 2,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'defend-idle-player',
+    frames: anims.generateFrameNames('defend-idle-player', {
+      start: 0,
+      end: 2,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
+    key: 'defend-run-player',
+    frames: anims.generateFrameNames('defend-run-player', {
+      start: 0,
+      end: 2,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
     key: 'dribble-front-cpu',
     frames: anims.generateFrameNames('dribble-front-cpu', {
       start: 0,

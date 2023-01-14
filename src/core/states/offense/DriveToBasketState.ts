@@ -37,11 +37,6 @@ export class DriveToBasketState extends State {
         if (distToHoop <= LAYUP_DISTANCE) {
           this.startedTimestamp = -1
           this.onDriveSuccess()
-          if (currPlayer.canLayupBall()) {
-            currPlayer.setState(States.LAYUP)
-          } else {
-            currPlayer.setState(States.SHOOTING)
-          }
         } else {
           currPlayer.moveTowards(
             {

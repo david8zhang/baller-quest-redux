@@ -39,11 +39,11 @@ export class DefendManState extends State {
         currPlayer.sprite.setVelocity(0, 0)
         if (Date.now() - this.lastUpdatedTimestamp > 250) {
           const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
-          currPlayer.sprite.play(`${OFFBALL_ANIMS.idle}-${suffix}`, true)
+          currPlayer.sprite.play(`${OFFBALL_ANIMS.idleDefend}-${suffix}`, true)
         }
       } else {
         this.lastUpdatedTimestamp = Date.now()
-        currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr())
+        currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr(), true)
       }
     }
   }

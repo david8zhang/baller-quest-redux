@@ -19,6 +19,7 @@ export class Preload extends Phaser.Scene {
     this.loadPassAnimations()
     this.loadCourtAnimations()
     this.loadBlockAnimations()
+    this.loadDefendAnimations()
   }
 
   loadBlockAnimations() {
@@ -222,6 +223,30 @@ export class Preload extends Phaser.Scene {
     this.load.image(
       'layup-flick-front-cpu',
       'animations/layup/layup-front/layup-flick-front-cpu.png'
+    )
+  }
+
+  loadDefendAnimations() {
+    this.load.atlas(
+      'defend-idle-cpu',
+      'animations/defend/defend-idle/defend-idle-cpu.png',
+      'animations/defend/defend-idle/defend-idle-cpu.json'
+    )
+    this.load.atlas(
+      'defend-run-cpu',
+      'animations/defend/defend-run/defend-run-cpu.png',
+      'animations/defend/defend-run/defend-run-cpu.json'
+    )
+
+    this.load.atlas(
+      'defend-idle-player',
+      'animations/defend/defend-idle/defend-idle-player.png',
+      'animations/defend/defend-idle/defend-idle-player.json'
+    )
+    this.load.atlas(
+      'defend-run-player',
+      'animations/defend/defend-run/defend-run-player.png',
+      'animations/defend/defend-run/defend-run-player.json'
     )
   }
 
