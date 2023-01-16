@@ -1,11 +1,11 @@
 import Game from '~/scenes/Game'
-import { Side } from './Constants'
+import { DEFAULT_FONT, Side } from './Constants'
 
 export class ScoreTracker {
   private playerScoreText!: Phaser.GameObjects.Text
   private cpuScoreText!: Phaser.GameObjects.Text
-  private playerScore: number = 0
-  private cpuScore: number = 0
+  public playerScore: number = 0
+  public cpuScore: number = 0
 
   private game: Game
 
@@ -16,16 +16,18 @@ export class ScoreTracker {
 
   initializeText() {
     this.playerScoreText = this.game.add.text(0, 0, `Player: ${this.playerScore}`).setStyle({
-      fontSize: '14px',
+      fontSize: '20px',
       color: 'white',
+      fontFamily: DEFAULT_FONT,
     })
     this.cpuScoreText = this.game.add.text(0, 0, `CPU: ${this.cpuScore}`).setStyle({
-      fontSize: '14px',
+      fontSize: '20px',
       color: 'white',
+      fontFamily: DEFAULT_FONT,
     })
 
-    this.playerScoreText.setPosition(20, this.playerScoreText.displayHeight / 2 + 10)
-    this.cpuScoreText.setPosition(this.playerScoreText.displayWidth + 50, this.playerScoreText.y)
+    this.playerScoreText.setPosition(20, 20)
+    this.cpuScoreText.setPosition(this.playerScoreText.displayWidth + 50, 20)
   }
 
   increaseScore(numPoints: number, side: Side) {

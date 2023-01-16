@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { Ball } from '~/core/Ball'
-import { Side, SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
+import { DEFAULT_FONT, Side, SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
 import { Court } from '~/core/Court'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { createPlayerAnims } from '~/core/CourtPlayerAnims'
@@ -11,8 +11,10 @@ import { createNetAnims } from '~/core/NetAnims'
 import { PlayerTeam } from '~/core/player/PlayerTeam'
 import { ScoreTracker } from '~/core/ScoreTracker'
 import { ShotClock } from '~/core/ShotClock'
+import { Timer } from '~/core/Timer'
 
 export default class Game extends Phaser.Scene {
+  public timer!: Timer
   public player!: PlayerTeam
   public cpu!: CPUTeam
   public hoop!: Hoop
@@ -46,6 +48,9 @@ export default class Game extends Phaser.Scene {
   create() {
     createPlayerAnims(this.anims)
     createNetAnims(this.anims)
+    this.timer = new Timer(this, () => {
+      this.handleMatchFinished()
+    })
     this.playerCourtPlayers = this.add.group()
     this.cpuCourtPlayers = this.add.group()
     this.court = new Court(this)
@@ -68,6 +73,13 @@ export default class Game extends Phaser.Scene {
     this.setupUI()
   }
 
+  handleMatchFinished() {
+    this.scene.start('gameover', {
+      playerScore: this.scoreTracker.playerScore,
+      cpuScore: this.scoreTracker.cpuScore,
+    })
+  }
+
   setupUI() {
     this.changingPossessionOverlay = this.add
       .rectangle(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT, 0x000000, 0.5)
@@ -77,7 +89,8 @@ export default class Game extends Phaser.Scene {
     const sideWithPossession = this.ball.playerWithBall ? this.ball.playerWithBall.side : ''
     this.changingPossessionText = this.add
       .text(0, 0, `${sideWithPossession} BALL!`, {
-        fontSize: '20px',
+        fontSize: '30px',
+        fontFamily: DEFAULT_FONT,
       })
       .setDepth(SORT_ORDER.ui + 100)
       .setName('ui')
@@ -113,7 +126,7 @@ export default class Game extends Phaser.Scene {
       player.stop()
     })
     this.isChangingPossession = true
-    this.changingPossessionOverlay.setVisible(true)
+    this.changingPossessionOverlay.setVisible(true).setDepth(SORT_ORDER.ui + 1000)
     const newSideWithPossession = prevSideWithPossession === Side.CPU ? Side.PLAYER : Side.CPU
     const newTeamWithPossession = newSideWithPossession === Side.CPU ? this.cpu : this.player
     const newTeamOnDefense = newSideWithPossession === Side.CPU ? this.player : this.cpu

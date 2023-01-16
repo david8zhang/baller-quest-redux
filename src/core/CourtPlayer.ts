@@ -1,6 +1,7 @@
 import Game from '~/scenes/Game'
 import { BallState } from './Ball'
 import {
+  DEFAULT_FONT,
   getDistanceBetween,
   LAYUP_DISTANCE,
   OFFBALL_ANIMS,
@@ -130,9 +131,11 @@ export class CourtPlayer {
         color: 'black',
       })
       .setDepth(SORT_ORDER.ui)
+      .setVisible(false)
     this.playerIdText = Game.instance.add
-      .text(this.x, this.stateText.y - 20, this.playerId, {
-        fontSize: '12px',
+      .text(this.x, this.y - 25, this.playerId, {
+        fontSize: '16px',
+        fontFamily: DEFAULT_FONT,
         color: 'black',
       })
       .setDepth(SORT_ORDER.ui)
@@ -273,9 +276,11 @@ export class CourtPlayer {
       this.x - this.stateText.displayWidth / 2,
       this.y - 20 - this.stateText.displayHeight / 2
     )
+    this.stateText.setVisible(false)
+
     this.playerIdText.setPosition(
       this.x - this.playerIdText.displayWidth / 2,
-      this.stateText.y - 20
+      this.y - 25 - this.playerIdText.displayHeight
     )
   }
 

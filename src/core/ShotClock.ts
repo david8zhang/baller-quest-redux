@@ -1,6 +1,6 @@
 import Game from '~/scenes/Game'
 import { BallState } from './Ball'
-import { SORT_ORDER, WINDOW_WIDTH } from './Constants'
+import { DEFAULT_FONT, SORT_ORDER, WINDOW_WIDTH } from './Constants'
 
 export class ShotClock {
   private static DEFAULT_CLOCK_TIME = 24
@@ -14,14 +14,14 @@ export class ShotClock {
     this.shotClockText = this.game.add
       .text(WINDOW_WIDTH - 20, 20, this.shotTimeSeconds.toString(), {
         color: 'white',
-        fontSize: '14px',
+        fontSize: '20px',
+        fontFamily: DEFAULT_FONT,
       })
       .setDepth(SORT_ORDER.ui)
     this.shotClockText.setPosition(WINDOW_WIDTH - this.shotClockText.displayWidth - 20, 20)
     this.timerEvent = this.game.time.addEvent({
       delay: 1000,
       repeat: -1,
-      paused: true,
       callback: () => {
         if (this.shotTimeSeconds === 0) {
           if (!this.isBallInFlight()) {
@@ -41,7 +41,7 @@ export class ShotClock {
     this.shotTimeSeconds = ShotClock.DEFAULT_CLOCK_TIME
     this.shotClockText.setText(`${this.shotTimeSeconds.toString()}`)
     this.shotClockText.setPosition(WINDOW_WIDTH - this.shotClockText.displayWidth - 20, 20)
-    // this.timerEvent.paused = false
+    this.timerEvent.paused = false
   }
 
   reboundShotClockReset() {

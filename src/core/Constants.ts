@@ -3,6 +3,8 @@ import { CourtPlayer } from './CourtPlayer'
 import { ShootingState, ShotCoverage } from './states/offense/ShootingState'
 import { Team } from './Team'
 
+export const DEFAULT_FONT = 'Superstar'
+
 export const WINDOW_WIDTH = 864
 export const WINDOW_HEIGHT = 640
 export const LAYUP_DISTANCE = 180
