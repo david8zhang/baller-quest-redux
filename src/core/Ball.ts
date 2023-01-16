@@ -117,8 +117,13 @@ export class Ball {
           this.ballState === BallState.MADE_TWO_POINT_SHOT ||
           this.ballState === BallState.MADE_THREE_POINT_SHOT
         ) {
-          this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.7)
-          this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.85)
+          let direction = 'up'
+          if (this.ballState === BallState.MADE_TWO_POINT_SHOT) {
+            direction = this.sprite.body.velocity.x > 0 ? 'right' : 'left'
+          }
+          this.game.hoop.rimSprite.play(`net-swish-${direction}`, true)
+          this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.8)
+          this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.9)
         } else if (this.ballState === BallState.MISSED_SHOT) {
           // Rebound
           this.isRebounding = true

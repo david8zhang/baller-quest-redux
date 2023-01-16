@@ -7,6 +7,7 @@ import { createPlayerAnims } from '~/core/CourtPlayerAnims'
 import { CPUTeam } from '~/core/cpu/CPUTeam'
 import { Cursor } from '~/core/Cursor'
 import { Hoop } from '~/core/Hoop'
+import { createNetAnims } from '~/core/NetAnims'
 import { PlayerTeam } from '~/core/player/PlayerTeam'
 import { ScoreTracker } from '~/core/ScoreTracker'
 import { ShotClock } from '~/core/ShotClock'
@@ -44,6 +45,7 @@ export default class Game extends Phaser.Scene {
 
   create() {
     createPlayerAnims(this.anims)
+    createNetAnims(this.anims)
     this.playerCourtPlayers = this.add.group()
     this.cpuCourtPlayers = this.add.group()
     this.court = new Court(this)

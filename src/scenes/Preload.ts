@@ -20,6 +20,25 @@ export class Preload extends Phaser.Scene {
     this.loadCourtAnimations()
     this.loadBlockAnimations()
     this.loadDefendAnimations()
+    this.loadNetSwishAnimations()
+  }
+
+  loadNetSwishAnimations() {
+    this.load.atlas(
+      'net-swish-up',
+      'animations/net-swish/net-swish-up/net-swish-up.png',
+      'animations/net-swish/net-swish-up/net-swish-up.json'
+    )
+    this.load.atlas(
+      'net-swish-left',
+      'animations/net-swish/net-swish-left/net-swish-left.png',
+      'animations/net-swish/net-swish-left/net-swish-left.json'
+    )
+    this.load.atlas(
+      'net-swish-right',
+      'animations/net-swish/net-swish-right/net-swish-right.png',
+      'animations/net-swish/net-swish-right/net-swish-right.json'
+    )
   }
 
   loadBlockAnimations() {
