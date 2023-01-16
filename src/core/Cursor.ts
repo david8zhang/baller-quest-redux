@@ -20,6 +20,7 @@ export class Cursor {
       .setVisible(false)
       .setScale(3)
       .setAlpha(config.alpha ? config.alpha : 1)
+      .setName('highlight')
     if (config.color) {
       this.highlight.setTintFill(config.color)
     }

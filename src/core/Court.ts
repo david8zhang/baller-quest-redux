@@ -23,7 +23,9 @@ export class Court {
 
   constructor(game: Game) {
     this.game = game
-    this.sprite = this.game.add.sprite(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 'court')
+    this.sprite = this.game.add
+      .sprite(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, 'court')
+      .setName('court')
     this.objects = this.game.add.group()
     this.debugFieldGrid()
     this.handleDebugToggleInput()

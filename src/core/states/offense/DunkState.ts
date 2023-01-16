@@ -12,6 +12,7 @@ export class DunkState extends State {
     const ball = Game.instance.ball
     const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
     currPlayer.sprite.anims.stop()
+    currPlayer.sprite.setName('shooting')
     currPlayer.sprite.setTexture(`dunk-arm-out-front-${suffix}`)
     const jumpDuration = 0.75
     createArc(
@@ -55,6 +56,7 @@ export class DunkState extends State {
   }
 
   exit(currPlayer: CourtPlayer) {
+    currPlayer.sprite.setName('')
     currPlayer.shotReleased = false
   }
 }

@@ -87,18 +87,13 @@ export class ScreenHandOff extends OffensePlay {
     screenDirection: ScreenDirection
   ) {
     const point = {
-      x: screenDirection == ScreenDirection.RIGHT ? screener.x + 50 : screener.x - 50,
+      x: screenDirection == ScreenDirection.RIGHT ? screener.x + 75 : screener.x - 75,
       y: screener.y + 50,
     }
     const config: DribbleToPointStateConfig = {
       timeout: 5000,
       onReachedPointCB: () => {
-        const randNum = Phaser.Math.Between(0, 3)
-        if (randNum === 3) {
-          this.shoot(receiver)
-        } else {
-          this.driveToBasket(receiver)
-        }
+        this.shootOrDrive(receiver)
       },
       failedToReachPointCB: () => {
         this.isPlayFinished = true
@@ -106,6 +101,19 @@ export class ScreenHandOff extends OffensePlay {
       point,
     }
     receiver.setState(States.DRIBBLE_TO_POINT, config)
+  }
+
+  shootOrDrive(receiver: CourtPlayer) {
+    const isThreePointShot = Game.instance.court.isThreePointShot(
+      receiver.sprite.x,
+      receiver.sprite.y
+    )
+    const shotSuccessData = calculateShotSuccessPercentage(receiver, this.team, isThreePointShot)
+    if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
+      this.shoot(receiver)
+    } else {
+      this.driveToBasket(receiver)
+    }
   }
 
   shoot(receiver: CourtPlayer) {

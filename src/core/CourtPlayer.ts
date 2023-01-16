@@ -15,6 +15,7 @@ import { TreeNode } from './decision-tree/TreeNode'
 import { ChaseReboundState } from './states/ChaseReboundState'
 import { DefendManState } from './states/defense/DefendManState'
 import { FightOverScreenState } from './states/defense/FightOverScreenState'
+import { HelpDefenseState } from './states/defense/HelpDefenseState'
 import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
 import { IdleState } from './states/IdleState'
 import { BlockShotState } from './states/offense/BlockShotState'
@@ -70,7 +71,7 @@ export class CourtPlayer {
   protected team: Team
   protected decisionTree!: TreeNode
   protected blackboard: Blackboard
-  protected raycastIntersectRect: Phaser.Geom.Rectangle
+  public raycastIntersectRect: Phaser.Geom.Rectangle
   protected attributes: PlayerAttributes
 
   public graphics: Phaser.GameObjects.Graphics
@@ -119,6 +120,7 @@ export class CourtPlayer {
         [States.PLAYER_CONTROL]: new PlayerControlState(),
         [States.BLOCK_SHOT]: new BlockShotState(),
         [States.FUMBLE]: new FumbleState(),
+        [States.HELP_DEFENSE]: new HelpDefenseState(),
       },
       [this, this.team]
     )

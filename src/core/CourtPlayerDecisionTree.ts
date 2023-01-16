@@ -2,13 +2,10 @@ import { CourtPlayer } from './CourtPlayer'
 import { Blackboard } from './decision-tree/Blackboard'
 import { HasPossession } from './decision-tree/decisions/HasPossession'
 import { IsBallLoose } from './decision-tree/decisions/IsBallLoose'
-import { PassBall } from './decision-tree/decisions/PassBall'
 import { ShouldBlockShot } from './decision-tree/decisions/ShouldBlockShot'
 import { ShouldContestShot } from './decision-tree/decisions/ShouldContestShot'
 import { ShouldFightOverScreen } from './decision-tree/decisions/ShouldFightOverScreen'
-import { ShouldPassBall } from './decision-tree/decisions/ShouldPassBall'
-import { ShouldSwitch } from './decision-tree/decisions/ShouldSwitch'
-import { ShouldTakeShot } from './decision-tree/decisions/ShouldTakeShot'
+import { ShouldHelpOnDefense } from './decision-tree/decisions/ShouldHelpOnDefense'
 import { LeafNode } from './decision-tree/LeafNode'
 import { PopulateBlackboard } from './decision-tree/PopulateBlackboard'
 import { SelectorNode } from './decision-tree/SelectorNode'
@@ -55,15 +52,15 @@ export const createDecisionTree = (
               'ShouldReactToScreen',
               blackboard,
               new SelectorNode(
-                'ShouldSwitchOrFightOverScreen',
+                'ShouldHelpOrFightOverScreen',
                 blackboard,
                 new SequenceNode('FightOverScreenSeq', blackboard, [
                   new ShouldFightOverScreen(blackboard),
                   new LeafNode('FightOverScreen', blackboard, States.FIGHT_OVER_SCREEN),
                 ]),
-                new SequenceNode('SwitchScreenSeq', blackboard, [
-                  new ShouldSwitch(blackboard),
-                  new LeafNode('SwitchScreen', blackboard, States.SWITCH_DEFENSE),
+                new SequenceNode('HelpDefenseSeq', blackboard, [
+                  new ShouldHelpOnDefense(blackboard),
+                  new LeafNode('HelpDefense', blackboard, States.HELP_DEFENSE),
                 ])
               ),
               new LeafNode('DefendMan', blackboard, States.DEFEND_MAN)

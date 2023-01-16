@@ -1,5 +1,6 @@
 export enum States {
   SWITCH_DEFENSE = 'SwitchDefense',
+  HELP_DEFENSE = 'HelpDefense',
   FIGHT_OVER_SCREEN = 'FightOverScreen',
   DEFEND_MAN = 'DefendMan',
   IDLE = 'Idle',

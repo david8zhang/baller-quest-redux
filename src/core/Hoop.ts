@@ -21,11 +21,13 @@ export class Hoop {
       .setScale(3)
       .setDepth(SORT_ORDER.stand)
       .setDebug(false, false, 0xffffff)
+      .setName('hoop')
     this.rimSprite = this.game.physics.add
       .sprite(position.x, position.y, 'hoop-rim')
       .setScale(3)
       .setDepth(SORT_ORDER.rim)
       .setDebug(true, true, 0xff0000)
+      .setName('rim')
     this.rimSprite.body.setSize(10, 10)
     this.rimSprite.body.offset.y = 25
 

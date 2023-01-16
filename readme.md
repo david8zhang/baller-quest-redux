@@ -4,8 +4,7 @@
 
 ## TODO:
 
-- Animations for defending
+- Layup with contact
+- Dunk with contact
 
 ## Bugs
-
-- Set screen bug where team mate keeps running forever

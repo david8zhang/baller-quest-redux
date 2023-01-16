@@ -44,6 +44,7 @@ export class Ball {
       .setScale(3)
       .setDepth(SORT_ORDER.ball)
       .setBounce(0.8)
+      .setName('ball')
     this.sprite.body.setSize(5, 5)
     this.setupHoopCollider()
     this.sprite.setCollideWorldBounds(true)

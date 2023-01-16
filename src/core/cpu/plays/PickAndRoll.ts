@@ -46,6 +46,7 @@ export class PickAndRoll extends OffensePlay {
           if (!this.isDrivingAroundScreen) {
             this.isPlayFinished = true
           }
+          this.driveToBasket(screener)
         },
         isScreeningCallback: () => {
           this.driveAroundScreen(screener, ballHandler)
@@ -55,13 +56,26 @@ export class PickAndRoll extends OffensePlay {
     }
   }
 
+  shootOrDrive(receiver: CourtPlayer) {
+    const isThreePointShot = Game.instance.court.isThreePointShot(
+      receiver.sprite.x,
+      receiver.sprite.y
+    )
+    const shotSuccessData = calculateShotSuccessPercentage(receiver, this.team, isThreePointShot)
+    if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
+      this.shoot(receiver)
+    } else {
+      this.driveToBasket(receiver)
+    }
+  }
+
   public driveAroundScreen(screener: CourtPlayer, ballHandler: CourtPlayer) {
     if (!this.isDrivingAroundScreen) {
       this.isDrivingAroundScreen = true
       const screenDirection =
         screener.x > ballHandler.x ? ScreenDirection.RIGHT : ScreenDirection.LEFT
       const point = {
-        x: screenDirection == ScreenDirection.RIGHT ? screener.x + 50 : screener.x - 50,
+        x: screenDirection == ScreenDirection.RIGHT ? screener.x + 75 : screener.x - 75,
         y: screener.y + 50,
       }
       const config: DribbleToPointStateConfig = {
@@ -69,12 +83,7 @@ export class PickAndRoll extends OffensePlay {
         onReachedPointCB: () => {
           const driveToBasketConfig = {
             onDriveSuccess: () => {
-              const randNum = Phaser.Math.Between(0, 3)
-              if (randNum === 3) {
-                this.shoot(ballHandler)
-              } else {
-                this.driveToBasket(ballHandler)
-              }
+              this.shootOrDrive(ballHandler)
             },
             onDriveFailed: () => {
               this.handleDriveFailed(ballHandler)

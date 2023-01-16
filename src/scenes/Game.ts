@@ -27,6 +27,8 @@ export default class Game extends Phaser.Scene {
   public shotClock!: ShotClock
   private static _instance: Game
 
+  public ignoreDepthSortingNames = ['hoop', 'rim', 'shooting', 'ball', 'court', 'highlight', 'ui']
+
   constructor() {
     super('game')
     Game._instance = this
@@ -68,13 +70,15 @@ export default class Game extends Phaser.Scene {
     this.changingPossessionOverlay = this.add
       .rectangle(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2, WINDOW_WIDTH, WINDOW_HEIGHT, 0x000000, 0.5)
       .setDepth(SORT_ORDER.ui)
+      .setName('ui')
       .setVisible(false)
     const sideWithPossession = this.ball.playerWithBall ? this.ball.playerWithBall.side : ''
     this.changingPossessionText = this.add
       .text(0, 0, `${sideWithPossession} BALL!`, {
         fontSize: '20px',
       })
-      .setDepth(SORT_ORDER.ui)
+      .setDepth(SORT_ORDER.ui + 100)
+      .setName('ui')
       .setVisible(false)
     this.changingPossessionText.setPosition(
       WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
@@ -112,11 +116,16 @@ export default class Game extends Phaser.Scene {
     const newTeamWithPossession = newSideWithPossession === Side.CPU ? this.cpu : this.player
     const newTeamOnDefense = newSideWithPossession === Side.CPU ? this.player : this.cpu
 
-    this.changingPossessionText.setText(`${newSideWithPossession} BALL!`).setVisible(true)
-    this.changingPossessionText.setPosition(
-      WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
-      WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
-    )
+    this.changingPossessionText
+      .setText(`${newSideWithPossession} BALL!`)
+      .setVisible(true)
+      .setDepth(SORT_ORDER.ui + 1000)
+    this.changingPossessionText
+      .setPosition(
+        WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
+        WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
+      )
+      .setDepth(SORT_ORDER.ui + 1000)
     this.time.delayedCall(1500, () => {
       this.ball.prevPlayerWithBall = null
       newTeamWithPossession.handleNewPossession()
@@ -135,9 +144,27 @@ export default class Game extends Phaser.Scene {
     this.isChangingPossession = false
   }
 
+  depthSort() {
+    const sortedByY = this.sys.displayList
+      .getChildren()
+      .filter((child: any) => {
+        return child.y && !this.ignoreDepthSortingNames.includes(child.name)
+      })
+      .sort((a: any, b: any) => {
+        return a.y - b.y
+      })
+    let lowestLayer = 1
+    sortedByY.forEach((c: any, index: number) => {
+      if (c.setDepth) {
+        c.setDepth(lowestLayer + index)
+      }
+    })
+  }
+
   update() {
     this.ball.update()
     this.player.update()
     this.cpu.update()
+    this.depthSort()
   }
 }

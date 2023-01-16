@@ -22,6 +22,7 @@ export class LayupState extends State {
       },
       jumpDuration
     )
+    currPlayer.sprite.setName('shooting')
     currPlayer.sprite.setDepth(SORT_ORDER.ui)
     Game.instance.time.delayedCall(975 * jumpDuration * 0.25, () => {
       currPlayer.sprite.setTexture(`layup-arm-out-front-${suffix}`)
@@ -45,9 +46,7 @@ export class LayupState extends State {
   }
 
   calculateShotSuccessPercentage(currPlayer: CourtPlayer, team: Team) {
-    const shotContesters = team.getOtherTeamCourtPlayers().filter((p) => {
-      return p.getCurrState().key === States.CONTEST_SHOT
-    })
+    const shotContesters = team.getOtherTeamCourtPlayers()
     const closestContester = getClosestPlayer(currPlayer, shotContesters)
     if (closestContester) {
       const distToClosestContester = Phaser.Math.Distance.Between(
@@ -102,6 +101,7 @@ export class LayupState extends State {
   }
 
   exit(currPlayer: CourtPlayer) {
+    currPlayer.sprite.setName('')
     currPlayer.shotReleased = false
   }
 }

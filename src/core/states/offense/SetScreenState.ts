@@ -45,6 +45,9 @@ export class SetScreenState extends State {
         : Game.instance.playerCourtPlayers
     this.screenCollider = Game.instance.physics.add.collider(currPlayer.sprite, otherPlayers)
     this.screenCollider.active = false
+    Game.instance.time.delayedCall(500, () => {
+      this.screenCollider.active = true
+    })
   }
 
   execute(currPlayer: CourtPlayer, team: Team) {
@@ -52,7 +55,6 @@ export class SetScreenState extends State {
       const currTimestamp = Date.now()
       if (this.screenPosition) {
         if (currPlayer.isAtPoint(this.screenPosition) || this.travelTimeExpired) {
-          this.screenCollider.active = true
           this.isAtScreenPosition = true
           if (this.isScreeningCallback) {
             this.isScreeningCallback()

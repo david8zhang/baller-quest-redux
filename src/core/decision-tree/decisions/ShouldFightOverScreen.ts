@@ -22,12 +22,13 @@ export class ShouldFightOverScreen extends TreeNode {
     }
 
     const manToDefend = team.getDefensiveAssignmentForPlayer(currPlayer.playerId)
-    if (manToDefend && manToDefend.getCurrState().key === States.SET_SCREEN) {
-      const state = manToDefend.getCurrState().data as SetScreenState
-      if (state.isAtScreenPosition) {
-        return Decision.PROCEED
-      }
-      return Decision.STOP
+    const hasScreener =
+      team.getOtherTeamCourtPlayers().find((player) => {
+        return player.getCurrState().key === States.SET_SCREEN
+      }) !== undefined
+
+    if (manToDefend && manToDefend.hasPossession && hasScreener) {
+      return Decision.PROCEED
     }
     return Decision.STOP
   }
