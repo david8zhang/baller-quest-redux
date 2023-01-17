@@ -14,6 +14,9 @@ export class CPUTeam extends Team {
   public players: CPUCourtPlayer[] = []
   public offensePlays: OffensePlay[] = []
   public currPlay: OffensePlay | null = null
+  public isPuttingBackBall: boolean = false
+  public isResettingOffense: boolean = false
+
   public defensiveAssignmentMapping: any = { ...CPUConstants.DEFENSIVE_ASSIGNMENTS }
 
   private reachedInitialPosAfterReboundIds: Set<string> = new Set()
@@ -54,10 +57,15 @@ export class CPUTeam extends Team {
       if (shouldResetClock) {
         this.game.shotClock.resetShotClockOnNewPossession()
       }
-      if (this.canPutBackBall()) {
+      if (this.canPutBackBall() && !this.isPuttingBackBall) {
+        this.isPuttingBackBall = true
         const ballHandler = this.game.ball.playerWithBall
-        ballHandler!.setState(States.SHOOTING)
+        ballHandler!.setState(States.LAYUP, () => {
+          ballHandler?.setState(States.IDLE)
+          this.isPuttingBackBall = false
+        })
       } else {
+        this.isResettingOffense = true
         this.resetOffense()
       }
     } else {
@@ -90,6 +98,7 @@ export class CPUTeam extends Team {
       this.reachedInitialPosAfterReboundIds.add(player.playerId)
       player.setState(States.IDLE)
       if (this.reachedInitialPosAfterReboundIds.size === this.players.length) {
+        this.isResettingOffense = false
         this.reachedInitialPosAfterReboundIds.clear()
         this.offensePlays.forEach((play) => {
           play.reset()
@@ -172,14 +181,17 @@ export class CPUTeam extends Team {
       }
     })
     this.currPlay = this.offensePlays[Phaser.Math.Between(0, this.offensePlays.length - 1)]
-    console.log('[Next CPU Play]: ', this.currPlay.playType)
+  }
+
+  shouldExecutePlay() {
+    return this.hasPossession() && !this.isPuttingBackBall && !this.isResettingOffense
   }
 
   update() {
     if (Game.instance.isChangingPossession) {
       return
     }
-    if (this.hasPossession()) {
+    if (this.shouldExecutePlay()) {
       this.handlePlayExecution()
     }
     this.players.forEach((p) => {

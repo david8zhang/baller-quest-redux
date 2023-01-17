@@ -1,6 +1,11 @@
 import Game from '~/scenes/Game'
 import { BallState } from '../Ball'
-import { DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING, getClosestPlayer, Side } from '../Constants'
+import {
+  BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING,
+  DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING,
+  getClosestPlayer,
+  Side,
+} from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
 import { PassConfig } from '../states/offense/PassingState'
@@ -158,7 +163,10 @@ export class PlayerTeam extends Team {
         shooter.sprite.x,
         shooter.sprite.y
       )
-      return distToShooter < 65
+      const blockRating = this.selectedCourtPlayer.attributes.block
+      const blockLikelihood = BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING[blockRating.toString()]
+      const randNum = Phaser.Math.Between(0, 100)
+      return distToShooter < 65 && randNum <= blockLikelihood
     }
     return false
   }

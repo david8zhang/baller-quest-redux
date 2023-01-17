@@ -57,10 +57,7 @@ export class LayupState extends State {
     ball.show()
     Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
     Game.instance.ball.sprite.setDepth(SORT_ORDER.ui)
-
     const shotData = calculateShotSuccessPercentage(currPlayer, team, false, true)
-
-    console.log('[LAYUP SHOT DATA]:', shotData)
 
     const isMiss = Phaser.Math.Between(0, 100) > shotData.percentage
     let posToLandX = Game.instance.hoop.rimSprite.x

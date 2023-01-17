@@ -19,6 +19,9 @@ export class PopulateBlackboard extends TreeNode {
   public process(): Decision | States {
     this.blackboard.setData(BlackboardKeys.CURR_PLAYER, this.courtPlayer)
     this.blackboard.setData(BlackboardKeys.CURR_TEAM, this.team)
+    if (this.blackboard.getData(BlackboardKeys.SHOULD_HELP_DECISION) === undefined) {
+      this.blackboard.setData(BlackboardKeys.SHOULD_HELP_DECISION, null)
+    }
     return Decision.PROCEED
   }
 }

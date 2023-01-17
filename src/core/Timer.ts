@@ -4,7 +4,7 @@ import { DEFAULT_FONT, WINDOW_WIDTH } from './Constants'
 export class Timer {
   private game: Game
   public clockText: Phaser.GameObjects.Text
-  public static MATCH_TIME = 180
+  public static MATCH_TIME = 15
   public currSeconds: number = Timer.MATCH_TIME
   public onMatchFinished: Function | null = null
 

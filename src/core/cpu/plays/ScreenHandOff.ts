@@ -108,7 +108,12 @@ export class ScreenHandOff extends OffensePlay {
       receiver.sprite.x,
       receiver.sprite.y
     )
-    const shotSuccessData = calculateShotSuccessPercentage(receiver, this.team, isThreePointShot)
+    const shotSuccessData = calculateShotSuccessPercentage(
+      receiver,
+      this.team,
+      isThreePointShot,
+      false
+    )
     if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
       this.shoot(receiver)
     } else {
@@ -132,7 +137,7 @@ export class ScreenHandOff extends OffensePlay {
             this.isPlayFinished = true
           })
         } else {
-          const shotSuccessData = calculateShotSuccessPercentage(receiver, this.team, false)
+          const shotSuccessData = calculateShotSuccessPercentage(receiver, this.team, false, false)
           if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
             receiver.setState(States.SHOOTING, () => {
               receiver.setState(States.IDLE)

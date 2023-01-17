@@ -4,22 +4,26 @@ import Game from '~/scenes/Game'
 import { State } from '../StateMachine'
 import { States } from '../States'
 
+export enum BlockDirection {
+  LEFT = 'LEFT',
+  RIGHT = 'RIGHT',
+}
+
 export class FightOverScreenState extends State {
   private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
   public newDefensiveAssignment: CourtPlayer | null = null
   public didFightOverScreen: boolean = false
-  public isFightingAroundScreen: boolean = false
+  public blockDirection: BlockDirection | null = null
 
   execute(currPlayer: CourtPlayer, team: Team) {
     const screener = team.getOtherTeamCourtPlayers().find((player: CourtPlayer) => {
       return player.getCurrState().key === States.SET_SCREEN
     })
-
     if (
       (currPlayer.sprite.body.blocked.left === true ||
-        currPlayer.sprite.body.blocked.right === true) &&
-      !this.didFightOverScreen &&
-      !this.isFightingAroundScreen
+        currPlayer.sprite.body.blocked.right === true ||
+        this.blockDirection !== null) &&
+      !this.didFightOverScreen
     ) {
       if (screener) {
         const posInFrontOfScreener = {
@@ -27,7 +31,12 @@ export class FightOverScreenState extends State {
           y: screener.sprite.y + 50,
         }
 
-        if (currPlayer.sprite.body.blocked.left) {
+        if (!this.blockDirection) {
+          this.blockDirection = currPlayer.sprite.body.blocked.left
+            ? BlockDirection.LEFT
+            : BlockDirection.RIGHT
+        }
+        if (this.blockDirection == BlockDirection.LEFT) {
           posInFrontOfScreener.x -= 30
         } else {
           posInFrontOfScreener.x += 30
@@ -35,7 +44,7 @@ export class FightOverScreenState extends State {
         if (currPlayer.isAtPoint(posInFrontOfScreener)) {
           this.didFightOverScreen = true
         } else {
-          currPlayer.moveTowards(posInFrontOfScreener, currPlayer.getDefSpeedFromAttr() * 1.5)
+          currPlayer.moveTowards(posInFrontOfScreener, currPlayer.getDefSpeedFromAttr())
         }
       }
     } else {
@@ -68,6 +77,6 @@ export class FightOverScreenState extends State {
 
   exit(currPlayer: CourtPlayer, team: Team) {
     this.didFightOverScreen = false
-    this.isFightingAroundScreen = false
+    this.blockDirection = null
   }
 }

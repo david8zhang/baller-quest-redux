@@ -61,7 +61,12 @@ export class PickAndRoll extends OffensePlay {
       receiver.sprite.x,
       receiver.sprite.y
     )
-    const shotSuccessData = calculateShotSuccessPercentage(receiver, this.team, isThreePointShot)
+    const shotSuccessData = calculateShotSuccessPercentage(
+      receiver,
+      this.team,
+      isThreePointShot,
+      false
+    )
     if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
       this.shoot(receiver)
     } else {
@@ -81,16 +86,7 @@ export class PickAndRoll extends OffensePlay {
       const config: DribbleToPointStateConfig = {
         timeout: 5000,
         onReachedPointCB: () => {
-          const driveToBasketConfig = {
-            onDriveSuccess: () => {
-              this.shootOrDrive(ballHandler)
-            },
-            onDriveFailed: () => {
-              this.handleDriveFailed(ballHandler)
-            },
-            timeout: 4000,
-          }
-          ballHandler.setState(States.DRIVE_TO_BASKET, driveToBasketConfig)
+          this.shootOrDrive(ballHandler)
         },
         failedToReachPointCB: () => {
           this.isPlayFinished = true
@@ -108,23 +104,32 @@ export class PickAndRoll extends OffensePlay {
     })
   }
 
-  driveToBasket(ballHandler: CourtPlayer) {
-    if (ballHandler.canLayupBall()) {
-      ballHandler.setState(States.LAYUP, () => {
-        ballHandler.setState(States.IDLE)
-        this.isPlayFinished = true
-      })
-    } else {
-      const shotSuccessData = calculateShotSuccessPercentage(ballHandler, this.team, false)
-      if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
-        ballHandler.setState(States.SHOOTING, () => {
-          ballHandler.setState(States.IDLE)
-          this.isPlayFinished = true
-        })
-      } else {
-        this.handleDriveFailed(ballHandler)
-      }
+  driveToBasket(receiver: CourtPlayer) {
+    const driveToBasketConfig = {
+      onDriveSuccess: () => {
+        if (receiver.canLayupBall()) {
+          receiver.setState(States.LAYUP, () => {
+            receiver.setState(States.IDLE)
+            this.isPlayFinished = true
+          })
+        } else {
+          const shotSuccessData = calculateShotSuccessPercentage(receiver, this.team, false, false)
+          if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
+            receiver.setState(States.SHOOTING, () => {
+              receiver.setState(States.IDLE)
+              this.isPlayFinished = true
+            })
+          } else {
+            this.handleDriveFailed(receiver)
+          }
+        }
+      },
+      onDriveFailed: () => {
+        this.handleDriveFailed(receiver)
+      },
+      timeout: 4000,
     }
+    receiver.setState(States.DRIVE_TO_BASKET, driveToBasketConfig)
   }
 
   handleDriveFailed(ballHandler: CourtPlayer) {

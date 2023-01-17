@@ -41,6 +41,10 @@ export default class Game extends Phaser.Scene {
     return Game._instance
   }
 
+  init() {
+    this.isChangingPossession = false
+  }
+
   onScore(side: Side, numPoints: number) {
     this.scoreTracker.increaseScore(numPoints, side)
   }

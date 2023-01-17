@@ -4,6 +4,15 @@ import { ShotCoverage } from './states/offense/ShootingState'
 import { Team } from './Team'
 
 export const DEFAULT_FONT = 'Superstar'
+
+export const BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING = {
+  '5': 80,
+  '4': 60,
+  '3': 40,
+  '2': 20,
+  '1': 10,
+}
+
 export const DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING = {
   '5': 90,
   '4': 75,

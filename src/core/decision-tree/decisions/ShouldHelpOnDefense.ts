@@ -23,16 +23,23 @@ export class ShouldHelpOnDefense extends TreeNode {
     }
     const manToDefend = team.getDefensiveAssignmentForPlayer(currPlayer.playerId)
     if (manToDefend && manToDefend.getCurrState().key === States.SET_SCREEN) {
+      const cachedDecision = this.blackboard.getData(BlackboardKeys.SHOULD_HELP_DECISION)
+      if (cachedDecision !== null) {
+        return cachedDecision ? Decision.PROCEED : Decision.STOP
+      }
       const setScreenState = manToDefend.getCurrState().data as SetScreenState
       if (setScreenState.isAtScreenPosition) {
         if (this.ballHandlerHasOpenLane(team)) {
-          return Decision.PROCEED
+          const shouldHelp = Phaser.Math.Between(0, 1) === 0
+          this.blackboard.setData(BlackboardKeys.SHOULD_HELP_DECISION, shouldHelp)
+          return shouldHelp ? Decision.PROCEED : Decision.STOP
         }
         return Decision.STOP
       } else {
         return Decision.STOP
       }
     }
+    this.blackboard.setData(BlackboardKeys.SHOULD_HELP_DECISION, null)
     return Decision.STOP
   }
 

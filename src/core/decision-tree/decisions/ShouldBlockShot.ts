@@ -1,4 +1,4 @@
-import { Side } from '~/core/Constants'
+import { BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING, Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
@@ -19,7 +19,6 @@ export class ShouldBlockShot extends TreeNode {
     if (team.side === Side.PLAYER) {
       return Decision.STOP
     }
-
     const otherTeamPlayers = team.getOtherTeamCourtPlayers()
     const shooter = otherTeamPlayers.find((p) => {
       return p.getCurrState().key === States.SHOOTING
@@ -31,7 +30,12 @@ export class ShouldBlockShot extends TreeNode {
         shooter.sprite.x,
         shooter.sprite.y
       )
-      if (distToShooter < 65) {
+
+      const blockLikelihood =
+        BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING[currPlayer.attributes.block.toString()]
+      const randNum = Phaser.Math.Between(0, 100)
+
+      if (distToShooter < 65 && randNum <= blockLikelihood) {
         return Decision.PROCEED
       } else {
         return Decision.STOP

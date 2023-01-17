@@ -9,6 +9,9 @@ export enum WinConditions {
 
 export class GameOver extends Phaser.Scene {
   public winCondition!: WinConditions
+  public playerScore: number = 0
+  public cpuScore: number = 0
+
   constructor() {
     super('gameover')
   }
@@ -21,6 +24,8 @@ export class GameOver extends Phaser.Scene {
     } else {
       this.winCondition = WinConditions.TIE
     }
+    this.playerScore = data.playerScore
+    this.cpuScore = data.cpuScore
   }
 
   create() {
@@ -36,6 +41,16 @@ export class GameOver extends Phaser.Scene {
       winText.setText("It's a tie!")
     }
     winText.setPosition(WINDOW_WIDTH / 2 - winText.displayWidth / 2, WINDOW_HEIGHT / 2.5)
+
+    const scoreText = this.add.text(0, 0, `${this.playerScore} - ${this.cpuScore}`, {
+      fontSize: '35px',
+      fontFamily: DEFAULT_FONT,
+    })
+    scoreText.setPosition(
+      WINDOW_WIDTH / 2 - scoreText.displayWidth / 2,
+      winText.y + winText.displayHeight + 10
+    )
+
     const startButton = button('Play Again', {
       fontFamily: DEFAULT_FONT,
       fontSize: '20px',
@@ -50,7 +65,7 @@ export class GameOver extends Phaser.Scene {
     }) as HTMLElement
 
     const startButtonDOM = this.add
-      .dom(this.scale.width / 2, winText.y + 75, startButton)
+      .dom(this.scale.width / 2, scoreText.y + 75, startButton)
       .setOrigin(0.5)
       .addListener('click')
       .on('click', () => {
