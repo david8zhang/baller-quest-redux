@@ -1,5 +1,11 @@
 import { BallState } from '~/core/Ball'
-import { createArc, getClosestPlayer, Side, SORT_ORDER } from '~/core/Constants'
+import {
+  calculateShotSuccessPercentage,
+  createArc,
+  getClosestPlayer,
+  Side,
+  SORT_ORDER,
+} from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -14,6 +20,7 @@ export class LayupState extends State {
     currPlayer.sprite.anims.stop()
     const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
     currPlayer.sprite.setTexture(`layup-gather-front-${suffix}`)
+    currPlayer.sprite.setDepth(SORT_ORDER.ui)
     createArc(
       currPlayer.sprite,
       {
@@ -23,7 +30,6 @@ export class LayupState extends State {
       jumpDuration
     )
     currPlayer.sprite.setName('shooting')
-    currPlayer.sprite.setDepth(SORT_ORDER.ui)
     Game.instance.time.delayedCall(975 * jumpDuration * 0.25, () => {
       currPlayer.sprite.setTexture(`layup-arm-out-front-${suffix}`)
     })
@@ -45,38 +51,18 @@ export class LayupState extends State {
     })
   }
 
-  calculateShotSuccessPercentage(currPlayer: CourtPlayer, team: Team) {
-    const shotContesters = team.getOtherTeamCourtPlayers()
-    const closestContester = getClosestPlayer(currPlayer, shotContesters)
-    if (closestContester) {
-      const distToClosestContester = Phaser.Math.Distance.Between(
-        currPlayer.sprite.x,
-        currPlayer.sprite.y,
-        closestContester.sprite.x,
-        closestContester.sprite.y
-      )
-      if (distToClosestContester > 100) {
-        return 95
-      }
-      if (distToClosestContester <= 100 && distToClosestContester > 80) {
-        return 80
-      }
-      if (distToClosestContester <= 80 && distToClosestContester > 65) {
-        return 65
-      }
-    } else {
-      return 50
-    }
-    return 100
-  }
-
   launchBallTowardsHoop(currPlayer: CourtPlayer, team: Team) {
     const ball = Game.instance.ball
     const arcTime = 0.7
     ball.show()
     Game.instance.ball.setPosition(currPlayer.sprite.x + 5, currPlayer.sprite.y - 28)
-    const shotPercentage = this.calculateShotSuccessPercentage(currPlayer, team)
-    const isMiss = Phaser.Math.Between(0, 100) > shotPercentage
+    Game.instance.ball.sprite.setDepth(SORT_ORDER.ui)
+
+    const shotData = calculateShotSuccessPercentage(currPlayer, team, false, true)
+
+    console.log('[LAYUP SHOT DATA]:', shotData)
+
+    const isMiss = Phaser.Math.Between(0, 100) > shotData.percentage
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {
       ball.ballState = BallState.MISSED_SHOT

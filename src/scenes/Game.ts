@@ -145,18 +145,17 @@ export default class Game extends Phaser.Scene {
       this.ball.prevPlayerWithBall = null
       newTeamWithPossession.handleNewPossession()
       newTeamOnDefense.handleNewDefenseSetup()
-      this.shotClock.resetShotClockOnNewPossession()
       this.resetPositioning()
+      this.shotClock.resetShotClockOnNewPossession()
+      this.isChangingPossession = false
     })
   }
 
   resetPositioning() {
     this.changingPossessionOverlay.setVisible(false)
     this.changingPossessionText.setVisible(false)
-
     this.player.positionPlayers()
     this.cpu.positionPlayers()
-    this.isChangingPossession = false
   }
 
   depthSort() {

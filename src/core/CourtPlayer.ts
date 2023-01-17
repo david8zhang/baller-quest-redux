@@ -2,6 +2,7 @@ import Game from '~/scenes/Game'
 import { BallState } from './Ball'
 import {
   DEFAULT_FONT,
+  DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING,
   getDistanceBetween,
   LAYUP_DISTANCE,
   OFFBALL_ANIMS,
@@ -40,7 +41,8 @@ export interface PlayerAttributes {
   defSpeed: number
   shooting: number
   block: number
-  contest: number
+  dunk: number
+  layup: number
 }
 
 export interface CourtPlayerConfig {
@@ -73,7 +75,7 @@ export class CourtPlayer {
   protected decisionTree!: TreeNode
   protected blackboard: Blackboard
   public raycastIntersectRect: Phaser.Geom.Rectangle
-  protected attributes: PlayerAttributes
+  public attributes: PlayerAttributes
 
   public graphics: Phaser.GameObjects.Graphics
 
@@ -159,10 +161,15 @@ export class CourtPlayer {
 
   canDunkBall() {
     const state = this.getCurrState().key
+    const dunkAttribute = this.attributes.dunk
+    const randNum = Phaser.Math.Between(0, 100)
+    const dunkLikelihood = DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING[dunkAttribute.toString()]
+
     return (
       !this.hasDefenderInFront() &&
       this.withinDunkOrLayupRange() &&
       this.team.shouldDunk() &&
+      randNum <= dunkLikelihood &&
       this.hasPossession &&
       state !== States.LAYUP &&
       state !== States.DUNK

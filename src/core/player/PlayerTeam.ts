@@ -1,6 +1,6 @@
 import Game from '~/scenes/Game'
 import { BallState } from '../Ball'
-import { getClosestPlayer, Side } from '../Constants'
+import { DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING, getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
 import { PassConfig } from '../states/offense/PassingState'

@@ -4,9 +4,6 @@
 
 ## TODO:
 
-- Add title screen
-- Add game timer
-- Add win/lose condition
 - Shot success based on attribute score
 - Layup success based on attribute score
 - Dunk likelihood based on attribute score

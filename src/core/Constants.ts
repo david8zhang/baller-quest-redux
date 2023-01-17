@@ -1,9 +1,118 @@
 import Game from '~/scenes/Game'
 import { CourtPlayer } from './CourtPlayer'
-import { ShootingState, ShotCoverage } from './states/offense/ShootingState'
+import { ShotCoverage } from './states/offense/ShootingState'
 import { Team } from './Team'
 
 export const DEFAULT_FONT = 'Superstar'
+export const DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING = {
+  '5': 90,
+  '4': 75,
+  '3': 60,
+  '2': 45,
+  '1': 30,
+}
+export const SHOOTING_CONFIGS = {
+  '1': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 30,
+      [ShotCoverage.OPEN]: 25,
+      [ShotCoverage.CONTESTED]: 1,
+      [ShotCoverage.SMOTHERED]: 0,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 55,
+      [ShotCoverage.OPEN]: 40,
+      [ShotCoverage.CONTESTED]: 5,
+      [ShotCoverage.SMOTHERED]: 0,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 70,
+      [ShotCoverage.OPEN]: 60,
+      [ShotCoverage.CONTESTED]: 45,
+      [ShotCoverage.SMOTHERED]: 30,
+    },
+  },
+  '2': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 35,
+      [ShotCoverage.OPEN]: 30,
+      [ShotCoverage.CONTESTED]: 5,
+      [ShotCoverage.SMOTHERED]: 0,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 65,
+      [ShotCoverage.OPEN]: 50,
+      [ShotCoverage.CONTESTED]: 10,
+      [ShotCoverage.SMOTHERED]: 1,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 80,
+      [ShotCoverage.OPEN]: 70,
+      [ShotCoverage.CONTESTED]: 55,
+      [ShotCoverage.SMOTHERED]: 40,
+    },
+  },
+  '3': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 50,
+      [ShotCoverage.OPEN]: 40,
+      [ShotCoverage.CONTESTED]: 10,
+      [ShotCoverage.SMOTHERED]: 1,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 75,
+      [ShotCoverage.OPEN]: 60,
+      [ShotCoverage.CONTESTED]: 20,
+      [ShotCoverage.SMOTHERED]: 5,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 95,
+      [ShotCoverage.OPEN]: 80,
+      [ShotCoverage.CONTESTED]: 65,
+      [ShotCoverage.SMOTHERED]: 50,
+    },
+  },
+  '4': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 65,
+      [ShotCoverage.OPEN]: 50,
+      [ShotCoverage.CONTESTED]: 20,
+      [ShotCoverage.SMOTHERED]: 5,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 90,
+      [ShotCoverage.OPEN]: 75,
+      [ShotCoverage.CONTESTED]: 40,
+      [ShotCoverage.SMOTHERED]: 15,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 100,
+      [ShotCoverage.OPEN]: 95,
+      [ShotCoverage.CONTESTED]: 80,
+      [ShotCoverage.SMOTHERED]: 65,
+    },
+  },
+  '5': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 75,
+      [ShotCoverage.OPEN]: 60,
+      [ShotCoverage.CONTESTED]: 30,
+      [ShotCoverage.SMOTHERED]: 10,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 100,
+      [ShotCoverage.OPEN]: 90,
+      [ShotCoverage.CONTESTED]: 55,
+      [ShotCoverage.SMOTHERED]: 25,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 100,
+      [ShotCoverage.OPEN]: 100,
+      [ShotCoverage.CONTESTED]: 95,
+      [ShotCoverage.SMOTHERED]: 80,
+    },
+  },
+}
 
 export const WINDOW_WIDTH = 864
 export const WINDOW_HEIGHT = 640
@@ -39,25 +148,25 @@ export const createArc = (
 
 export const getMostOpenPassRecipient = (teammates: CourtPlayer[], team: Team) => {
   let recipient: CourtPlayer | null = null
-  let bestShotCoverage: ShotCoverage | null = null
+  let bestShotPercentage: number = Number.MIN_SAFE_INTEGER
 
   // Check if team mates are open
   for (let i = 0; i < teammates.length; i++) {
     const teammate = teammates[i]
     const isThreePointShot = Game.instance.court.isThreePointShot(teammate.x, teammate.y)
-    const shotPercentageData = calculateShotSuccessPercentage(teammate, team, isThreePointShot)
-    if (shotPercentageData.coverage === ShotCoverage.OPEN) {
-      if (!recipient) {
-        recipient = teammate
-        bestShotCoverage = ShotCoverage.OPEN
-      }
+    const shotPercentageData = calculateShotSuccessPercentage(
+      teammate,
+      team,
+      isThreePointShot,
+      false
+    )
+    if (shotPercentageData.percentage > bestShotPercentage) {
+      recipient = teammate
+      bestShotPercentage = shotPercentageData.percentage
     }
-    if (shotPercentageData.coverage === ShotCoverage.WIDE_OPEN) {
-      if (!recipient || bestShotCoverage === ShotCoverage.OPEN) {
-        recipient = teammate
-        bestShotCoverage = ShotCoverage.WIDE_OPEN
-      }
-    }
+  }
+  if (bestShotPercentage <= 50) {
+    return null
   }
   return recipient
 }
@@ -65,7 +174,8 @@ export const getMostOpenPassRecipient = (teammates: CourtPlayer[], team: Team) =
 export const calculateShotSuccessPercentage = (
   currPlayer: CourtPlayer,
   team: Team,
-  isThreePointShot: boolean
+  isThreePointShot: boolean,
+  isLayup: boolean
 ) => {
   const shotContesters = team.getOtherTeamCourtPlayers()
   const closestContester = getClosestPlayer(currPlayer, shotContesters)
@@ -89,9 +199,16 @@ export const calculateShotSuccessPercentage = (
   } else {
     shotCoverage = ShotCoverage.WIDE_OPEN
   }
-  const percentagesConfig = isThreePointShot
-    ? ShootingState.THREE_POINT_PERCENTAGES
-    : ShootingState.MID_RANGE_PERCENTAGES
+
+  let shotAttribute = currPlayer.attributes.shooting
+  const allConfigs = SHOOTING_CONFIGS[shotAttribute.toString()]
+  let percentagesConfig = allConfigs.two
+  if (isThreePointShot) {
+    percentagesConfig = allConfigs.three
+  } else if (isLayup) {
+    shotAttribute = currPlayer.attributes.layup
+    percentagesConfig = SHOOTING_CONFIGS[shotAttribute.toString()].layup
+  }
   return {
     coverage: shotCoverage,
     percentage: percentagesConfig[shotCoverage],

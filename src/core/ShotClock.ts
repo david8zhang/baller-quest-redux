@@ -24,7 +24,7 @@ export class ShotClock {
       repeat: -1,
       callback: () => {
         if (this.shotTimeSeconds === 0) {
-          if (!this.isBallInFlight()) {
+          if (!this.isBallInFlight() && !this.game.isChangingPossession) {
             this.timerEvent.paused = true
             this.game.handleChangePossession(this.game.ball.playerWithBall!.side)
           }

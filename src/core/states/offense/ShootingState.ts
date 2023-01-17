@@ -14,20 +14,6 @@ export enum ShotCoverage {
 }
 
 export class ShootingState extends State {
-  public static THREE_POINT_PERCENTAGES = {
-    [ShotCoverage.WIDE_OPEN]: 50,
-    [ShotCoverage.OPEN]: 40,
-    [ShotCoverage.CONTESTED]: 10,
-    [ShotCoverage.SMOTHERED]: 1,
-  }
-
-  public static MID_RANGE_PERCENTAGES = {
-    [ShotCoverage.WIDE_OPEN]: 75,
-    [ShotCoverage.OPEN]: 60,
-    [ShotCoverage.CONTESTED]: 20,
-    [ShotCoverage.SMOTHERED]: 5,
-  }
-
   enter(currPlayer: CourtPlayer, team: Team, callback: Function) {
     const hoop = Game.instance.hoop.standSprite
     currPlayer.stop()
@@ -104,7 +90,15 @@ export class ShootingState extends State {
       arcTime = 1.5
     }
 
-    const percentageSuccess = calculateShotSuccessPercentage(currPlayer, team, isThreePointShot)
+    const percentageSuccess = calculateShotSuccessPercentage(
+      currPlayer,
+      team,
+      isThreePointShot,
+      false
+    )
+
+    console.log('[SHOT DATA]:', percentageSuccess)
+
     const isMiss = Phaser.Math.Between(0, 100) > percentageSuccess.percentage
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {

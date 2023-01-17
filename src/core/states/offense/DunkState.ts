@@ -27,6 +27,7 @@ export class DunkState extends State {
     currPlayer.sprite.body.checkCollision.none = true
 
     Game.instance.time.delayedCall(975 * jumpDuration * 0.5, () => {
+      Game.instance.ball.sprite.setDepth(Game.instance.hoop.rimSprite.depth - 1)
       currPlayer.sprite.setTexture(`dunk-wind-up-front-${suffix}`)
     })
 

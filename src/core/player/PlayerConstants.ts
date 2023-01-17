@@ -4,22 +4,25 @@ export class PlayerConstants {
       offSpeed: 3,
       defSpeed: 3,
       shooting: 3,
+      layup: 3,
+      dunk: 3,
       block: 3,
-      contest: 3,
     },
     player2: {
       offSpeed: 4,
       defSpeed: 2,
       shooting: 4,
+      layup: 4,
+      dunk: 1,
       block: 1,
-      contest: 1,
     },
     player3: {
       offSpeed: 2,
       defSpeed: 4,
-      shooting: 1,
+      shooting: 2,
+      layup: 5,
+      dunk: 5,
       block: 3,
-      contest: 4,
     },
   }
 
@@ -30,8 +33,8 @@ export class PlayerConstants {
   }
 
   public static NEW_POSSESSION_PLAYER_ID = 'player1'
-  public static PRIMARY_SCREENER_ID = 'player2'
-  public static SECONDARY_SCREENER_ID = 'player3'
+  public static PRIMARY_SCREENER_ID = 'player3'
+  public static SECONDARY_SCREENER_ID = 'player2'
 
   public static DEFENSE_POSITIONS_PLAYER = {
     player1: {

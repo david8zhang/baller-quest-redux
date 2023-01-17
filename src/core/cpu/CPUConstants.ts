@@ -5,21 +5,24 @@ export class CPUConstants {
       defSpeed: 3,
       shooting: 3,
       block: 3,
-      contest: 3,
+      layup: 3,
+      dunk: 3,
     },
     cpu2: {
       offSpeed: 4,
       defSpeed: 2,
       shooting: 4,
       block: 1,
-      contest: 1,
+      layup: 4,
+      dunk: 1,
     },
     cpu3: {
       offSpeed: 2,
       defSpeed: 4,
       shooting: 1,
       block: 3,
-      contest: 4,
+      layup: 5,
+      dunk: 5,
     },
   }
 
