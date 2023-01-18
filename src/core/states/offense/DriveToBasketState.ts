@@ -43,7 +43,7 @@ export class DriveToBasketState extends State {
               x: hoop.x,
               y: hoop.y,
             },
-            currPlayer.getOffSpeedFromAttr()
+            currPlayer.getOffSpeedFromAttr() * 1.5
           )
         }
       }

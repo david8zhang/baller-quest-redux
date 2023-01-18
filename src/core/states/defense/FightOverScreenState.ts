@@ -1,3 +1,4 @@
+import { OFFBALL_ANIMS, Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -11,6 +12,8 @@ export enum BlockDirection {
 
 export class FightOverScreenState extends State {
   private static DEFENSIVE_SPACING_PERCENTAGE = 0.2
+  public lastUpdatedTimestamp: number = -1
+
   public newDefensiveAssignment: CourtPlayer | null = null
   public didFightOverScreen: boolean = false
   public blockDirection: BlockDirection | null = null
@@ -44,7 +47,8 @@ export class FightOverScreenState extends State {
         if (currPlayer.isAtPoint(posInFrontOfScreener)) {
           this.didFightOverScreen = true
         } else {
-          currPlayer.moveTowards(posInFrontOfScreener, currPlayer.getDefSpeedFromAttr())
+          let speed = currPlayer.getDefSpeedFromAttr()
+          currPlayer.moveTowards(posInFrontOfScreener, speed, true)
         }
       }
     } else {
@@ -64,10 +68,17 @@ export class FightOverScreenState extends State {
           hoop.standSprite.y
         )
         const pointToMoveTo = line.getPoint(FightOverScreenState.DEFENSIVE_SPACING_PERCENTAGE)
+
+        let speed = currPlayer.getDefSpeedFromAttr()
         if (currPlayer.isAtPoint(pointToMoveTo)) {
-          currPlayer.stop(true)
+          currPlayer.sprite.setVelocity(0, 0)
+          if (Date.now() - this.lastUpdatedTimestamp > 250) {
+            const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
+            currPlayer.sprite.play(`${OFFBALL_ANIMS.idleDefend}-${suffix}`, true)
+          }
         } else {
-          currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr())
+          this.lastUpdatedTimestamp = Date.now()
+          currPlayer.moveTowards(pointToMoveTo, speed, true)
         }
       } else {
         currPlayer.stop(true)
@@ -78,5 +89,6 @@ export class FightOverScreenState extends State {
   exit(currPlayer: CourtPlayer, team: Team) {
     this.didFightOverScreen = false
     this.blockDirection = null
+    this.lastUpdatedTimestamp = -1
   }
 }

@@ -121,6 +121,11 @@ export class ScreenHandOff extends OffensePlay {
     }
   }
 
+  shouldLayup(receiver: CourtPlayer) {
+    const shouldLayupThroughContact = Phaser.Math.Between(0, 100) > 50
+    return shouldLayupThroughContact || receiver.canLayupBall()
+  }
+
   shoot(receiver: CourtPlayer) {
     receiver.setState(States.SHOOTING, () => {
       receiver.setState(States.IDLE)
@@ -131,7 +136,7 @@ export class ScreenHandOff extends OffensePlay {
   driveToBasket(receiver: CourtPlayer) {
     const driveToBasketConfig = {
       onDriveSuccess: () => {
-        if (receiver.canLayupBall()) {
+        if (this.shouldLayup(receiver)) {
           receiver.setState(States.LAYUP, () => {
             receiver.setState(States.IDLE)
             this.isPlayFinished = true

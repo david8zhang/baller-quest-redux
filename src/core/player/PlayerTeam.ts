@@ -349,9 +349,10 @@ export class PlayerTeam extends Team {
     const upDown = this.keyArrowUp.isDown
     const downDown = this.keyArrowDown.isDown
 
-    const speed = this.hasPossession()
+    let speed = this.hasPossession()
       ? this.selectedCourtPlayer.getOffSpeedFromAttr()
       : this.selectedCourtPlayer.getDefSpeedFromAttr()
+    speed *= this.sprintMeter.getSpeedMultiplier()
 
     let velocityX = 0
     let velocityY = 0

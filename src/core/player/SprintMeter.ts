@@ -18,7 +18,7 @@ export class SprintMeter {
       callback: () => {
         if (this.keyShift.isDown) {
           this.isSprinting = true
-          this.sprintDuration = Math.min(100, this.sprintDuration + 2)
+          this.sprintDuration = Math.min(250, this.sprintDuration + 2)
         } else {
           this.isSprinting = false
           this.sprintDuration = Math.max(0, this.sprintDuration - 1)
@@ -27,17 +27,23 @@ export class SprintMeter {
     })
   }
 
-  public getSpeed() {
+  public getSpeedMultiplier() {
     if (this.isSprinting) {
       if (this.sprintDuration >= 25 && this.sprintDuration < 75) {
-        return COURT_PLAYER_SPRINT_SPEED
+        return 1.5
       }
-      if (this.sprintDuration >= 75) {
-        return COURT_PLAYER_SPEED
+      if (this.sprintDuration >= 75 && this.sprintDuration < 150) {
+        return 1.25
       }
-      return COURT_PLAYER_SPEED
+      if (this.sprintDuration >= 150 && this.sprintDuration < 200) {
+        return 0.85
+      }
+      if (this.sprintDuration > 200) {
+        return 0.75
+      }
+      return 1
     } else {
-      return COURT_PLAYER_SPEED
+      return 1
     }
   }
 }

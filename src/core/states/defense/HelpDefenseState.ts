@@ -1,3 +1,4 @@
+import { OFFBALL_ANIMS, Side } from '~/core/Constants'
 import { CourtPlayer } from '~/core/CourtPlayer'
 import { Team } from '~/core/Team'
 import Game from '~/scenes/Game'
@@ -10,6 +11,7 @@ export enum HelpDefenseDirection {
 
 export class HelpDefenseState extends State {
   private newDefensiveAssignment: CourtPlayer | null = null
+  public lastUpdatedTimestamp: number = -1
 
   execute(currPlayer: CourtPlayer, team: Team) {
     const ballHandler =
@@ -35,14 +37,21 @@ export class HelpDefenseState extends State {
       }
 
       if (currPlayer.isAtPoint(pointToMoveTo)) {
-        currPlayer.stop()
+        currPlayer.sprite.setVelocity(0, 0)
+        if (Date.now() - this.lastUpdatedTimestamp > 250) {
+          const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
+          currPlayer.sprite.play(`${OFFBALL_ANIMS.idleDefend}-${suffix}`, true)
+        }
       } else {
-        currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr())
+        this.lastUpdatedTimestamp = Date.now()
+        let speed = currPlayer.getDefSpeedFromAttr()
+        currPlayer.moveTowards(pointToMoveTo, speed, true)
       }
     }
   }
 
   exit() {
     this.newDefensiveAssignment = null
+    this.lastUpdatedTimestamp = -1
   }
 }

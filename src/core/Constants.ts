@@ -20,6 +20,110 @@ export const DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING = {
   '2': 45,
   '1': 30,
 }
+
+export const SHOOTING_CONFIGS_CPU = {
+  '1': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 50,
+      [ShotCoverage.OPEN]: 45,
+      [ShotCoverage.CONTESTED]: 10,
+      [ShotCoverage.SMOTHERED]: 5,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 65,
+      [ShotCoverage.OPEN]: 50,
+      [ShotCoverage.CONTESTED]: 15,
+      [ShotCoverage.SMOTHERED]: 10,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 75,
+      [ShotCoverage.OPEN]: 65,
+      [ShotCoverage.CONTESTED]: 55,
+      [ShotCoverage.SMOTHERED]: 40,
+    },
+  },
+  '2': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 55,
+      [ShotCoverage.OPEN]: 50,
+      [ShotCoverage.CONTESTED]: 15,
+      [ShotCoverage.SMOTHERED]: 10,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 75,
+      [ShotCoverage.OPEN]: 60,
+      [ShotCoverage.CONTESTED]: 20,
+      [ShotCoverage.SMOTHERED]: 15,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 85,
+      [ShotCoverage.OPEN]: 75,
+      [ShotCoverage.CONTESTED]: 60,
+      [ShotCoverage.SMOTHERED]: 45,
+    },
+  },
+  '3': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 60,
+      [ShotCoverage.OPEN]: 55,
+      [ShotCoverage.CONTESTED]: 25,
+      [ShotCoverage.SMOTHERED]: 20,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 80,
+      [ShotCoverage.OPEN]: 65,
+      [ShotCoverage.CONTESTED]: 25,
+      [ShotCoverage.SMOTHERED]: 10,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 100,
+      [ShotCoverage.OPEN]: 95,
+      [ShotCoverage.CONTESTED]: 75,
+      [ShotCoverage.SMOTHERED]: 60,
+    },
+  },
+  '4': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 70,
+      [ShotCoverage.OPEN]: 55,
+      [ShotCoverage.CONTESTED]: 30,
+      [ShotCoverage.SMOTHERED]: 25,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 100,
+      [ShotCoverage.OPEN]: 80,
+      [ShotCoverage.CONTESTED]: 45,
+      [ShotCoverage.SMOTHERED]: 20,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 100,
+      [ShotCoverage.OPEN]: 100,
+      [ShotCoverage.CONTESTED]: 95,
+      [ShotCoverage.SMOTHERED]: 70,
+    },
+  },
+  '5': {
+    three: {
+      [ShotCoverage.WIDE_OPEN]: 80,
+      [ShotCoverage.OPEN]: 65,
+      [ShotCoverage.CONTESTED]: 50,
+      [ShotCoverage.SMOTHERED]: 30,
+    },
+    two: {
+      [ShotCoverage.WIDE_OPEN]: 100,
+      [ShotCoverage.OPEN]: 100,
+      [ShotCoverage.CONTESTED]: 75,
+      [ShotCoverage.SMOTHERED]: 50,
+    },
+    layup: {
+      [ShotCoverage.WIDE_OPEN]: 100,
+      [ShotCoverage.OPEN]: 100,
+      [ShotCoverage.CONTESTED]: 95,
+      [ShotCoverage.SMOTHERED]: 85,
+    },
+  },
+}
+
 export const SHOOTING_CONFIGS = {
   '1': {
     three: {
@@ -210,13 +314,14 @@ export const calculateShotSuccessPercentage = (
   }
 
   let shotAttribute = currPlayer.attributes.shooting
-  const allConfigs = SHOOTING_CONFIGS[shotAttribute.toString()]
+  const shootingConfigs = currPlayer.side === Side.PLAYER ? SHOOTING_CONFIGS : SHOOTING_CONFIGS_CPU
+  const allConfigs = shootingConfigs[shotAttribute.toString()]
   let percentagesConfig = allConfigs.two
   if (isThreePointShot) {
     percentagesConfig = allConfigs.three
   } else if (isLayup) {
     shotAttribute = currPlayer.attributes.layup
-    percentagesConfig = SHOOTING_CONFIGS[shotAttribute.toString()].layup
+    percentagesConfig = shootingConfigs[shotAttribute.toString()].layup
   }
   return {
     coverage: shotCoverage,

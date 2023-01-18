@@ -153,7 +153,7 @@ export class CourtPlayer {
     return CourtPlayerAttributeMapper.getOffensiveMovementSpeedFromAttr(this.attributes.offSpeed)
   }
   getDefSpeedFromAttr() {
-    return CourtPlayerAttributeMapper.getOffensiveMovementSpeedFromAttr(this.attributes.defSpeed)
+    return CourtPlayerAttributeMapper.getDefensiveMovementSpeedFromAttr(this.attributes.defSpeed)
   }
   getShotPctFromAttr() {}
   getBlockSuccessPctFromAttr() {}

@@ -30,7 +30,7 @@ export class ShouldHelpOnDefense extends TreeNode {
       const setScreenState = manToDefend.getCurrState().data as SetScreenState
       if (setScreenState.isAtScreenPosition) {
         if (this.ballHandlerHasOpenLane(team)) {
-          const shouldHelp = Phaser.Math.Between(0, 1) === 0
+          const shouldHelp = Phaser.Math.Between(0, 2) !== 0
           this.blackboard.setData(BlackboardKeys.SHOULD_HELP_DECISION, shouldHelp)
           return shouldHelp ? Decision.PROCEED : Decision.STOP
         }

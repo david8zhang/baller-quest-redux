@@ -35,6 +35,20 @@ export class DefendManState extends State {
         hoop.standSprite.y
       )
       const pointToMoveTo = line.getPoint(DefendManState.DEFENSIVE_SPACING_PERCENTAGE)
+
+      let speed = currPlayer.getDefSpeedFromAttr()
+      const distToPoint = Phaser.Math.Distance.Between(
+        currPlayer.sprite.x,
+        currPlayer.sprite.y,
+        pointToMoveTo.x,
+        pointToMoveTo.y
+      )
+      if (distToPoint <= 50) {
+        speed *= 0.75
+      } else {
+        speed *= 1
+      }
+
       if (currPlayer.isAtPoint(pointToMoveTo)) {
         currPlayer.sprite.setVelocity(0, 0)
         if (Date.now() - this.lastUpdatedTimestamp > 250) {
@@ -43,7 +57,7 @@ export class DefendManState extends State {
         }
       } else {
         this.lastUpdatedTimestamp = Date.now()
-        currPlayer.moveTowards(pointToMoveTo, currPlayer.getDefSpeedFromAttr(), true)
+        currPlayer.moveTowards(pointToMoveTo, speed, true)
       }
     }
   }

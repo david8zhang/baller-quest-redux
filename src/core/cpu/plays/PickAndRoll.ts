@@ -86,7 +86,8 @@ export class PickAndRoll extends OffensePlay {
       const config: DribbleToPointStateConfig = {
         timeout: 5000,
         onReachedPointCB: () => {
-          this.shootOrDrive(ballHandler)
+          // this.shootOrDrive(ballHandler)
+          this.driveToBasket(ballHandler)
         },
         failedToReachPointCB: () => {
           this.isPlayFinished = true
@@ -104,10 +105,15 @@ export class PickAndRoll extends OffensePlay {
     })
   }
 
+  shouldLayup(receiver: CourtPlayer) {
+    const shouldLayupThroughContact = Phaser.Math.Between(0, 100) > 50
+    return shouldLayupThroughContact || receiver.canLayupBall()
+  }
+
   driveToBasket(receiver: CourtPlayer) {
     const driveToBasketConfig = {
       onDriveSuccess: () => {
-        if (receiver.canLayupBall()) {
+        if (this.shouldLayup(receiver)) {
           receiver.setState(States.LAYUP, () => {
             receiver.setState(States.IDLE)
             this.isPlayFinished = true
