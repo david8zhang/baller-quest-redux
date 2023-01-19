@@ -127,12 +127,12 @@ export class ScreenHandOff extends OffensePlay {
   }
 
   shouldLayup(receiver: CourtPlayer) {
-    const shouldLayupThroughContact = Phaser.Math.Between(0, 100) > 50
+    const shouldLayupThroughContact = Phaser.Math.Between(0, 100) > 70
     return shouldLayupThroughContact || receiver.canLayupBall()
   }
 
   shouldDunk(receiver: CourtPlayer) {
-    const shouldDunkThroughContact = Phaser.Math.Between(0, 100) > 80
+    const shouldDunkThroughContact = Phaser.Math.Between(0, 100) > 85
     return shouldDunkThroughContact || receiver.canDunkBall()
   }
 

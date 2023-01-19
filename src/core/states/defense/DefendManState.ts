@@ -43,10 +43,10 @@ export class DefendManState extends State {
         pointToMoveTo.x,
         pointToMoveTo.y
       )
-      if (distToPoint <= 50) {
-        speed *= 0.75
-      } else {
-        speed *= 1
+      if (distToPoint > 100) {
+        speed *= 1.25
+      } else if (distToPoint > 50 && distToPoint < 100) {
+        speed *= 1.1
       }
 
       if (currPlayer.isAtPoint(pointToMoveTo)) {

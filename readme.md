@@ -4,9 +4,7 @@
 
 ## TODO:
 
-- CPU dunks
-- Post Up when player overlaps with enemy (slower movement, can't move past a certain point)
-- Fadeaway moves
+- Post Up + Fadeaway moves
 - Special abilities (dribble hesi pull up, step back)
 
 ### Stretch Goals

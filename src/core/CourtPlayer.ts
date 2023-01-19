@@ -160,16 +160,50 @@ export class CourtPlayer {
       this.attributes.offSpeed
     )
     if (this.isOverlapping) {
-      return offSpeed * 0.5
+      const overlapSlowdownFactor = this.getOverlapSlowdownFactor()
+      return offSpeed * overlapSlowdownFactor
     }
     return offSpeed
   }
+
+  getOverlapSlowdownFactor() {
+    const otherPlayers = this.team.getOtherTeamCourtPlayers()
+    let intersectRectArea = 0
+    for (let i = 0; i < otherPlayers.length; i++) {
+      const courtPlayer = otherPlayers[i]
+      const outputRect = new Phaser.Geom.Rectangle()
+      if (
+        Phaser.Geom.Intersects.RectangleToRectangle(
+          this.playerOverlapRect,
+          courtPlayer.playerOverlapRect
+        )
+      ) {
+        Phaser.Geom.Intersects.GetRectangleIntersection(
+          this.playerOverlapRect,
+          courtPlayer.playerOverlapRect,
+          outputRect
+        )
+        intersectRectArea = outputRect.width * outputRect.height
+      }
+    }
+    if (intersectRectArea < 25) {
+      return 0.8
+    }
+    if (intersectRectArea >= 25 && intersectRectArea < 100) {
+      return 0.75
+    }
+    if (intersectRectArea >= 50 && intersectRectArea < 250) {
+      return 0.7
+    }
+    if (intersectRectArea >= 250) {
+      return 0.65
+    }
+    return 1
+  }
+
   getDefSpeedFromAttr() {
     return CourtPlayerAttributeMapper.getDefensiveMovementSpeedFromAttr(this.attributes.defSpeed)
   }
-  getShotPctFromAttr() {}
-  getBlockSuccessPctFromAttr() {}
-  getShotContestSuccessPctFromAttr() {}
 
   canDunkBall() {
     const state = this.getCurrState().key
@@ -313,6 +347,14 @@ export class CourtPlayer {
     const otherPlayers = this.team.getOtherTeamCourtPlayers()
     for (let i = 0; i < otherPlayers.length; i++) {
       const courtPlayer = otherPlayers[i]
+
+      const outputRect = new Phaser.Geom.Rectangle()
+      Phaser.Geom.Intersects.GetRectangleIntersection(
+        this.playerOverlapRect,
+        courtPlayer.playerOverlapRect,
+        outputRect
+      )
+
       if (
         Phaser.Geom.Intersects.RectangleToRectangle(
           this.playerOverlapRect,
