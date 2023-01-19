@@ -67,6 +67,7 @@ export class CourtPlayer {
 
   public shotReleased: boolean = false
   public wasShotBlocked: boolean = false
+  public isOverlapping: boolean = false
 
   protected stateText: Phaser.GameObjects.Text
   protected playerIdText: Phaser.GameObjects.Text
@@ -75,6 +76,7 @@ export class CourtPlayer {
   protected decisionTree!: TreeNode
   protected blackboard: Blackboard
   public raycastIntersectRect: Phaser.Geom.Rectangle
+  public playerOverlapRect: Phaser.Geom.Rectangle
   public attributes: PlayerAttributes
 
   public graphics: Phaser.GameObjects.Graphics
@@ -102,6 +104,8 @@ export class CourtPlayer {
     this.sprite.setCollideWorldBounds(true)
 
     this.raycastIntersectRect = new Phaser.Geom.Rectangle(this.sprite.x, this.sprite.y, 48, 64)
+    this.playerOverlapRect = new Phaser.Geom.Rectangle(this.sprite.x, this.sprite.y, 32, 32)
+
     this.team = team
     this.stateMachine = new StateMachine(
       States.IDLE,
@@ -147,10 +151,18 @@ export class CourtPlayer {
 
     this.graphics = this.game.add.graphics()
     this.graphics.lineStyle(1, 0x00ff00)
+    this.graphics.setDepth(SORT_ORDER.ui + 1000)
+    this.graphics.setName('ui')
   }
 
   getOffSpeedFromAttr() {
-    return CourtPlayerAttributeMapper.getOffensiveMovementSpeedFromAttr(this.attributes.offSpeed)
+    const offSpeed = CourtPlayerAttributeMapper.getOffensiveMovementSpeedFromAttr(
+      this.attributes.offSpeed
+    )
+    if (this.isOverlapping) {
+      return offSpeed * 0.5
+    }
+    return offSpeed
   }
   getDefSpeedFromAttr() {
     return CourtPlayerAttributeMapper.getDefensiveMovementSpeedFromAttr(this.attributes.defSpeed)
@@ -278,6 +290,11 @@ export class CourtPlayer {
       this.sprite.y - 15
     )
 
+    this.playerOverlapRect.setPosition(
+      this.sprite.x - this.playerOverlapRect.width / 2,
+      this.sprite.y + 15
+    )
+
     this.stateText.setText(this.stateMachine.getState())
     this.stateText.setPosition(
       this.x - this.stateText.displayWidth / 2,
@@ -289,6 +306,23 @@ export class CourtPlayer {
       this.x - this.playerIdText.displayWidth / 2,
       this.y - 25 - this.playerIdText.displayHeight
     )
+    this.isOverlapping = this.isOverlappingOtherPlayer()
+  }
+
+  isOverlappingOtherPlayer() {
+    const otherPlayers = this.team.getOtherTeamCourtPlayers()
+    for (let i = 0; i < otherPlayers.length; i++) {
+      const courtPlayer = otherPlayers[i]
+      if (
+        Phaser.Geom.Intersects.RectangleToRectangle(
+          this.playerOverlapRect,
+          courtPlayer.playerOverlapRect
+        )
+      ) {
+        return true
+      }
+    }
+    return false
   }
 
   public getCurrState() {

@@ -1,11 +1,6 @@
 import Game from '~/scenes/Game'
 import { BallState } from '../Ball'
-import {
-  BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING,
-  DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING,
-  getClosestPlayer,
-  Side,
-} from '../Constants'
+import { BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING, getClosestPlayer, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
 import { PassConfig } from '../states/offense/PassingState'
@@ -353,7 +348,6 @@ export class PlayerTeam extends Team {
       ? this.selectedCourtPlayer.getOffSpeedFromAttr()
       : this.selectedCourtPlayer.getDefSpeedFromAttr()
     speed *= this.sprintMeter.getSpeedMultiplier()
-
     let velocityX = 0
     let velocityY = 0
     if (leftDown || rightDown) {

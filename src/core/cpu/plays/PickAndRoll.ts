@@ -110,10 +110,20 @@ export class PickAndRoll extends OffensePlay {
     return shouldLayupThroughContact || receiver.canLayupBall()
   }
 
+  shouldDunk(receiver: CourtPlayer) {
+    const shouldDunkThroughContact = Phaser.Math.Between(0, 100) > 15
+    return shouldDunkThroughContact || receiver.canDunkBall()
+  }
+
   driveToBasket(receiver: CourtPlayer) {
     const driveToBasketConfig = {
       onDriveSuccess: () => {
-        if (this.shouldLayup(receiver)) {
+        if (this.shouldDunk(receiver)) {
+          receiver.setState(States.DUNK, () => {
+            receiver.setState(States.IDLE)
+            this.isPlayFinished = true
+          })
+        } else if (this.shouldLayup(receiver)) {
           receiver.setState(States.LAYUP, () => {
             receiver.setState(States.IDLE)
             this.isPlayFinished = true

@@ -103,18 +103,23 @@ export class ScreenHandOff extends OffensePlay {
     receiver.setState(States.DRIBBLE_TO_POINT, config)
   }
 
+  shouldShoot(receiver) {
+    const otherPlayers = this.team.getOtherTeamCourtPlayers()
+    let minDistance = Number.MAX_SAFE_INTEGER
+    otherPlayers.forEach((player: CourtPlayer) => {
+      const distance = Phaser.Math.Distance.Between(
+        player.sprite.x,
+        player.sprite.y,
+        receiver.sprite.x,
+        receiver.sprite.y
+      )
+      minDistance = Math.min(distance, minDistance)
+    })
+    return minDistance >= 125
+  }
+
   shootOrDrive(receiver: CourtPlayer) {
-    const isThreePointShot = Game.instance.court.isThreePointShot(
-      receiver.sprite.x,
-      receiver.sprite.y
-    )
-    const shotSuccessData = calculateShotSuccessPercentage(
-      receiver,
-      this.team,
-      isThreePointShot,
-      false
-    )
-    if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
+    if (this.shouldShoot(receiver)) {
       this.shoot(receiver)
     } else {
       this.driveToBasket(receiver)
@@ -124,6 +129,11 @@ export class ScreenHandOff extends OffensePlay {
   shouldLayup(receiver: CourtPlayer) {
     const shouldLayupThroughContact = Phaser.Math.Between(0, 100) > 50
     return shouldLayupThroughContact || receiver.canLayupBall()
+  }
+
+  shouldDunk(receiver: CourtPlayer) {
+    const shouldDunkThroughContact = Phaser.Math.Between(0, 100) > 80
+    return shouldDunkThroughContact || receiver.canDunkBall()
   }
 
   shoot(receiver: CourtPlayer) {
@@ -136,7 +146,12 @@ export class ScreenHandOff extends OffensePlay {
   driveToBasket(receiver: CourtPlayer) {
     const driveToBasketConfig = {
       onDriveSuccess: () => {
-        if (this.shouldLayup(receiver)) {
+        if (this.shouldDunk(receiver)) {
+          receiver.setState(States.DUNK, () => {
+            receiver.setState(States.IDLE)
+            this.isPlayFinished = true
+          })
+        } else if (this.shouldLayup(receiver)) {
           receiver.setState(States.LAYUP, () => {
             receiver.setState(States.IDLE)
             this.isPlayFinished = true

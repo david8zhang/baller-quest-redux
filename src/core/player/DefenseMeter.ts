@@ -39,7 +39,11 @@ export class DefenseMeter {
         Game.instance.hoop.standSprite.y
       )
       const pointToMoveTo = line.getPoint(DefendManState.DEFENSIVE_SPACING_PERCENTAGE)
-      selectedCourtPlayer.moveTowards(pointToMoveTo, selectedCourtPlayer.getDefSpeedFromAttr())
+      selectedCourtPlayer.moveTowards(
+        pointToMoveTo,
+        selectedCourtPlayer.getDefSpeedFromAttr(),
+        true
+      )
     }
   }
 }

@@ -4,15 +4,11 @@
 
 ## TODO:
 
-- Shot success based on attribute score
-- Layup success based on attribute score
-- Dunk likelihood based on attribute score
+- CPU dunks
+- Post Up when player overlaps with enemy (slower movement, can't move past a certain point)
+- Fadeaway moves
+- Special abilities (dribble hesi pull up, step back)
 
 ### Stretch Goals
-
-- Layup with contact
-- Dunk with contact
-- Post Up and fadeaway shots
-- Special abilities (dribble hesi pull up, step back)
 
 ## Bugs

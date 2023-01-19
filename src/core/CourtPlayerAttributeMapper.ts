@@ -1,18 +1,18 @@
 export class CourtPlayerAttributeMapper {
   public static getOffensiveMovementSpeedFromAttr(offSpeed: number) {
     if (offSpeed === 1) {
-      return 120
-    }
-    if (offSpeed === 2) {
-      return 130
-    }
-    if (offSpeed === 3) {
       return 140
     }
-    if (offSpeed === 4) {
+    if (offSpeed === 2) {
       return 150
     }
-    return 160
+    if (offSpeed === 3) {
+      return 160
+    }
+    if (offSpeed === 4) {
+      return 170
+    }
+    return 180
   }
 
   public static getDefensiveMovementSpeedFromAttr(defSpeed: number) {
