@@ -17,4 +17,5 @@ export enum States {
   DRIVE_TO_BASKET = 'DriveToBasket',
   PLAYER_CONTROL = 'PlayerControl',
   FUMBLE = 'Fumble',
+  STEAL = 'Steal',
 }

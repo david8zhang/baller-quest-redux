@@ -4,6 +4,8 @@
 
 ## TODO:
 
+- Steals / Turnovers
+- Make CPU Better at rebounding
 - Post Up + Fadeaway moves
 - Special abilities (dribble hesi pull up, step back)
 

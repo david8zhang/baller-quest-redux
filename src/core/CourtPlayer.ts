@@ -20,7 +20,7 @@ import { FightOverScreenState } from './states/defense/FightOverScreenState'
 import { HelpDefenseState } from './states/defense/HelpDefenseState'
 import { SwitchDefenseState } from './states/defense/SwitchDefenseState'
 import { IdleState } from './states/IdleState'
-import { BlockShotState } from './states/offense/BlockShotState'
+import { BlockShotState } from './states/defense/BlockShotState'
 import { ContestShotState } from './states/offense/ContestShotState'
 import { DribbleToPointState } from './states/offense/DribbleToPointState'
 import { DriveToBasketState } from './states/offense/DriveToBasketState'
@@ -35,6 +35,7 @@ import { PlayerControlState } from './states/PlayerControlState'
 import { StateMachine } from './states/StateMachine'
 import { States } from './states/States'
 import { Team } from './Team'
+import { StealState } from './states/defense/StealState'
 
 export interface PlayerAttributes {
   offSpeed: number
@@ -128,6 +129,7 @@ export class CourtPlayer {
         [States.BLOCK_SHOT]: new BlockShotState(),
         [States.FUMBLE]: new FumbleState(),
         [States.HELP_DEFENSE]: new HelpDefenseState(),
+        [States.STEAL]: new StealState(),
       },
       [this, this.team]
     )
@@ -306,7 +308,8 @@ export class CourtPlayer {
       }
     } else if (
       this.game.ball.ballState === BallState.LOOSE ||
-      this.game.ball.ballState === BallState.BLOCKED
+      this.game.ball.ballState === BallState.BLOCKED ||
+      this.game.ball.ballState === BallState.STOLEN
     ) {
       // Player that is still in their shooting motion should not be able to grab their own ball
       if (this.getCurrState().key !== States.FUMBLE) {

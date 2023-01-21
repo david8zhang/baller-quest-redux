@@ -16,6 +16,7 @@ export class CPUTeam extends Team {
   public currPlay: OffensePlay | null = null
   public isPuttingBackBall: boolean = false
   public isResettingOffense: boolean = false
+  public isTakingShot: boolean = false
 
   public defensiveAssignmentMapping: any = { ...CPUConstants.DEFENSIVE_ASSIGNMENTS }
 
@@ -184,13 +185,65 @@ export class CPUTeam extends Team {
   }
 
   shouldExecutePlay() {
-    return this.hasPossession() && !this.isPuttingBackBall && !this.isResettingOffense
+    return (
+      this.hasPossession() &&
+      !this.isPuttingBackBall &&
+      !this.isResettingOffense &&
+      !this.isTakingShot
+    )
+  }
+
+  shouldTakeShot() {
+    if (this.currPlay && this.currPlay.isRunning) {
+      return false
+    }
+
+    const isNotConflictingWithOtherStates =
+      this.hasPossession() &&
+      !this.isPuttingBackBall &&
+      !this.isResettingOffense &&
+      !this.isTakingShot
+    if (!isNotConflictingWithOtherStates) {
+      return false
+    }
+
+    const randProbability = Phaser.Math.Between(0, 100) > 50
+    const playerWithBall = Game.instance.ball.playerWithBall
+    if (playerWithBall) {
+      let nearestDefenderDistance = Number.MAX_SAFE_INTEGER
+      this.getOtherTeamCourtPlayers().forEach((player: CourtPlayer) => {
+        const distance = Phaser.Math.Distance.Between(
+          player.sprite.x,
+          player.sprite.y,
+          playerWithBall.sprite.x,
+          playerWithBall.sprite.y
+        )
+        nearestDefenderDistance = Math.min(distance, nearestDefenderDistance)
+      })
+      return nearestDefenderDistance > 120 && randProbability
+    }
+  }
+
+  takeShot() {
+    const playerWithBall = Game.instance.ball.playerWithBall
+    if (playerWithBall) {
+      this.isTakingShot = true
+      playerWithBall.setState(States.SHOOTING, () => {
+        playerWithBall.setState(States.IDLE)
+        this.isTakingShot = false
+      })
+    }
   }
 
   update() {
     if (Game.instance.isChangingPossession) {
       return
     }
+
+    if (this.shouldTakeShot()) {
+      this.takeShot()
+    }
+
     if (this.shouldExecutePlay()) {
       this.handlePlayExecution()
     }

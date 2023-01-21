@@ -20,6 +20,7 @@ export enum BallState {
   POST_MADE_SHOT = 'POST_MADE_SHOT',
   BLOCKED = 'BLOCKED',
   NONE = 'NONE',
+  STOLEN = 'STOLEN',
 }
 
 export class Ball {
@@ -67,13 +68,21 @@ export class Ball {
     this.blockShotFloorCollider.active = false
   }
 
+  isBallInFlight() {
+    return this.isBallMadeShot() || this.ballState === BallState.MISSED_SHOT
+  }
+
+  isBallMadeShot() {
+    return (
+      this.ballState === BallState.DUNK ||
+      this.ballState === BallState.POST_MADE_SHOT ||
+      this.ballState === BallState.MADE_TWO_POINT_SHOT ||
+      this.ballState === BallState.MADE_THREE_POINT_SHOT
+    )
+  }
+
   handlePlayerCollision() {
-    if (
-      this.ballState !== BallState.DUNK &&
-      this.ballState !== BallState.POST_MADE_SHOT &&
-      this.ballState !== BallState.MADE_TWO_POINT_SHOT &&
-      this.ballState !== BallState.MADE_THREE_POINT_SHOT
-    ) {
+    if (!this.isBallMadeShot()) {
       this.floorCollider.active = false
     }
   }
@@ -125,6 +134,11 @@ export class Ball {
           this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.8)
           this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.9)
         } else if (this.ballState === BallState.MISSED_SHOT) {
+          if (this.game.timer.currSeconds === 0) {
+            this.game.handleMatchFinished()
+            return
+          }
+
           // Rebound
           this.isRebounding = true
           this.ballState = BallState.LOOSE

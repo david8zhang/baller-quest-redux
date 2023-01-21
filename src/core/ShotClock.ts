@@ -26,7 +26,11 @@ export class ShotClock {
         if (this.shotTimeSeconds === 0) {
           if (!this.isBallInFlight() && !this.game.isChangingPossession) {
             this.timerEvent.paused = true
-            this.game.handleChangePossession(this.game.ball.playerWithBall!.side)
+            if (!this.game.ball.playerWithBall) {
+              this.game.handleChangePossession(this.game.ball.prevPlayerWithBall!.side)
+            } else {
+              this.game.handleChangePossession(this.game.ball.playerWithBall.side)
+            }
           }
         } else {
           this.shotTimeSeconds--

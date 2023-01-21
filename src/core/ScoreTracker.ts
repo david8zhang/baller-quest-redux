@@ -38,7 +38,7 @@ export class ScoreTracker {
       this.cpuScore += numPoints
       this.cpuScoreText.setText(`CPU: ${this.cpuScore}`)
     }
-    this.playerScoreText.setPosition(20, this.playerScoreText.displayHeight / 2 + 10)
-    this.cpuScoreText.setPosition(this.playerScoreText.displayWidth + 50, this.playerScoreText.y)
+    this.playerScoreText.setPosition(20, 20)
+    this.cpuScoreText.setPosition(this.playerScoreText.displayWidth + 50, 20)
   }
 }

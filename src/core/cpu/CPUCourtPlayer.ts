@@ -4,7 +4,6 @@ import { CourtPlayer, CourtPlayerConfig } from '../CourtPlayer'
 import { BlackboardKeys } from '../decision-tree/BlackboardKeys'
 import { States } from '../states/States'
 import { CPUTeam } from './CPUTeam'
-import { PlayTypes } from './plays/PlayTypes'
 
 export class CPUCourtPlayer extends CourtPlayer {
   constructor(game: Game, config: CourtPlayerConfig) {
@@ -30,7 +29,8 @@ export class CPUCourtPlayer extends CourtPlayer {
       !this.isShooting() &&
       !this.isBlockingOrContesting() &&
       !cpuTeam.isPuttingBackBall &&
-      !cpuTeam.isResettingOffense
+      !cpuTeam.isResettingOffense &&
+      !cpuTeam.isTakingShot
     )
   }
 

@@ -7,6 +7,7 @@ export class Timer {
   public static MATCH_TIME = 180
   public currSeconds: number = Timer.MATCH_TIME
   public onMatchFinished: Function | null = null
+  public timerEvent: Phaser.Time.TimerEvent
 
   constructor(game: Game, onMatchFinished: Function) {
     this.game = game
@@ -17,7 +18,7 @@ export class Timer {
     })
     this.onMatchFinished = onMatchFinished
     this.clockText.setPosition(WINDOW_WIDTH / 2 - this.clockText.width / 2, 20)
-    this.game.time.addEvent({
+    this.timerEvent = this.game.time.addEvent({
       callback: () => {
         this.decrementClock()
       },
@@ -27,12 +28,13 @@ export class Timer {
   }
   decrementClock() {
     this.currSeconds--
+    this.clockText.setText(this.convertToClockString(this.currSeconds))
     if (this.currSeconds === 0) {
-      if (this.onMatchFinished) {
+      if (Game.instance.ball.isBallInFlight()) {
+        this.timerEvent.paused = true
+      } else if (this.onMatchFinished) {
         this.onMatchFinished()
       }
-    } else {
-      this.clockText.setText(this.convertToClockString(this.currSeconds))
     }
   }
 

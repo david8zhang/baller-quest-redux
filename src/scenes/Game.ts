@@ -117,42 +117,46 @@ export default class Game extends Phaser.Scene {
   }
 
   handleChangePossession(prevSideWithPossession: Side) {
-    this.player.getCourtPlayers().forEach((player) => {
-      if (prevSideWithPossession === Side.PLAYER && player.hasPossession) {
-        player.losePossessionOfBall()
-      }
-      player.stop()
-    })
-    this.cpu.getCourtPlayers().forEach((player) => {
-      if (prevSideWithPossession === Side.CPU && player.hasPossession) {
-        player.losePossessionOfBall()
-      }
-      player.stop()
-    })
-    this.isChangingPossession = true
-    this.changingPossessionOverlay.setVisible(true).setDepth(SORT_ORDER.ui + 1000)
-    const newSideWithPossession = prevSideWithPossession === Side.CPU ? Side.PLAYER : Side.CPU
-    const newTeamWithPossession = newSideWithPossession === Side.CPU ? this.cpu : this.player
-    const newTeamOnDefense = newSideWithPossession === Side.CPU ? this.player : this.cpu
+    if (this.timer.currSeconds === 0) {
+      this.handleMatchFinished()
+    } else {
+      this.player.getCourtPlayers().forEach((player) => {
+        if (prevSideWithPossession === Side.PLAYER && player.hasPossession) {
+          player.losePossessionOfBall()
+        }
+        player.stop()
+      })
+      this.cpu.getCourtPlayers().forEach((player) => {
+        if (prevSideWithPossession === Side.CPU && player.hasPossession) {
+          player.losePossessionOfBall()
+        }
+        player.stop()
+      })
+      this.isChangingPossession = true
+      this.changingPossessionOverlay.setVisible(true).setDepth(SORT_ORDER.ui + 1000)
+      const newSideWithPossession = prevSideWithPossession === Side.CPU ? Side.PLAYER : Side.CPU
+      const newTeamWithPossession = newSideWithPossession === Side.CPU ? this.cpu : this.player
+      const newTeamOnDefense = newSideWithPossession === Side.CPU ? this.player : this.cpu
 
-    this.changingPossessionText
-      .setText(`${newSideWithPossession} BALL!`)
-      .setVisible(true)
-      .setDepth(SORT_ORDER.ui + 1000)
-    this.changingPossessionText
-      .setPosition(
-        WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
-        WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
-      )
-      .setDepth(SORT_ORDER.ui + 1000)
-    this.time.delayedCall(1500, () => {
-      this.ball.prevPlayerWithBall = null
-      newTeamWithPossession.handleNewPossession()
-      newTeamOnDefense.handleNewDefenseSetup()
-      this.resetPositioning()
-      this.shotClock.resetShotClockOnNewPossession()
-      this.isChangingPossession = false
-    })
+      this.changingPossessionText
+        .setText(`${newSideWithPossession} BALL!`)
+        .setVisible(true)
+        .setDepth(SORT_ORDER.ui + 1000)
+      this.changingPossessionText
+        .setPosition(
+          WINDOW_WIDTH / 2 - this.changingPossessionText.displayWidth / 2,
+          WINDOW_HEIGHT / 2 - this.changingPossessionText.displayHeight / 2
+        )
+        .setDepth(SORT_ORDER.ui + 1000)
+      this.time.delayedCall(1500, () => {
+        this.ball.prevPlayerWithBall = null
+        newTeamWithPossession.handleNewPossession()
+        newTeamOnDefense.handleNewDefenseSetup()
+        this.resetPositioning()
+        this.shotClock.resetShotClockOnNewPossession()
+        this.isChangingPossession = false
+      })
+    }
   }
 
   resetPositioning() {

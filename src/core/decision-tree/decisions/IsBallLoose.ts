@@ -15,8 +15,13 @@ export class IsBallLoose extends TreeNode {
   public process(): Decision | States {
     const ball = Game.instance.ball
     const currPlayer = this.blackboard.getData(BlackboardKeys.CURR_PLAYER) as CourtPlayer
-    if (currPlayer.getCurrState().key !== States.BLOCK_SHOT) {
-      return ball.ballState === BallState.LOOSE || ball.ballState === BallState.BLOCKED
+    if (
+      currPlayer.getCurrState().key !== States.BLOCK_SHOT &&
+      currPlayer.getCurrState().key !== States.STEAL
+    ) {
+      return ball.ballState === BallState.LOOSE ||
+        ball.ballState === BallState.BLOCKED ||
+        ball.ballState === BallState.STOLEN
         ? Decision.PROCEED
         : Decision.STOP
     }

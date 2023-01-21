@@ -75,6 +75,12 @@ export class PlayerTeam extends Team {
           }
           break
         }
+        case 'KeyX': {
+          if (this.canStealBall()) {
+            this.stealBall()
+          }
+          break
+        }
         case 'KeyQ': {
           this.callForScreen()
           break
@@ -89,6 +95,31 @@ export class PlayerTeam extends Team {
         }
       }
     })
+  }
+
+  canStealBall() {
+    const ballHandler = this.game.ball.playerWithBall
+    if (!ballHandler) {
+      return false
+    }
+    const distanceToBallHandler = Phaser.Math.Distance.Between(
+      this.selectedCourtPlayer.sprite.x,
+      this.selectedCourtPlayer.sprite.y,
+      ballHandler.sprite.x,
+      ballHandler.sprite.y
+    )
+    return !this.hasPossession() && distanceToBallHandler < 75
+  }
+
+  stealBall() {
+    if (this.selectedCourtPlayer.getCurrState().key !== States.STEAL) {
+      const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
+      courtPlayer.isPlayerCommandOverride = true
+      this.selectedCourtPlayer.setState(States.STEAL, (player: PlayerCourtPlayer) => {
+        player.setState(States.PLAYER_CONTROL)
+        player.isPlayerCommandOverride = false
+      })
+    }
   }
 
   canSwitchPlayer() {
