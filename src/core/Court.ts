@@ -1,5 +1,6 @@
 import Game from '~/scenes/Game'
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from './Constants'
+import { CourtPlayer } from './CourtPlayer'
 
 export enum ShotDistance {
   POST = 'POST',

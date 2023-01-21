@@ -7,6 +7,7 @@ export class PlayerConstants {
       layup: 3,
       dunk: 3,
       block: 3,
+      steal: 3,
     },
     player2: {
       offSpeed: 4,
@@ -15,6 +16,7 @@ export class PlayerConstants {
       layup: 4,
       dunk: 1,
       block: 1,
+      steal: 4,
     },
     player3: {
       offSpeed: 2,
@@ -23,6 +25,7 @@ export class PlayerConstants {
       layup: 5,
       dunk: 5,
       block: 3,
+      steal: 2,
     },
   }
 

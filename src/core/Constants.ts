@@ -5,6 +5,14 @@ import { Team } from './Team'
 
 export const DEFAULT_FONT = 'Superstar'
 
+export const STEAL_LIKELIHOOD_ATTRIBUTE_MAPPING = {
+  '5': 30,
+  '4': 25,
+  '3': 20,
+  '2': 15,
+  '1': 10,
+}
+
 export const BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING = {
   '5': 80,
   '4': 60,

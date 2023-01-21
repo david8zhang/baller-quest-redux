@@ -12,3 +12,5 @@
 ### Stretch Goals
 
 ## Bugs
+
+- Sometimes the shot arc is weird (hard to repro, usually happens after a block and immediately shooting after possession change)

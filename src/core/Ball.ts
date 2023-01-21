@@ -32,6 +32,7 @@ export class Ball {
   public floorCollider!: Phaser.Physics.Arcade.Collider
   public ballStateText: Phaser.GameObjects.Text
   public isRebounding: boolean = false
+  public reboundPoint: { x: number; y: number } | null = null
 
   // Floor for ball to bounce on when shot is blocked
   public blockShotFloor!: Phaser.Physics.Arcade.Sprite
@@ -143,14 +144,11 @@ export class Ball {
           this.isRebounding = true
           this.ballState = BallState.LOOSE
           const missOffset = Phaser.Math.Between(0, 1) > 0 ? -50 : 50
-          createArc(
-            this.sprite,
-            {
-              x: this.game.hoop.standSprite.x + missOffset,
-              y: this.game.hoop.standSprite.y - 50,
-            },
-            0.5
-          )
+          this.reboundPoint = {
+            x: this.game.hoop.standSprite.x + missOffset,
+            y: this.game.hoop.standSprite.y - 50,
+          }
+          createArc(this.sprite, this.reboundPoint, 0.5)
         }
         this.floorCollider.active = true
       }

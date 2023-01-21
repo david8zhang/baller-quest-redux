@@ -1,3 +1,6 @@
+import { calculateShotSuccessPercentage, getMostOpenPassRecipient } from '~/core/Constants'
+import { CourtPlayer } from '~/core/CourtPlayer'
+import { PassConfig } from '~/core/states/offense/PassingState'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
 import { CPUTeam } from '../CPUTeam'
@@ -25,5 +28,114 @@ export abstract class OffensePlay {
     })
     const cpuTeam = this.team as CPUTeam
     cpuTeam.selectNextPlay()
+  }
+
+  shouldShoot(receiver) {
+    const otherPlayers = this.team.getOtherTeamCourtPlayers()
+    let minDistance = Number.MAX_SAFE_INTEGER
+    otherPlayers.forEach((player: CourtPlayer) => {
+      const distance = Phaser.Math.Distance.Between(
+        player.sprite.x,
+        player.sprite.y,
+        receiver.sprite.x,
+        receiver.sprite.y
+      )
+      minDistance = Math.min(distance, minDistance)
+    })
+    return minDistance >= 125
+  }
+
+  shootOrDrive(receiver: CourtPlayer) {
+    if (this.shouldShoot(receiver)) {
+      this.shoot(receiver)
+    } else {
+      this.driveToBasket(receiver)
+    }
+  }
+
+  shouldLayup(receiver: CourtPlayer) {
+    const shouldLayupThroughContact = Phaser.Math.Between(0, 100) > 70
+    return shouldLayupThroughContact || receiver.canLayupBall()
+  }
+
+  shouldDunk(receiver: CourtPlayer) {
+    const shouldDunkThroughContact = Phaser.Math.Between(0, 100) > 85
+    return shouldDunkThroughContact || receiver.canDunkBall()
+  }
+
+  shoot(receiver: CourtPlayer) {
+    receiver.setState(States.SHOOTING, () => {
+      receiver.setState(States.IDLE)
+      this.isPlayFinished = true
+    })
+  }
+
+  driveToBasket(receiver: CourtPlayer) {
+    const driveToBasketConfig = {
+      onDriveSuccess: () => {
+        if (this.shouldDunk(receiver)) {
+          receiver.setState(States.DUNK, () => {
+            receiver.setState(States.IDLE)
+            this.isPlayFinished = true
+          })
+        } else if (this.shouldLayup(receiver)) {
+          receiver.setState(States.LAYUP, () => {
+            receiver.setState(States.IDLE)
+            this.isPlayFinished = true
+          })
+        } else {
+          if (this.shouldShoot(receiver)) {
+            receiver.setState(States.SHOOTING, () => {
+              receiver.setState(States.IDLE)
+              this.isPlayFinished = true
+            })
+          } else {
+            this.handleDriveFailed(receiver)
+          }
+        }
+      },
+      onDriveFailed: () => {
+        this.handleDriveFailed(receiver)
+      },
+      timeout: 4000,
+    }
+    receiver.setState(States.DRIVE_TO_BASKET, driveToBasketConfig)
+  }
+
+  handleDriveFailed(ballHandler: CourtPlayer) {
+    const shouldPass = Phaser.Math.Between(0, 1) == 0
+    if (shouldPass) {
+      this.passOut(ballHandler)
+    } else {
+      this.goBackToSpot(ballHandler)
+    }
+  }
+
+  passOut(player: CourtPlayer) {
+    const teammates = this.team.getCourtPlayers().filter((p) => {
+      return p !== player
+    })
+    const passRecipient = getMostOpenPassRecipient(teammates, this.team)
+    const passConfig: PassConfig = {
+      onPassCompleteCb: () => {
+        player.setState(States.GO_BACK_TO_SPOT, () => {
+          this.isPlayFinished = true
+        })
+      },
+      onPassStartedCb: () => {
+        player.stop()
+      },
+    }
+    if (passRecipient) {
+      player.setState(States.PASSING, passRecipient, passConfig)
+    } else {
+      this.goBackToSpot(player)
+    }
+  }
+
+  goBackToSpot(player: CourtPlayer) {
+    player.setState(States.GO_BACK_TO_SPOT, () => {
+      this.isPlayFinished = true
+    })
   }
 }

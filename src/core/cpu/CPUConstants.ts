@@ -7,6 +7,7 @@ export class CPUConstants {
       block: 3,
       layup: 3,
       dunk: 3,
+      steal: 3,
     },
     cpu2: {
       offSpeed: 4,
@@ -15,6 +16,7 @@ export class CPUConstants {
       block: 3,
       layup: 5,
       dunk: 4,
+      steal: 4,
     },
     cpu3: {
       offSpeed: 3,
@@ -23,6 +25,7 @@ export class CPUConstants {
       block: 3,
       layup: 5,
       dunk: 5,
+      steal: 3,
     },
   }
 

@@ -44,6 +44,7 @@ export interface PlayerAttributes {
   block: number
   dunk: number
   layup: number
+  steal: number
 }
 
 export interface CourtPlayerConfig {
@@ -419,10 +420,10 @@ export class CourtPlayer {
           this.getCurrState().key === States.CHASE_REBOUND ||
           this.getCurrState().key === States.PLAYER_CONTROL
         ) {
-          this.team.handleOffensiveRebound(this.side, prevBallState !== BallState.BLOCKED)
-          this.team
-            .getOtherTeam()
-            .handleOffensiveRebound(this.side, prevBallState !== BallState.BLOCKED)
+          const notBlockOrSteal =
+            prevBallState !== BallState.BLOCKED && prevBallState !== BallState.STOLEN
+          this.team.handleOffensiveRebound(this.side, notBlockOrSteal)
+          this.team.getOtherTeam().handleOffensiveRebound(this.side, notBlockOrSteal)
         }
       }
     }
@@ -442,6 +443,10 @@ export class CourtPlayer {
       : OFFBALL_ANIMS.idle
     const suffix = this.side === Side.CPU ? 'cpu' : 'player'
     this.sprite.anims.play(`${anims}-${suffix}`, true)
+  }
+
+  setVelocity(xVelocity: number, yVelocity: number) {
+    this.sprite.setVelocity(xVelocity, yVelocity)
   }
 
   setVelocityX(xVelocity: number) {

@@ -5,6 +5,7 @@ import { States } from '../States'
 
 export class FumbleState extends State {
   enter(currPlayer: CourtPlayer, team: Team, prevState: States) {
+    currPlayer.stop()
     currPlayer.sprite.setTint(0x0000ff)
   }
 

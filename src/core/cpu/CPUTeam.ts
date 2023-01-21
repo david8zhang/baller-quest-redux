@@ -6,6 +6,7 @@ import { States } from '../states/States'
 import { Team } from '../Team'
 import { CPUConstants } from './CPUConstants'
 import { CPUCourtPlayer } from './CPUCourtPlayer'
+import { IsoDribble } from './plays/IsoDribble'
 import { OffensePlay } from './plays/OffensePlay'
 import { PickAndRoll } from './plays/PickAndRoll'
 import { ScreenHandOff } from './plays/ScreenHandOff'
@@ -26,7 +27,7 @@ export class CPUTeam extends Team {
     super(game, Side.CPU)
     this.setupPlayers()
     super.positionPlayers()
-    this.offensePlays = [new PickAndRoll(this), new ScreenHandOff(this)]
+    this.offensePlays = [new IsoDribble(this)]
   }
 
   public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
@@ -220,8 +221,9 @@ export class CPUTeam extends Team {
         )
         nearestDefenderDistance = Math.min(distance, nearestDefenderDistance)
       })
-      return nearestDefenderDistance > 120 && randProbability
+      return nearestDefenderDistance > 150 && randProbability
     }
+    return false
   }
 
   takeShot() {

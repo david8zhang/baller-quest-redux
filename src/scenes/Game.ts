@@ -11,6 +11,7 @@ import { createNetAnims } from '~/core/NetAnims'
 import { PlayerTeam } from '~/core/player/PlayerTeam'
 import { ScoreTracker } from '~/core/ScoreTracker'
 import { ShotClock } from '~/core/ShotClock'
+import { States } from '~/core/states/States'
 import { Timer } from '~/core/Timer'
 
 export default class Game extends Phaser.Scene {
@@ -124,13 +125,13 @@ export default class Game extends Phaser.Scene {
         if (prevSideWithPossession === Side.PLAYER && player.hasPossession) {
           player.losePossessionOfBall()
         }
-        player.stop()
+        player.setState(States.IDLE)
       })
       this.cpu.getCourtPlayers().forEach((player) => {
         if (prevSideWithPossession === Side.CPU && player.hasPossession) {
           player.losePossessionOfBall()
         }
-        player.stop()
+        player.setState(States.IDLE)
       })
       this.isChangingPossession = true
       this.changingPossessionOverlay.setVisible(true).setDepth(SORT_ORDER.ui + 1000)

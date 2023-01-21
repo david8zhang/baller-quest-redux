@@ -1,4 +1,5 @@
 import { CourtPlayer } from '~/core/CourtPlayer'
+import { ChaseReboundState } from '~/core/states/ChaseReboundState'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
 import { Blackboard } from '../Blackboard'
@@ -14,6 +15,13 @@ export class ShouldContestShot extends TreeNode {
   public process(): Decision | States {
     const currPlayer = this.blackboard.getData(BlackboardKeys.CURR_PLAYER) as CourtPlayer
     const currTeam = this.blackboard.getData(BlackboardKeys.CURR_TEAM) as Team
+    if (currPlayer.getCurrState().key === States.CHASE_REBOUND) {
+      const data = currPlayer.getCurrState().data as ChaseReboundState
+      if (data.isJumping) {
+        return Decision.STOP
+      }
+    }
+
     if (currPlayer.getCurrState().key === States.CONTEST_SHOT) {
       return Decision.PROCEED
     }

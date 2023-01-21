@@ -56,6 +56,9 @@ export class PlayerTeam extends Team {
 
   setupKeyboardPressListener() {
     this.game.input.keyboard.on('keydown', (e) => {
+      if (this.game.isChangingPossession) {
+        return
+      }
       switch (e.code) {
         case 'KeyS': {
           if (this.hasPossession()) {
@@ -108,7 +111,12 @@ export class PlayerTeam extends Team {
       ballHandler.sprite.x,
       ballHandler.sprite.y
     )
-    return !this.hasPossession() && distanceToBallHandler < 75
+    return (
+      !this.hasPossession() &&
+      distanceToBallHandler < 75 &&
+      ballHandler.getCurrState().key !== States.PASSING &&
+      ballHandler.getCurrState().key !== States.SHOOTING
+    )
   }
 
   stealBall() {
@@ -166,7 +174,10 @@ export class PlayerTeam extends Team {
   }
 
   contestShot() {
-    if (this.selectedCourtPlayer.getCurrState().key !== States.CONTEST_SHOT) {
+    if (
+      this.selectedCourtPlayer.getCurrState().key !== States.CONTEST_SHOT &&
+      this.selectedCourtPlayer.getCurrState().key !== States.SHOOTING
+    ) {
       const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
       courtPlayer.isPlayerCommandOverride = true
       this.selectedCourtPlayer.setState(States.CONTEST_SHOT, (player: PlayerCourtPlayer) => {

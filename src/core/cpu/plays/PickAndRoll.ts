@@ -56,24 +56,6 @@ export class PickAndRoll extends OffensePlay {
     }
   }
 
-  shootOrDrive(receiver: CourtPlayer) {
-    const isThreePointShot = Game.instance.court.isThreePointShot(
-      receiver.sprite.x,
-      receiver.sprite.y
-    )
-    const shotSuccessData = calculateShotSuccessPercentage(
-      receiver,
-      this.team,
-      isThreePointShot,
-      false
-    )
-    if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
-      this.shoot(receiver)
-    } else {
-      this.driveToBasket(receiver)
-    }
-  }
-
   public driveAroundScreen(screener: CourtPlayer, ballHandler: CourtPlayer) {
     if (!this.isDrivingAroundScreen) {
       this.isDrivingAroundScreen = true
@@ -95,92 +77,5 @@ export class PickAndRoll extends OffensePlay {
       }
       ballHandler.setState(States.DRIBBLE_TO_POINT, config)
     }
-  }
-
-  shoot(ballHandler: CourtPlayer) {
-    ballHandler.setState(States.SHOOTING, () => {
-      ballHandler.setState(States.IDLE)
-      this.isPlayFinished = true
-    })
-  }
-
-  shouldLayup(receiver: CourtPlayer) {
-    const shouldLayupThroughContact = Phaser.Math.Between(0, 100) > 70
-    return shouldLayupThroughContact || receiver.canLayupBall()
-  }
-
-  shouldDunk(receiver: CourtPlayer) {
-    const shouldDunkThroughContact = Phaser.Math.Between(0, 100) > 85
-    return shouldDunkThroughContact || receiver.canDunkBall()
-  }
-
-  driveToBasket(receiver: CourtPlayer) {
-    const driveToBasketConfig = {
-      onDriveSuccess: () => {
-        if (this.shouldDunk(receiver)) {
-          receiver.setState(States.DUNK, () => {
-            receiver.setState(States.IDLE)
-            this.isPlayFinished = true
-          })
-        } else if (this.shouldLayup(receiver)) {
-          receiver.setState(States.LAYUP, () => {
-            receiver.setState(States.IDLE)
-            this.isPlayFinished = true
-          })
-        } else {
-          const shotSuccessData = calculateShotSuccessPercentage(receiver, this.team, false, false)
-          if (shotSuccessData.coverage === ShotCoverage.WIDE_OPEN) {
-            receiver.setState(States.SHOOTING, () => {
-              receiver.setState(States.IDLE)
-              this.isPlayFinished = true
-            })
-          } else {
-            this.handleDriveFailed(receiver)
-          }
-        }
-      },
-      onDriveFailed: () => {
-        this.handleDriveFailed(receiver)
-      },
-      timeout: 4000,
-    }
-    receiver.setState(States.DRIVE_TO_BASKET, driveToBasketConfig)
-  }
-
-  handleDriveFailed(ballHandler: CourtPlayer) {
-    const shouldPass = Phaser.Math.Between(0, 1) == 0
-    if (shouldPass) {
-      this.passOut(ballHandler)
-    } else {
-      this.goBackToSpot(ballHandler)
-    }
-  }
-
-  passOut(player: CourtPlayer) {
-    const teammates = this.team.getCourtPlayers().filter((p) => {
-      return p !== player
-    })
-    const passRecipient = getMostOpenPassRecipient(teammates, this.team)
-    const passConfig: PassConfig = {
-      onPassCompleteCb: () => {
-        player.setState(States.GO_BACK_TO_SPOT, () => {
-          this.isPlayFinished = true
-        })
-      },
-      onPassStartedCb: () => {
-        player.stop()
-      },
-    }
-    if (passRecipient) {
-      player.setState(States.PASSING, passRecipient, passConfig)
-    } else {
-      this.goBackToSpot(player)
-    }
-  }
-
-  goBackToSpot(player: CourtPlayer) {
-    player.setState(States.GO_BACK_TO_SPOT, () => {
-      this.isPlayFinished = true
-    })
   }
 }
