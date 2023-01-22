@@ -2,11 +2,13 @@ import Game from '~/scenes/Game'
 import { getClosestPlayer } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
 import { DefendManState } from '../states/defense/DefendManState'
+import { States } from '../states/States'
 import { PlayerTeam } from './PlayerTeam'
 
 export class DefenseMeter {
   private team: PlayerTeam
   private keyD!: Phaser.Input.Keyboard.Key
+  public isDefending: boolean = false
 
   constructor(team: PlayerTeam) {
     this.team = team
@@ -16,22 +18,27 @@ export class DefenseMeter {
       delay: 1,
       callback: () => {
         if (this.keyD.isDown) {
+          this.isDefending = true
           this.defendPlayer()
+        } else {
+          this.isDefending = false
         }
       },
     })
   }
 
   getManToDefend(selectedCourtPlayer: CourtPlayer) {
-    return getClosestPlayer(selectedCourtPlayer, this.team.getOtherTeamCourtPlayers())
+    return this.team.getDefensiveAssignmentForPlayer(selectedCourtPlayer.playerId)
   }
 
   defendPlayer() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
     const manToDefend = this.getManToDefend(selectedCourtPlayer)
-
-    // const manToDefend = this.team.getDefensiveAssignmentForPlayer(selectedCourtPlayer.playerId)
-    if (manToDefend) {
+    if (
+      manToDefend &&
+      !this.team.hasPossession() &&
+      selectedCourtPlayer.getCurrState().key !== States.CONTEST_SHOT
+    ) {
       const line = new Phaser.Geom.Line(
         manToDefend.sprite.x,
         manToDefend.sprite.y,

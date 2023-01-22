@@ -61,7 +61,7 @@ export abstract class Team {
 
   hasPossession(): boolean {
     const ball = this.game.ball
-    if (ball.ballState === BallState.PASS) {
+    if (ball.ballState === BallState.PASS || ball.isBallInFlight()) {
       return ball.prevPlayerWithBall !== null && ball.prevPlayerWithBall.side === this.side
     }
     return ball.playerWithBall !== null && ball.playerWithBall.side === this.side

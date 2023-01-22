@@ -377,7 +377,8 @@ export class PlayerTeam extends Team {
       !this.keyArrowUp ||
       !this.keyArrowDown ||
       !this.selectedCourtPlayer.canMove() ||
-      this.selectedCourtPlayer.getCurrState().key !== States.PLAYER_CONTROL
+      this.selectedCourtPlayer.getCurrState().key !== States.PLAYER_CONTROL ||
+      this.defenseMeter.isDefending
     ) {
       return
     }
