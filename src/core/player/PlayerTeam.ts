@@ -59,45 +59,67 @@ export class PlayerTeam extends Team {
       if (this.game.isChangingPossession) {
         return
       }
-      switch (e.code) {
-        case 'KeyS': {
-          if (this.hasPossession()) {
-            if (this.selectedCourtPlayer.canDunkBall()) {
-              this.dunkBall()
-            } else if (this.selectedCourtPlayer.canLayupBall()) {
-              this.layupBall()
-            } else if (this.selectedCourtPlayer.canShootBall()) {
-              this.shootBall()
-            }
-          } else {
-            if (this.canBlockShot()) {
-              this.blockShot()
+      if (e.code.includes('Digit')) {
+        this.handleDigitPress(e.code)
+      } else {
+        switch (e.code) {
+          case 'KeyS': {
+            if (this.hasPossession()) {
+              if (this.selectedCourtPlayer.canDunkBall()) {
+                this.dunkBall()
+              } else if (this.selectedCourtPlayer.canLayupBall()) {
+                this.layupBall()
+              } else if (this.selectedCourtPlayer.canShootBall()) {
+                this.shootBall()
+              }
             } else {
-              this.contestShot()
+              if (this.canBlockShot()) {
+                this.blockShot()
+              } else {
+                this.contestShot()
+              }
             }
+            break
           }
-          break
-        }
-        case 'KeyX': {
-          if (this.canStealBall()) {
-            this.stealBall()
+          case 'KeyX': {
+            if (this.canStealBall()) {
+              this.stealBall()
+            }
+            break
           }
-          break
-        }
-        case 'KeyQ': {
-          this.callForScreen()
-          break
-        }
-        case 'Space': {
-          if (this.selectedCourtPlayer.canPassBall()) {
-            this.passBall()
-          } else if (this.canSwitchPlayer()) {
-            this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer!)
+          case 'KeyQ': {
+            this.callForScreen()
+            break
           }
-          break
+          case 'Space': {
+            if (this.selectedCourtPlayer.canPassBall()) {
+              this.passBall()
+            } else if (this.canSwitchPlayer()) {
+              this.setSelectedCourtPlayer(this.passCursor.selectedCourtPlayer!)
+            }
+            break
+          }
         }
       }
     })
+  }
+
+  handleDigitPress(keyCode: string) {
+    const numberPressed = keyCode.split('Digit')[1]
+    if (numberPressed) {
+      const playerToSelectId = `player${numberPressed}`
+      const selectedPlayer = this.getSelectedCourtPlayer()
+      if (playerToSelectId !== selectedPlayer.playerId) {
+        const playerToSelect = this.getPlayerById(playerToSelectId)
+        if (playerToSelect) {
+          if (this.hasPossession()) {
+            this.passBall(playerToSelect)
+          } else {
+            this.setSelectedCourtPlayer(playerToSelect)
+          }
+        }
+      }
+    }
   }
 
   canStealBall() {
@@ -275,9 +297,9 @@ export class PlayerTeam extends Team {
     }
   }
 
-  passBall() {
+  passBall(recipient: CourtPlayer | null = null) {
     if (this.passCursor.selectedCourtPlayer) {
-      const passRecipient = this.passCursor.selectedCourtPlayer
+      const passRecipient = recipient ? recipient : this.passCursor.selectedCourtPlayer
       // If the currently selected player has the ball, pass it. Otherwise, switch player
       if (this.selectedCourtPlayer.canPassBall()) {
         const playerCourtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
@@ -292,11 +314,7 @@ export class PlayerTeam extends Team {
             player.stop()
           },
         }
-        this.selectedCourtPlayer.setState(
-          States.PASSING,
-          this.passCursor.selectedCourtPlayer,
-          passConfig
-        )
+        this.selectedCourtPlayer.setState(States.PASSING, passRecipient, passConfig)
       }
     }
   }

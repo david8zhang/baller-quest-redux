@@ -73,6 +73,12 @@ export abstract class Team {
     this.defensiveAssignmentMapping[defenderId] = manToDefendId
   }
 
+  getPlayerById(playerId: string) {
+    return this.players.find((player) => {
+      return player.playerId === playerId
+    })
+  }
+
   positionPlayers() {
     const initialPositions = this.hasPossession()
       ? this.getOffensivePositions()
