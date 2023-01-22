@@ -8,6 +8,20 @@ export enum ShotDistance {
   PERIMETER = 'PERIMETER',
 }
 
+export enum ShotArcType {
+  THREE_POINT = 'THREE_POINT',
+  LONG_TWO = 'LONG_TWO',
+  MID_TWO = 'MID_TWO',
+  NEAR_BASKET = 'NEAR_BASKET',
+}
+
+export const ShotArcTimeMapping = {
+  [ShotArcType.THREE_POINT]: 1.5,
+  [ShotArcType.LONG_TWO]: 1.25,
+  [ShotArcType.MID_TWO]: 1,
+  [ShotArcType.NEAR_BASKET]: 0.9,
+}
+
 export class Court {
   private game: Game
   private sprite: Phaser.GameObjects.Sprite
@@ -72,6 +86,30 @@ export class Court {
 
     this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.playerCourtPlayers)
     this.game.physics.add.collider(this.behindBackboardWallSprite, this.game.cpuCourtPlayers)
+  }
+
+  getShotArcTime(x: number, y: number): number {
+    let shotArcType: ShotArcType | null = null
+    if (!this.threePointDetectorCircle.contains(x, y)) {
+      shotArcType = ShotArcType.THREE_POINT
+    } else if (
+      this.threePointDetectorCircle.contains(x, y) &&
+      !this.midRangeDetectorCircle.contains(x, y)
+    ) {
+      shotArcType = ShotArcType.LONG_TWO
+    } else if (
+      this.midRangeDetectorCircle.contains(x, y) &&
+      !this.postDetectorCircle.contains(x, y)
+    ) {
+      shotArcType = ShotArcType.MID_TWO
+    } else if (this.postDetectorCircle.contains(x, y)) {
+      shotArcType = ShotArcType.NEAR_BASKET
+    }
+    if (shotArcType) {
+      console.log('SHOT ARC TYPE: ', shotArcType)
+      return ShotArcTimeMapping[shotArcType]
+    }
+    return 1.25
   }
 
   getRandomLocationOnPerimeter() {

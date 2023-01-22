@@ -43,12 +43,10 @@ export class ShootingState extends State {
       currPlayer.sprite.x,
       currPlayer.sprite.y + 32
     )
-    const distanceBeforeJumping = Phaser.Math.Distance.Between(
-      currPlayer.sprite.x,
-      currPlayer.sprite.y + 32,
-      hoop.x,
-      hoop.y
-    )
+    const positionBeforeJumping = {
+      x: currPlayer.sprite.x,
+      y: currPlayer.sprite.y,
+    }
 
     createArc(currPlayer.sprite, { x: initialX, y: initialY }, jumpTime)
     Game.instance.time.delayedCall(jumpTime * 975 * 0.45, () => {
@@ -64,7 +62,7 @@ export class ShootingState extends State {
       Game.instance.ball.giveUpPossession()
       Game.instance.ball.sprite.setDepth(Game.instance.hoop.rimSprite.depth + 1)
       if (!currPlayer.wasShotBlocked) {
-        this.launchBallTowardsHoop(currPlayer, team, distanceBeforeJumping, isThreePointShot)
+        this.launchBallTowardsHoop(currPlayer, team, positionBeforeJumping, isThreePointShot)
       }
     })
     Game.instance.time.delayedCall(jumpTime * 975, () => {
@@ -80,21 +78,11 @@ export class ShootingState extends State {
   launchBallTowardsHoop(
     currPlayer: CourtPlayer,
     team: Team,
-    distanceBeforeJumping: number,
+    positionBeforeJumping: { x: number; y: number },
     isThreePointShot: boolean
   ) {
     const ball = Game.instance.ball
     ball.show()
-    let arcTime = 1.5
-    if (distanceBeforeJumping < 150) {
-      arcTime = 1
-    } else if (distanceBeforeJumping >= 150 && distanceBeforeJumping < 200) {
-      arcTime = 1.2
-    } else if (distanceBeforeJumping > 200) {
-      arcTime = 1.5
-    }
-
-    console.log('SHOT ARC TIME: ', arcTime)
 
     const percentageSuccess = calculateShotSuccessPercentage(
       currPlayer,
@@ -102,9 +90,10 @@ export class ShootingState extends State {
       isThreePointShot,
       false
     )
-
-    console.log('[SHOT DATA]:', percentageSuccess)
-
+    const arcTime = Game.instance.court.getShotArcTime(
+      positionBeforeJumping.x,
+      positionBeforeJumping.y
+    )
     const isMiss = Phaser.Math.Between(0, 100) > percentageSuccess.percentage
     let posToLandX = Game.instance.hoop.rimSprite.x
     if (isMiss) {

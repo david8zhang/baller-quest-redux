@@ -501,7 +501,7 @@ export class CourtPlayer {
   }
 
   playRunAnimationForVelocity(xVelocity: number, yVelocity: number, isDefense: boolean) {
-    if (Math.abs(xVelocity) > Math.abs(yVelocity)) {
+    if (Math.abs(xVelocity) >= Math.abs(yVelocity)) {
       this.sprite.setFlipX(xVelocity > 0)
       const animToPlay = this.hasPossession
         ? ONBALL_ANIMS.run.left
