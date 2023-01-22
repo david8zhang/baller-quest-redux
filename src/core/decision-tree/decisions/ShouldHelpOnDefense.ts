@@ -30,7 +30,7 @@ export class ShouldHelpOnDefense extends TreeNode {
       const setScreenState = manToDefend.getCurrState().data as SetScreenState
       if (setScreenState.isAtScreenPosition) {
         if (this.ballHandlerHasOpenLane(team)) {
-          const shouldHelp = Phaser.Math.Between(0, 2) !== 0
+          const shouldHelp = this.shouldHelpOnDefense(manToDefend)
           this.blackboard.setData(BlackboardKeys.SHOULD_HELP_DECISION, shouldHelp)
           return shouldHelp ? Decision.PROCEED : Decision.STOP
         }
@@ -41,6 +41,16 @@ export class ShouldHelpOnDefense extends TreeNode {
     }
     this.blackboard.setData(BlackboardKeys.SHOULD_HELP_DECISION, null)
     return Decision.STOP
+  }
+
+  shouldHelpOnDefense(manToDefend: CourtPlayer) {
+    const shootAttr = manToDefend.attributes.shooting
+    // If the screener is a good shooter, don't help as often
+    if (shootAttr > 3) {
+      return Phaser.Math.Between(0, 3) == 0
+    } else {
+      return Phaser.Math.Between(0, 2) !== 0
+    }
   }
 
   ballHandlerHasOpenLane(currTeam: Team) {

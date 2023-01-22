@@ -5,7 +5,6 @@
 ## TODO:
 
 - Steals / Turnovers
-- Add rebound jumping
 - Special abilities (dribble hesi pull up, step back)
 - Post Up + Fadeaway moves
 

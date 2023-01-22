@@ -4,6 +4,8 @@ import { DEFAULT_FONT, SORT_ORDER, WINDOW_WIDTH } from './Constants'
 
 export class ShotClock {
   private static DEFAULT_CLOCK_TIME = 24
+  private static OFFENSIVE_REBOUND_CLOCK_TIME = 14
+
   private game: Game
   private shotClockText: Phaser.GameObjects.Text
   public shotTimeSeconds: number = ShotClock.DEFAULT_CLOCK_TIME
@@ -49,7 +51,10 @@ export class ShotClock {
   }
 
   reboundShotClockReset() {
-    this.shotTimeSeconds = 14
+    this.shotTimeSeconds = ShotClock.OFFENSIVE_REBOUND_CLOCK_TIME
+    this.shotClockText.setText(`${this.shotTimeSeconds.toString()}`)
+    this.shotClockText.setPosition(WINDOW_WIDTH - this.shotClockText.displayWidth - 20, 20)
+    this.timerEvent.paused = false
   }
 
   isBallInFlight() {

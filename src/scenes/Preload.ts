@@ -21,6 +21,17 @@ export class Preload extends Phaser.Scene {
     this.loadBlockAnimations()
     this.loadDefendAnimations()
     this.loadNetSwishAnimations()
+    this.loadStealAnimations()
+  }
+
+  loadStealAnimations() {
+    this.load.image('steal-wind-player', 'animations/steal/steal-wind-player.png')
+    this.load.image('steal-reach-player', 'animations/steal/steal-reach-player.png')
+    this.load.image('steal-follow-player', 'animations/steal/steal-follow-player.png')
+
+    this.load.image('steal-wind-cpu', 'animations/steal/steal-wind-cpu.png')
+    this.load.image('steal-reach-cpu', 'animations/steal/steal-reach-cpu.png')
+    this.load.image('steal-follow-cpu', 'animations/steal/steal-follow-cpu.png')
   }
 
   loadNetSwishAnimations() {

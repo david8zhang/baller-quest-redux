@@ -45,7 +45,7 @@ export class ShootingState extends State {
     )
     const positionBeforeJumping = {
       x: currPlayer.sprite.x,
-      y: currPlayer.sprite.y,
+      y: currPlayer.sprite.y + 32,
     }
 
     createArc(currPlayer.sprite, { x: initialX, y: initialY }, jumpTime)

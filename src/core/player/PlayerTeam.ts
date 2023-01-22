@@ -123,22 +123,7 @@ export class PlayerTeam extends Team {
   }
 
   canStealBall() {
-    const ballHandler = this.game.ball.playerWithBall
-    if (!ballHandler) {
-      return false
-    }
-    const distanceToBallHandler = Phaser.Math.Distance.Between(
-      this.selectedCourtPlayer.sprite.x,
-      this.selectedCourtPlayer.sprite.y,
-      ballHandler.sprite.x,
-      ballHandler.sprite.y
-    )
-    return (
-      !this.hasPossession() &&
-      distanceToBallHandler < 75 &&
-      ballHandler.getCurrState().key !== States.PASSING &&
-      ballHandler.getCurrState().key !== States.SHOOTING
-    )
+    return !this.hasPossession()
   }
 
   stealBall() {
@@ -163,7 +148,7 @@ export class PlayerTeam extends Team {
     const playerWithBall = this.game.ball.playerWithBall
     if (side === Side.PLAYER) {
       if (shouldResetClock) {
-        this.game.shotClock.resetShotClockOnNewPossession()
+        this.game.shotClock.reboundShotClockReset()
       }
       if (playerWithBall) {
         this.setSelectedCourtPlayer(playerWithBall)

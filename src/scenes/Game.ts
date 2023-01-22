@@ -121,6 +121,7 @@ export default class Game extends Phaser.Scene {
     if (this.timer.currSeconds === 0) {
       this.handleMatchFinished()
     } else {
+      // Reset all player states
       this.player.getCourtPlayers().forEach((player) => {
         if (prevSideWithPossession === Side.PLAYER && player.hasPossession) {
           player.losePossessionOfBall()
@@ -150,6 +151,9 @@ export default class Game extends Phaser.Scene {
         )
         .setDepth(SORT_ORDER.ui + 1000)
       this.time.delayedCall(1500, () => {
+        // Turn off all ball colliders
+        this.ball.floorCollider.active = false
+        this.ball.blockShotFloorCollider.active = false
         this.ball.prevPlayerWithBall = null
         newTeamWithPossession.handleNewPossession()
         newTeamOnDefense.handleNewDefenseSetup()

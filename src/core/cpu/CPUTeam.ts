@@ -27,7 +27,7 @@ export class CPUTeam extends Team {
     super(game, Side.CPU)
     this.setupPlayers()
     super.positionPlayers()
-    this.offensePlays = [new IsoDribble(this)]
+    this.offensePlays = [new IsoDribble(this), new ScreenHandOff(this), new PickAndRoll(this)]
   }
 
   public getOffensivePositions(): { [key: string]: { row: number; col: number } } {
@@ -57,7 +57,7 @@ export class CPUTeam extends Team {
   handleOffensiveRebound(side: Side, shouldResetClock: boolean) {
     if (side === Side.CPU) {
       if (shouldResetClock) {
-        this.game.shotClock.resetShotClockOnNewPossession()
+        this.game.shotClock.reboundShotClockReset()
       }
       if (this.canPutBackBall() && !this.isPuttingBackBall) {
         this.isPuttingBackBall = true
