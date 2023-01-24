@@ -60,22 +60,23 @@ export class StealState extends State {
   }
 
   didStealSucceed(currPlayer: CourtPlayer, ballHandler: CourtPlayer) {
-    const distanceToBallHandler = Phaser.Math.Distance.Between(
-      currPlayer.sprite.x,
-      currPlayer.sprite.y,
-      ballHandler.sprite.x,
-      ballHandler.sprite.y
-    )
-    const stealSuccessPct =
-      STEAL_LIKELIHOOD_ATTRIBUTE_MAPPING[currPlayer.attributes.steal.toString()]
-    return (
-      Phaser.Math.Between(0, 100) <= stealSuccessPct &&
-      distanceToBallHandler < 75 &&
-      ballHandler.getCurrState().key !== States.PASSING &&
-      ballHandler.getCurrState().key !== States.SHOOTING &&
-      ballHandler.getCurrState().key !== States.LAYUP &&
-      ballHandler.getCurrState().key !== States.DUNK
-    )
+    return true
+    // const distanceToBallHandler = Phaser.Math.Distance.Between(
+    //   currPlayer.sprite.x,
+    //   currPlayer.sprite.y,
+    //   ballHandler.sprite.x,
+    //   ballHandler.sprite.y
+    // )
+    // const stealSuccessPct =
+    //   STEAL_LIKELIHOOD_ATTRIBUTE_MAPPING[currPlayer.attributes.steal.toString()]
+    // return (
+    //   Phaser.Math.Between(0, 100) <= stealSuccessPct &&
+    //   distanceToBallHandler < 75 &&
+    //   ballHandler.getCurrState().key !== States.PASSING &&
+    //   ballHandler.getCurrState().key !== States.SHOOTING &&
+    //   ballHandler.getCurrState().key !== States.LAYUP &&
+    //   ballHandler.getCurrState().key !== States.DUNK
+    // )
   }
 
   launchBallBackwardsAfterSteal(currPlayer: CourtPlayer, ballHandler: CourtPlayer) {
@@ -100,6 +101,8 @@ export class StealState extends State {
     createArc(ball.sprite, point, stealDeflectDuration)
     Game.instance.time.delayedCall(stealDeflectDuration * 1000, () => {
       ball.ballState = BallState.STOLEN
+    })
+    Game.instance.time.delayedCall(stealDeflectDuration * 2000, () => {
       ballHandler.setState(States.IDLE)
     })
   }

@@ -323,6 +323,10 @@ export class CourtPlayer {
   }
 
   public update() {
+    if (this.playerId === 'cpu1') {
+      console.log(this.getCurrState().key)
+    }
+
     this.raycastIntersectRect.setPosition(
       this.sprite.x - this.raycastIntersectRect.width / 2,
       this.sprite.y - 15
@@ -395,7 +399,10 @@ export class CourtPlayer {
   losePossessionOfBall() {
     this.hasPossession = false
     const suffix = this.side === Side.CPU ? 'cpu' : 'player'
-    this.sprite.anims.play(`${OFFBALL_ANIMS.idle}-${suffix}`)
+
+    if (this.getCurrState().key !== States.FUMBLE) {
+      this.sprite.anims.play(`${OFFBALL_ANIMS.idle}-${suffix}`)
+    }
   }
 
   getPossessionOfBall(prevBallState: BallState) {

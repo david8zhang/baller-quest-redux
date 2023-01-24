@@ -28,6 +28,7 @@ export class CPUCourtPlayer extends CourtPlayer {
       cpuTeam.currPlay === null &&
       !this.isShooting() &&
       !this.isBlockingOrContesting() &&
+      this.getCurrState().key !== States.FUMBLE &&
       !cpuTeam.isPuttingBackBall &&
       !cpuTeam.isResettingOffense &&
       !cpuTeam.isTakingShot

@@ -23,6 +23,17 @@ export class Preload extends Phaser.Scene {
     this.loadNetSwishAnimations()
     this.loadStealAnimations()
     this.loadScreenAnimations()
+    this.loadFumbleAnimations()
+  }
+
+  loadFumbleAnimations() {
+    this.load.image('fumble-cpu-start', 'animations/fumble/cpu-fumble-start.png')
+    this.load.image('fumble-cpu-fall', 'animations/fumble/cpu-fumble-fall.png')
+    this.load.image('fumble-cpu-end', 'animations/fumble/cpu-fumble-end.png')
+
+    this.load.image('fumble-player-start', 'animations/fumble/player-fumble-start.png')
+    this.load.image('fumble-player-fall', 'animations/fumble/player-fumble-fall.png')
+    this.load.image('fumble-player-end', 'animations/fumble/player-fumble-end.png')
   }
 
   loadScreenAnimations() {
