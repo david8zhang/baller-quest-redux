@@ -22,6 +22,12 @@ export class Preload extends Phaser.Scene {
     this.loadDefendAnimations()
     this.loadNetSwishAnimations()
     this.loadStealAnimations()
+    this.loadScreenAnimations()
+  }
+
+  loadScreenAnimations() {
+    this.load.image('screen-cpu', 'animations/screen/screen-cpu.png')
+    this.load.image('screen-player', 'animations/screen/screen-player.png')
   }
 
   loadStealAnimations() {

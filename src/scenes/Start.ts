@@ -25,7 +25,7 @@ export class Start extends Phaser.Scene {
       fontFamily: DEFAULT_FONT,
       color: 'white',
     })
-    titleText.setPosition(WINDOW_WIDTH / 2 - titleText.displayWidth / 2, WINDOW_HEIGHT / 6.25)
+    titleText.setPosition(WINDOW_WIDTH / 2 - titleText.displayWidth / 2, WINDOW_HEIGHT / 6)
     titleText.setStroke('#000000', 20)
 
     const titleText2 = this.add.text(0, 0, 'Quest', {

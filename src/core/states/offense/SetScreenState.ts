@@ -50,16 +50,23 @@ export class SetScreenState extends State {
     })
   }
 
+  playScreenAnimation(currPlayer: CourtPlayer, team: Team) {
+    const suffix = team.side === Side.CPU ? 'cpu' : 'player'
+    currPlayer.sprite.setTexture(`screen-${suffix}`)
+    currPlayer.sprite.setFlipX(this.screenDirection === ScreenDirection.LEFT ? true : false)
+  }
+
   execute(currPlayer: CourtPlayer, team: Team) {
     if (this.startedScreenTimestamp != -1) {
       const currTimestamp = Date.now()
       if (this.screenPosition) {
         if (currPlayer.isAtPoint(this.screenPosition) || this.travelTimeExpired) {
+          this.playScreenAnimation(currPlayer, team)
           this.isAtScreenPosition = true
           if (this.isScreeningCallback) {
             this.isScreeningCallback()
           }
-          currPlayer.stop()
+          currPlayer.setVelocity(0, 0)
           // If the player is at the screen position for longer than the screen duration
           if (currTimestamp - this.startedScreenTimestamp > SetScreenState.SCREEN_DURATION) {
             currPlayer.setState(States.GO_BACK_TO_SPOT, this.onScreenFinishedCallback)
@@ -68,12 +75,14 @@ export class SetScreenState extends State {
           if (!currPlayer.sprite.body.touching.none) {
             if (currTimestamp - this.startedScreenTimestamp > SetScreenState.BLOCK_DURATION) {
               this.travelTimeExpired = true
-              currPlayer.stop()
+              this.playScreenAnimation(currPlayer, team)
+              currPlayer.setVelocity(0, 0)
             }
           } else {
             if (currTimestamp - this.startedScreenTimestamp > SetScreenState.TRAVEL_DURATION) {
               this.travelTimeExpired = true
-              currPlayer.stop
+              this.playScreenAnimation(currPlayer, team)
+              currPlayer.setVelocity(0, 0)
             }
           }
         }
