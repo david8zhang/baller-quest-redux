@@ -9,12 +9,16 @@ import { States } from '../States'
 export class BlockShotState extends State {
   enter(currPlayer: CourtPlayer, team: Team, callback: Function) {
     const shooter = team.getOtherTeamCourtPlayers().find((player) => {
-      return player.getCurrState().key === States.SHOOTING
+      return (
+        player.getCurrState().key === States.SHOOTING || player.getCurrState().key === States.LAYUP
+      )
     })
+    console.log('Went here!')
     const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
     if (shooter && !shooter.wasShotBlocked) {
       currPlayer.sprite.setFlipX(false)
       currPlayer.sprite.anims.stop()
+      currPlayer.sprite.setVelocity(0, 0)
       currPlayer.sprite.setTexture(`block-front-wind-up-${suffix}`)
       currPlayer.sprite.body.checkCollision.none = true
       shooter.wasShotBlocked = true
@@ -67,6 +71,7 @@ export class BlockShotState extends State {
     )
     const point = line.getPoint(1)
     const ball = Game.instance.ball
+
     ball.sprite.setPosition(shooter.sprite.x, shooter.sprite.y - shooter.sprite.displayHeight / 2)
     ball.sprite.setDepth(shooter.sprite.depth + 1)
     ball.blockShotFloor.setPosition(

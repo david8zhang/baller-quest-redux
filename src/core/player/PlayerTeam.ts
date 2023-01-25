@@ -123,7 +123,8 @@ export class PlayerTeam extends Team {
   }
 
   canStealBall() {
-    return !this.hasPossession()
+    const currState = this.getSelectedCourtPlayer().getCurrState().key
+    return !this.hasPossession() && currState !== States.CONTEST_SHOT
   }
 
   stealBall() {
@@ -181,9 +182,11 @@ export class PlayerTeam extends Team {
   }
 
   contestShot() {
+    const currState = this.selectedCourtPlayer.getCurrState().key
     if (
-      this.selectedCourtPlayer.getCurrState().key !== States.CONTEST_SHOT &&
-      this.selectedCourtPlayer.getCurrState().key !== States.SHOOTING
+      currState !== States.CONTEST_SHOT &&
+      currState !== States.SHOOTING &&
+      currState !== States.STEAL
     ) {
       const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
       courtPlayer.isPlayerCommandOverride = true
@@ -197,7 +200,7 @@ export class PlayerTeam extends Team {
   canBlockShot() {
     const otherTeamPlayers = this.getOtherTeamCourtPlayers()
     const shooter = otherTeamPlayers.find((p) => {
-      return p.getCurrState().key === States.SHOOTING
+      return p.getCurrState().key === States.SHOOTING || p.getCurrState().key === States.LAYUP
     })
     if (shooter && !shooter.shotReleased) {
       const selectedCourtPlayer = this.getSelectedCourtPlayer()

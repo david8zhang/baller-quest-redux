@@ -21,7 +21,7 @@ export class ShouldBlockShot extends TreeNode {
     }
     const otherTeamPlayers = team.getOtherTeamCourtPlayers()
     const shooter = otherTeamPlayers.find((p) => {
-      return p.getCurrState().key === States.SHOOTING
+      return p.getCurrState().key === States.SHOOTING || p.getCurrState().key === States.LAYUP
     })
     if (shooter && !shooter.shotReleased) {
       const distToShooter = Phaser.Math.Distance.Between(

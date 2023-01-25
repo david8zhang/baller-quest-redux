@@ -39,7 +39,9 @@ export class LayupState extends State {
       currPlayer.sprite.setTexture(`layup-flick-front-${suffix}`)
       currPlayer.hasPossession = false
       Game.instance.ball.giveUpPossession()
-      this.launchBallTowardsHoop(currPlayer, team)
+      if (!currPlayer.wasShotBlocked) {
+        this.launchBallTowardsHoop(currPlayer, team)
+      }
     })
     Game.instance.time.delayedCall(975 * jumpDuration, () => {
       currPlayer.sprite.body.checkCollision.none = false
