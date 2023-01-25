@@ -13,7 +13,6 @@ export class BlockShotState extends State {
         player.getCurrState().key === States.SHOOTING || player.getCurrState().key === States.LAYUP
       )
     })
-    console.log('Went here!')
     const suffix = currPlayer.side === Side.CPU ? 'cpu' : 'player'
     if (shooter && !shooter.wasShotBlocked) {
       currPlayer.sprite.setFlipX(false)

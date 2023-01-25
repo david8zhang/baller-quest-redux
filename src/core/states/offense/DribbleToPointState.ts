@@ -7,6 +7,7 @@ export interface DribbleToPointStateConfig {
   point: { x: number; y: number }
   onReachedPointCB: Function
   failedToReachPointCB: Function
+  speedMultiplier?: number
 }
 
 export class DribbleToPointState extends State {
@@ -15,12 +16,16 @@ export class DribbleToPointState extends State {
   public point!: { x: number; y: number }
   public onReachedPointCB: Function | null = null
   public failedToReachPointCB: Function | null = null
+  public speedMultiplier: number = 1
 
   enter(currPlayer: CourtPlayer, team: Team, config: DribbleToPointStateConfig) {
     this.point = config.point
     this.onReachedPointCB = config.onReachedPointCB
     this.failedToReachPointCB = config.failedToReachPointCB
     this.timeout = config.timeout
+    if (config.speedMultiplier) {
+      this.speedMultiplier = config.speedMultiplier
+    }
   }
 
   execute(currPlayer: CourtPlayer, team: Team) {
@@ -33,7 +38,10 @@ export class DribbleToPointState extends State {
       } else {
         if (this.startedDribblingTimestamp == -1) {
           this.startedDribblingTimestamp = currTimestamp
-          currPlayer.moveTowards(this.point, currPlayer.getOffSpeedFromAttr())
+          currPlayer.moveTowards(
+            this.point,
+            currPlayer.getOffSpeedFromAttr() * this.speedMultiplier
+          )
         } else {
           if (currTimestamp - this.startedDribblingTimestamp >= this.timeout) {
             currPlayer.stop()

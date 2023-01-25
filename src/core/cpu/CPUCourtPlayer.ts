@@ -15,6 +15,13 @@ export class CPUCourtPlayer extends CourtPlayer {
     return state === States.LAYUP || state === States.SHOOTING || state === States.DUNK
   }
 
+  getPossessionOfBall(prevBallState: BallState): void {
+    if (this.getCurrState().key === States.SET_SCREEN) {
+      this.setState(States.IDLE)
+    }
+    super.getPossessionOfBall(prevBallState)
+  }
+
   isBlockingOrContesting() {
     const state = this.getCurrState().key
     return state === States.BLOCK_SHOT || state === States.CONTEST_SHOT

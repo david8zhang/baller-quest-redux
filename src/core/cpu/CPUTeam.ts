@@ -1,6 +1,7 @@
 import Game from '~/scenes/Game'
-import { LAYUP_DISTANCE, Side } from '../Constants'
+import { getClosestPlayer, LAYUP_DISTANCE, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
+import { StealState } from '../states/defense/StealState'
 import { DribbleToPointStateConfig } from '../states/offense/DribbleToPointState'
 import { States } from '../states/States'
 import { Team } from '../Team'
@@ -195,10 +196,6 @@ export class CPUTeam extends Team {
   }
 
   shouldTakeShot() {
-    if (this.currPlay && this.currPlay.isRunning) {
-      return false
-    }
-
     const isNotConflictingWithOtherStates =
       this.hasPossession() &&
       !this.isPuttingBackBall &&
@@ -211,6 +208,13 @@ export class CPUTeam extends Team {
     const randProbability = Phaser.Math.Between(0, 100) > 50
     const playerWithBall = Game.instance.ball.playerWithBall
     if (playerWithBall) {
+      const isLayupOrDunk =
+        playerWithBall.getCurrState().key === States.LAYUP ||
+        playerWithBall.getCurrState().key === States.DUNK
+      if (isLayupOrDunk) {
+        return false
+      }
+
       let nearestDefenderDistance = Number.MAX_SAFE_INTEGER
       this.getOtherTeamCourtPlayers().forEach((player: CourtPlayer) => {
         const distance = Phaser.Math.Distance.Between(
@@ -228,6 +232,9 @@ export class CPUTeam extends Team {
 
   takeShot() {
     const playerWithBall = Game.instance.ball.playerWithBall
+    if (this.currPlay && this.currPlay.canInterruptPlay()) {
+      this.currPlay.interruptPlay()
+    }
     if (playerWithBall) {
       this.isTakingShot = true
       playerWithBall.setState(States.SHOOTING, () => {

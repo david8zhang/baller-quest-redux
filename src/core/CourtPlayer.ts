@@ -323,10 +323,6 @@ export class CourtPlayer {
   }
 
   public update() {
-    if (this.playerId === 'cpu1') {
-      console.log(this.getCurrState().key)
-    }
-
     this.raycastIntersectRect.setPosition(
       this.sprite.x - this.raycastIntersectRect.width / 2,
       this.sprite.y - 15
@@ -410,7 +406,6 @@ export class CourtPlayer {
     this.game.ball.isRebounding = false
     this.hasPossession = true
     this.game.ball.ballState = BallState.DRIBBLING
-
     const suffix = this.side === Side.CPU ? 'cpu' : 'player'
     this.sprite.anims.play(`${ONBALL_ANIMS.idle}-${suffix}`)
     this.game.ball.hide()

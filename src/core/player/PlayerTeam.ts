@@ -186,7 +186,8 @@ export class PlayerTeam extends Team {
     if (
       currState !== States.CONTEST_SHOT &&
       currState !== States.SHOOTING &&
-      currState !== States.STEAL
+      currState !== States.STEAL &&
+      currState !== States.BLOCK_SHOT
     ) {
       const courtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
       courtPlayer.isPlayerCommandOverride = true
@@ -292,15 +293,12 @@ export class PlayerTeam extends Team {
       if (this.selectedCourtPlayer.canPassBall()) {
         const playerCourtPlayer = this.selectedCourtPlayer as PlayerCourtPlayer
         playerCourtPlayer.isPlayerCommandOverride = true
-
         const passConfig: PassConfig = {
           onPassCompleteCb: (player: PlayerCourtPlayer) => {
             player.isPlayerCommandOverride = false
             this.setSelectedCourtPlayer(passRecipient)
           },
-          onPassStartedCb: (player: PlayerCourtPlayer) => {
-            player.stop()
-          },
+          onPassStartedCb: (player: PlayerCourtPlayer) => {},
         }
         this.selectedCourtPlayer.setState(States.PASSING, passRecipient, passConfig)
       }

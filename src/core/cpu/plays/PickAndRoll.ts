@@ -29,9 +29,7 @@ export class PickAndRoll extends OffensePlay {
   public execute(): void {
     if (!this.isRunning && !this.isPlayFinished) {
       this.isRunning = true
-      Game.instance.time.delayedCall(1500, () => {
-        this.callForScreen()
-      })
+      this.callForScreen()
     }
   }
 
@@ -41,6 +39,7 @@ export class PickAndRoll extends OffensePlay {
     if (ballHandler) {
       // Call for a screen
       const screener = getClosestPlayer(ballHandler, allTeamPlayers)
+
       const setScreenConfig: SetScreenStateConfig = {
         onScreenFinishedCallback: () => {
           if (!this.isDrivingAroundScreen) {

@@ -3,6 +3,7 @@ import { CourtPlayer } from '~/core/CourtPlayer'
 import { PassConfig } from '~/core/states/offense/PassingState'
 import { States } from '~/core/states/States'
 import { Team } from '~/core/Team'
+import Game from '~/scenes/Game'
 import { CPUTeam } from '../CPUTeam'
 import { PlayTypes } from './PlayTypes'
 
@@ -51,6 +52,27 @@ export abstract class OffensePlay {
     } else {
       this.driveToBasket(receiver)
     }
+  }
+
+  canInterruptPlay() {
+    const ballHandler = Game.instance.ball.playerWithBall
+    if (ballHandler && ballHandler.side === this.team.side) {
+      const currStateKey = ballHandler.getCurrState().key
+      return !(
+        currStateKey === States.SHOOTING ||
+        currStateKey === States.LAYUP ||
+        currStateKey == States.DUNK ||
+        currStateKey == States.PASSING
+      )
+    }
+    return false
+  }
+
+  interruptPlay() {
+    this.isPlayFinished = true
+    this.team.getCourtPlayers().forEach((player: CourtPlayer) => {
+      player.setState(States.IDLE)
+    })
   }
 
   shouldLayup(receiver: CourtPlayer) {
@@ -122,9 +144,7 @@ export abstract class OffensePlay {
           this.isPlayFinished = true
         })
       },
-      onPassStartedCb: () => {
-        player.stop()
-      },
+      onPassStartedCb: () => {},
     }
     if (passRecipient) {
       player.setState(States.PASSING, passRecipient, passConfig)

@@ -40,6 +40,7 @@ export class IsoDribble extends OffensePlay {
               this.isPlayFinished = true
             },
             timeout: 3000,
+            speedMultiplier: 1.25,
           }
           ballHandler.setState(States.DRIBBLE_TO_POINT, dribbleToPointConfig)
         }
