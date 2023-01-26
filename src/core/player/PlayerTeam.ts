@@ -112,7 +112,7 @@ export class PlayerTeam extends Team {
       if (playerToSelectId !== selectedPlayer.playerId) {
         const playerToSelect = this.getPlayerById(playerToSelectId)
         if (playerToSelect) {
-          if (this.hasPossession()) {
+          if (this.hasPossession() && !this.game.ball.isBallInFlight()) {
             this.passBall(playerToSelect)
           } else {
             this.setSelectedCourtPlayer(playerToSelect)
@@ -429,12 +429,24 @@ export class PlayerTeam extends Team {
     })
     const playerToSelect = this.getCourtPlayers().find((p) => p.playerId === 'player1')
     this.setSelectedCourtPlayer(playerToSelect!)
+    this.players.forEach((player: CourtPlayer) => {
+      const courtPlayer = player as PlayerCourtPlayer
+      if (player.playerId !== playerToSelect!.playerId) {
+        courtPlayer.isPlayerCommandOverride = false
+      }
+    })
   }
 
   public handleNewPossession(): void {
     super.handleNewPossession()
     const playerToControl = this.getPlayerToReceiveBallOnNewPossession()
     this.setSelectedCourtPlayer(playerToControl)
+    this.players.forEach((player: CourtPlayer) => {
+      const courtPlayer = player as PlayerCourtPlayer
+      if (player.playerId !== playerToControl.playerId) {
+        courtPlayer.isPlayerCommandOverride = false
+      }
+    })
   }
 
   public getPlayerToReceiveBallOnNewPossession(): CourtPlayer {

@@ -11,5 +11,5 @@
 
 ## Bugs
 
-- Sometimes the shot arc is weird (hard to repro, usually happens after a block and immediately shooting after possession change)
-- Spamming steal is a viable strategy that goes unpunished
+- Player 3 does not rebound
+- Layup during shot clock expiration causes the game to crash
