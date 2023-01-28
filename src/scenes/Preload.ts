@@ -173,6 +173,18 @@ export class Preload extends Phaser.Scene {
       'animations/dribble/dribble-front/dribble-front-cpu.png',
       'animations/dribble/dribble-front/dribble-front-cpu.json'
     )
+
+    this.load.atlas(
+      'dribble-switch-hand-cpu',
+      'animations/dribble/dribble-switch-hand/dribble-switch-hand-cpu.png',
+      'animations/dribble/dribble-switch-hand/dribble-switch-hand-cpu.json'
+    )
+
+    this.load.atlas(
+      'dribble-switch-hand-player',
+      'animations/dribble/dribble-switch-hand/dribble-switch-hand-player.png',
+      'animations/dribble/dribble-switch-hand/dribble-switch-hand-player.json'
+    )
   }
 
   loadShootAnimations() {

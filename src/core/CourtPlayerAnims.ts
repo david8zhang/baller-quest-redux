@@ -11,6 +11,17 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
+    key: 'dribble-switch-hand-player',
+    frames: anims.generateFrameNames('dribble-switch-hand-player', {
+      start: 0,
+      end: 4,
+      suffix: '.png',
+    }),
+    repeat: 0,
+    frameRate: 12,
+  })
+
+  anims.create({
     key: 'dribble-front-player',
     frames: anims.generateFrameNames('dribble-front-player', {
       start: 0,

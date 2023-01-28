@@ -38,6 +38,9 @@ export abstract class Team {
     playerToReceiveBall.getPossessionOfBall(BallState.LOOSE)
   }
 
+  public handleAnimationComplete(e) {}
+  public handleAnimationStart(e) {}
+
   public abstract handleNewDefenseSetup(): void
 
   public getDefenderForPlayer(player: CourtPlayer): CourtPlayer | null {

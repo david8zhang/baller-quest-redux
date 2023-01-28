@@ -11,5 +11,4 @@
 
 ## Bugs
 
-- Player 3 does not rebound
 - Layup during shot clock expiration causes the game to crash

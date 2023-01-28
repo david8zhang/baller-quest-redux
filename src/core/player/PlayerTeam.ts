@@ -1,13 +1,14 @@
 import Game from '~/scenes/Game'
 import { BallState } from '../Ball'
 import { BLOCK_LIKELIHOOD_ATTRIBUTE_MAPPING, getClosestPlayer, Side } from '../Constants'
-import { CourtPlayer } from '../CourtPlayer'
+import { CourtPlayer, Hand } from '../CourtPlayer'
 import { Cursor } from '../Cursor'
 import { PassConfig } from '../states/offense/PassingState'
 import { SetScreenStateConfig } from '../states/offense/SetScreenState'
 import { States } from '../states/States'
 import { Team } from '../Team'
 import { DefenseMeter } from './DefenseMeter'
+import { DribbleMeter } from './DribbleMeter'
 import { PlayerConstants } from './PlayerConstants'
 import { PlayerCourtPlayer } from './PlayerCourtPlayer'
 import { SprintMeter } from './SprintMeter'
@@ -25,6 +26,7 @@ export class PlayerTeam extends Team {
   private sprintMeter: SprintMeter
   public defensiveAssignmentMapping = { ...PlayerConstants.DEFENSIVE_ASSIGNMENTS }
   private defenseMeter: DefenseMeter
+  private dribbleMeter: DribbleMeter
   public canCallForScreen: boolean = true
 
   constructor(game: Game) {
@@ -44,6 +46,7 @@ export class PlayerTeam extends Team {
     )
     this.sprintMeter = new SprintMeter(game)
     this.defenseMeter = new DefenseMeter(this)
+    this.dribbleMeter = new DribbleMeter(this)
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
     this.setupPlayers()
@@ -59,7 +62,9 @@ export class PlayerTeam extends Team {
       if (this.game.isChangingPossession) {
         return
       }
-      if (e.code.includes('Digit')) {
+      if (e.code.includes('Arrow')) {
+        this.handleArrowPress(e.code)
+      } else if (e.code.includes('Digit')) {
         this.handleDigitPress(e.code)
       } else {
         switch (e.code) {
@@ -102,6 +107,18 @@ export class PlayerTeam extends Team {
         }
       }
     })
+  }
+
+  handleAnimationComplete(e) {
+    this.dribbleMeter.handleAnimationComplete(e)
+  }
+
+  handleAnimationStart(e) {
+    this.dribbleMeter.handleAnimationStart(e)
+  }
+
+  handleArrowPress(keyCode: string) {
+    this.dribbleMeter.switchHandDribble(keyCode)
   }
 
   handleDigitPress(keyCode: string) {
@@ -382,7 +399,8 @@ export class PlayerTeam extends Team {
       !this.keyArrowDown ||
       !this.selectedCourtPlayer.canMove() ||
       this.selectedCourtPlayer.getCurrState().key !== States.PLAYER_CONTROL ||
-      this.defenseMeter.isDefending
+      this.defenseMeter.isDefending ||
+      this.dribbleMeter.isDribbleButtonPressed
     ) {
       return
     }

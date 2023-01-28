@@ -12,10 +12,6 @@ export class PlayerCourtPlayer extends CourtPlayer {
   update() {
     const playerTeam = this.team as PlayerTeam
     if (playerTeam.getSelectedCourtPlayer() !== this && !Game.instance.isChangingPossession) {
-      if (this.playerId === 'player3') {
-        console.log(this.isPlayerCommandOverride)
-      }
-
       if (!this.isPlayerCommandOverride) {
         const nextState = this.decisionTree.process()
         if (nextState !== this.stateMachine.getState()) {

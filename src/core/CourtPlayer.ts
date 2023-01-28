@@ -37,6 +37,11 @@ import { States } from './states/States'
 import { Team } from './Team'
 import { StealState } from './states/defense/StealState'
 
+export enum Hand {
+  RIGHT = 'RIGHT',
+  LEFT = 'LEFT',
+}
+
 export interface PlayerAttributes {
   offSpeed: number
   defSpeed: number
@@ -82,6 +87,7 @@ export class CourtPlayer {
   public attributes: PlayerAttributes
 
   public graphics: Phaser.GameObjects.Graphics
+  public handWithBall = Hand.RIGHT
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -156,6 +162,13 @@ export class CourtPlayer {
     this.graphics.lineStyle(1, 0x00ff00)
     this.graphics.setDepth(SORT_ORDER.ui + 1000)
     this.graphics.setName('ui')
+
+    this.sprite.on('animationcomplete', (e) => {
+      this.team.handleAnimationComplete(e)
+    })
+    this.sprite.on('animationstart', (e) => {
+      this.team.handleAnimationStart(e)
+    })
   }
 
   getOffSpeedFromAttr() {
@@ -437,7 +450,7 @@ export class CourtPlayer {
 
   stop(isDefense: boolean = false) {
     this.sprite.setVelocity(0, 0)
-    this.sprite.setFlipX(false)
+    this.sprite.setFlipX(this.handWithBall === Hand.RIGHT ? false : true)
     const anims = this.hasPossession
       ? ONBALL_ANIMS.idle
       : isDefense
