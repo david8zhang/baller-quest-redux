@@ -50,10 +50,14 @@ export class DribbleMeter {
         }
       })
     }
+    if (e.key === 'crossover-escape-player') {
+      this.isCrossingOver = false
+      this.isWithinDribbleCombo = false
+    }
   }
 
   handleAnimationStart(e) {
-    if (e.key !== 'dribble-switch-hand-player') {
+    if (e.key !== 'dribble-switch-hand-player' && e.key !== 'crossover-escape-player') {
       this.isWithinDribbleCombo = false
     }
   }
@@ -91,24 +95,21 @@ export class DribbleMeter {
 
   crossover(direction: Direction) {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-    const initialXVelocity = direction === Direction.RIGHT ? -150 : 150
+    const initialXVelocity = direction === Direction.RIGHT ? -250 : 250
     selectedCourtPlayer.sprite.anims.stop()
     selectedCourtPlayer.sprite.setFlipX(direction === Direction.RIGHT)
-    selectedCourtPlayer.sprite.setTexture('crossover-start-player')
+    selectedCourtPlayer.sprite.setTexture('crossover-player-start')
     selectedCourtPlayer.sprite.setVelocity(initialXVelocity, -10)
     Game.instance.time.delayedCall(50, () => {
-      selectedCourtPlayer.sprite.setTexture('crossover-transfer-player')
+      selectedCourtPlayer.sprite.setTexture('crossover-player-transition-1')
       selectedCourtPlayer.sprite.setVelocity(0, 0)
       Game.instance.time.delayedCall(100, () => {
-        selectedCourtPlayer.sprite.setTexture('crossover-transfer-2-player')
+        selectedCourtPlayer.sprite.setTexture('crossover-player-transition-2')
         Game.instance.time.delayedCall(100, () => {
           selectedCourtPlayer.handWithBall = direction === Direction.RIGHT ? Hand.RIGHT : Hand.LEFT
-          selectedCourtPlayer.sprite.setTexture('crossover-finish-player')
+          selectedCourtPlayer.sprite.setTexture('crossover-player-finish')
           selectedCourtPlayer.sprite.setVelocity(-initialXVelocity, -10)
-          Game.instance.time.delayedCall(100, () => {
-            this.isWithinDribbleCombo = false
-            this.isCrossingOver = false
-          })
+          selectedCourtPlayer.sprite.anims.play('crossover-escape-player')
         })
       })
     })

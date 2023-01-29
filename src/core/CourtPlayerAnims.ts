@@ -11,6 +11,16 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
+    key: 'crossover-escape-player',
+    frames: anims.generateFrameNames('crossover-escape-player', {
+      frames: [0, 1, 2, 3, 4, 5, 6, 5, 4],
+      suffix: '.png',
+    }),
+    repeat: 1,
+    frameRate: 6,
+  })
+
+  anims.create({
     key: 'dribble-switch-hand-player',
     frames: anims.generateFrameNames('dribble-switch-hand-player', {
       start: 0,

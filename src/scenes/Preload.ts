@@ -29,20 +29,26 @@ export class Preload extends Phaser.Scene {
 
   loadCrossoverAnimations() {
     this.load.image(
-      'crossover-start-player',
-      'animations/dribble/crossover/player/crossover-start-player.png'
+      'crossover-player-start',
+      'animations/dribble/crossover/player/crossover-player-start.png'
     )
     this.load.image(
-      'crossover-transfer-player',
-      'animations/dribble/crossover/player/crossover-transfer-player.png'
+      'crossover-player-transition-1',
+      'animations/dribble/crossover/player/crossover-player-transition-1.png'
     )
     this.load.image(
-      'crossover-transfer-2-player',
-      'animations/dribble/crossover/player/crossover-transfer-2-player.png'
+      'crossover-player-transition-2',
+      'animations/dribble/crossover/player/crossover-player-transition-2.png'
     )
     this.load.image(
-      'crossover-finish-player',
-      'animations/dribble/crossover/player/crossover-finish-player.png'
+      'crossover-player-finish',
+      'animations/dribble/crossover/player/crossover-player-finish.png'
+    )
+
+    this.load.atlas(
+      'crossover-escape-player',
+      'animations/dribble/crossover/player/crossover-escape-player.png',
+      'animations/dribble/crossover/player/crossover-escape-player.json'
     )
   }
 
