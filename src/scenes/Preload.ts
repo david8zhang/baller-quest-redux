@@ -24,6 +24,26 @@ export class Preload extends Phaser.Scene {
     this.loadStealAnimations()
     this.loadScreenAnimations()
     this.loadFumbleAnimations()
+    this.loadCrossoverAnimations()
+  }
+
+  loadCrossoverAnimations() {
+    this.load.image(
+      'crossover-start-player',
+      'animations/dribble/crossover/player/crossover-start-player.png'
+    )
+    this.load.image(
+      'crossover-transfer-player',
+      'animations/dribble/crossover/player/crossover-transfer-player.png'
+    )
+    this.load.image(
+      'crossover-transfer-2-player',
+      'animations/dribble/crossover/player/crossover-transfer-2-player.png'
+    )
+    this.load.image(
+      'crossover-finish-player',
+      'animations/dribble/crossover/player/crossover-finish-player.png'
+    )
   }
 
   loadFumbleAnimations() {

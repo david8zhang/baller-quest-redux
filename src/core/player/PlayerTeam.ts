@@ -23,7 +23,7 @@ export class PlayerTeam extends Team {
   private keyArrowRight!: Phaser.Input.Keyboard.Key
   private keyArrowUp!: Phaser.Input.Keyboard.Key
   private keyArrowDown!: Phaser.Input.Keyboard.Key
-  private sprintMeter: SprintMeter
+  public sprintMeter: SprintMeter
   public defensiveAssignmentMapping = { ...PlayerConstants.DEFENSIVE_ASSIGNMENTS }
   private defenseMeter: DefenseMeter
   private dribbleMeter: DribbleMeter
@@ -118,7 +118,7 @@ export class PlayerTeam extends Team {
   }
 
   handleArrowPress(keyCode: string) {
-    this.dribbleMeter.switchHandDribble(keyCode)
+    this.dribbleMeter.handleDribbleMove(keyCode)
   }
 
   handleDigitPress(keyCode: string) {
