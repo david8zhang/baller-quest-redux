@@ -1,5 +1,7 @@
 import Game from '~/scenes/Game'
 import { COURT_PLAYER_SPEED, COURT_PLAYER_SPRINT_SPEED } from '../Constants'
+import { Team } from '../Team'
+import { PlayerTeam } from './PlayerTeam'
 
 export class SprintMeter {
   private game: Game
@@ -7,8 +9,10 @@ export class SprintMeter {
   private keyShift: Phaser.Input.Keyboard.Key
   private sprintDuration = 0
   public isSprinting: boolean = false
+  public team: PlayerTeam
 
-  constructor(game: Game) {
+  constructor(game: Game, team: PlayerTeam) {
+    this.team = team
     this.game = game
     this.keyShift = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT)
 
@@ -16,7 +20,7 @@ export class SprintMeter {
       repeat: -1,
       delay: 1,
       callback: () => {
-        if (this.keyShift.isDown) {
+        if (this.keyShift.isDown && !this.team.isDribbling) {
           this.isSprinting = true
           this.sprintDuration = Math.min(250, this.sprintDuration + 2)
         } else {

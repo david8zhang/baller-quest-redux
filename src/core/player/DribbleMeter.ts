@@ -1,11 +1,15 @@
 import Game from '~/scenes/Game'
 import { Direction, Side } from '../Constants'
-import { Hand } from '../CourtPlayer'
+import { CourtPlayer, Hand } from '../CourtPlayer'
+import { States } from '../states/States'
 import { PlayerTeam } from './PlayerTeam'
 
 export class DribbleMeter {
   private team: PlayerTeam
   private keyC!: Phaser.Input.Keyboard.Key
+  private keyShift!: Phaser.Input.Keyboard.Key
+
+  public isSprintButtonPressed: boolean = false
   public isDribbleButtonPressed: boolean = false
   public isWithinDribbleCombo: boolean = false
   public isCurrentlySwitchingHand: boolean = false
@@ -15,6 +19,7 @@ export class DribbleMeter {
   constructor(team: PlayerTeam) {
     this.team = team
     this.keyC = Game.instance.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C)
+    this.keyShift = Game.instance.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT)
     Game.instance.time.addEvent({
       repeat: -1,
       delay: 1,
@@ -24,6 +29,17 @@ export class DribbleMeter {
           this.isDribbleButtonPressed = true
         } else {
           this.isDribbleButtonPressed = false
+        }
+      },
+    })
+    Game.instance.time.addEvent({
+      repeat: -1,
+      delay: 1,
+      callback: () => {
+        if (this.keyShift.isDown) {
+          this.isSprintButtonPressed = true
+        } else {
+          this.isSprintButtonPressed = false
         }
       },
     })
@@ -58,13 +74,14 @@ export class DribbleMeter {
 
   handleAnimationStart(e) {
     if (e.key !== 'dribble-switch-hand-player' && e.key !== 'crossover-escape-player') {
+      this.isCrossingOver = false
       this.isWithinDribbleCombo = false
     }
   }
 
   handleDribbleMove(keyCode: string) {
     if (this.isDribbleButtonPressed) {
-      if (this.team.sprintMeter.isSprinting) {
+      if (this.isSprintButtonPressed) {
         this.performCrossover(keyCode)
       } else {
         this.switchHandDribble(keyCode)
@@ -95,22 +112,43 @@ export class DribbleMeter {
 
   crossover(direction: Direction) {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-    const initialXVelocity = direction === Direction.RIGHT ? -250 : 250
+    const initialXVelocity = direction === Direction.RIGHT ? -150 : 150
     selectedCourtPlayer.sprite.anims.stop()
     selectedCourtPlayer.sprite.setFlipX(direction === Direction.RIGHT)
     selectedCourtPlayer.sprite.setTexture('crossover-player-start')
     selectedCourtPlayer.sprite.setVelocity(initialXVelocity, -10)
-    Game.instance.time.delayedCall(50, () => {
+    Game.instance.time.delayedCall(250, () => {
       selectedCourtPlayer.sprite.setTexture('crossover-player-transition-1')
       selectedCourtPlayer.sprite.setVelocity(0, 0)
-      Game.instance.time.delayedCall(100, () => {
+      Game.instance.time.delayedCall(150, () => {
         selectedCourtPlayer.sprite.setTexture('crossover-player-transition-2')
-        Game.instance.time.delayedCall(100, () => {
+        Game.instance.time.delayedCall(50, () => {
+          this.dropDefender(selectedCourtPlayer)
           selectedCourtPlayer.handWithBall = direction === Direction.RIGHT ? Hand.RIGHT : Hand.LEFT
           selectedCourtPlayer.sprite.setTexture('crossover-player-finish')
-          selectedCourtPlayer.sprite.setVelocity(-initialXVelocity, -10)
+          this.burstSpeed(selectedCourtPlayer, initialXVelocity)
           selectedCourtPlayer.sprite.anims.play('crossover-escape-player')
         })
+      })
+    })
+  }
+
+  dropDefender(selectedCourtPlayer: CourtPlayer) {
+    const defender = this.team.getDefenderForPlayer(selectedCourtPlayer)
+    if (defender) {
+      defender.setState(States.FALL)
+      Game.instance.time.delayedCall(1000, () => {
+        defender.setState(States.IDLE)
+      })
+    }
+  }
+
+  burstSpeed(selectedCourtPlayer: CourtPlayer, xVel: number) {
+    selectedCourtPlayer.sprite.setVelocity(-xVel * 3, -20)
+    Game.instance.time.delayedCall(120, () => {
+      selectedCourtPlayer.sprite.setVelocity(-xVel * 2, -20)
+      Game.instance.time.delayedCall(50, () => {
+        selectedCourtPlayer.sprite.setVelocity(-xVel * 1.5, -20)
       })
     })
   }

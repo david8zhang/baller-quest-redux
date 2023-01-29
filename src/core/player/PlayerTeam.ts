@@ -44,13 +44,17 @@ export class PlayerTeam extends Team {
       },
       game
     )
-    this.sprintMeter = new SprintMeter(game)
+    this.sprintMeter = new SprintMeter(game, this)
     this.defenseMeter = new DefenseMeter(this)
     this.dribbleMeter = new DribbleMeter(this)
     this.setupMovementKeys()
     this.setupKeyboardPressListener()
     this.setupPlayers()
     super.positionPlayers()
+  }
+
+  public get isDribbling() {
+    return this.dribbleMeter.isDribbleButtonPressed
   }
 
   shouldDunk() {

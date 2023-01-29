@@ -1,6 +1,7 @@
 import Game from '~/scenes/Game'
 import { CourtPlayer } from './CourtPlayer'
 import { ShotCoverage } from './states/offense/ShootingState'
+import { States } from './states/States'
 import { Team } from './Team'
 
 export const DEFAULT_FONT = 'Superstar'
@@ -298,7 +299,9 @@ export const calculateShotSuccessPercentage = (
   isThreePointShot: boolean,
   isLayup: boolean
 ) => {
-  const shotContesters = team.getOtherTeamCourtPlayers()
+  const shotContesters = team.getOtherTeamCourtPlayers().filter((courtPlayer: CourtPlayer) => {
+    return courtPlayer.getCurrState().key !== States.FALL
+  })
   const closestContester = getClosestPlayer(currPlayer, shotContesters)
   let shotCoverage: ShotCoverage = ShotCoverage.SMOTHERED
   if (closestContester) {

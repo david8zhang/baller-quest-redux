@@ -13,10 +13,10 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   anims.create({
     key: 'crossover-escape-player',
     frames: anims.generateFrameNames('crossover-escape-player', {
-      frames: [0, 1, 2, 3, 4, 5, 6, 5, 4],
+      frames: [0, 1, 2, 3, 4, 5, 6],
       suffix: '.png',
     }),
-    repeat: 1,
+    repeat: 0,
     frameRate: 6,
   })
 

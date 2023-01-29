@@ -36,6 +36,7 @@ import { StateMachine } from './states/StateMachine'
 import { States } from './states/States'
 import { Team } from './Team'
 import { StealState } from './states/defense/StealState'
+import { FallState } from './states/defense/FallState'
 
 export enum Hand {
   RIGHT = 'RIGHT',
@@ -137,6 +138,7 @@ export class CourtPlayer {
         [States.FUMBLE]: new FumbleState(),
         [States.HELP_DEFENSE]: new HelpDefenseState(),
         [States.STEAL]: new StealState(),
+        [States.FALL]: new FallState(),
       },
       [this, this.team]
     )
