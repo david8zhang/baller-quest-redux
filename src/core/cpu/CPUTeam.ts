@@ -1,7 +1,8 @@
 import Game from '~/scenes/Game'
-import { getClosestPlayer, LAYUP_DISTANCE, Side } from '../Constants'
+import { LAYUP_DISTANCE, Side } from '../Constants'
 import { CourtPlayer } from '../CourtPlayer'
-import { StealState } from '../states/defense/StealState'
+import { PlayerCourtPlayer } from '../player/PlayerCourtPlayer'
+import { PlayerTeam } from '../player/PlayerTeam'
 import { DribbleToPointStateConfig } from '../states/offense/DribbleToPointState'
 import { States } from '../states/States'
 import { Team } from '../Team'
@@ -18,7 +19,9 @@ export class CPUTeam extends Team {
   public currPlay: OffensePlay | null = null
   public isPuttingBackBall: boolean = false
   public isResettingOffense: boolean = false
+  public isAttemptingSteal: boolean = false
   public isTakingShot: boolean = false
+  public stealCooldownExpired: boolean = true
 
   public defensiveAssignmentMapping: any = { ...CPUConstants.DEFENSIVE_ASSIGNMENTS }
 
@@ -61,12 +64,7 @@ export class CPUTeam extends Team {
         this.game.shotClock.reboundShotClockReset()
       }
       if (this.canPutBackBall() && !this.isPuttingBackBall) {
-        this.isPuttingBackBall = true
-        const ballHandler = this.game.ball.playerWithBall
-        ballHandler!.setState(States.LAYUP, () => {
-          ballHandler?.setState(States.IDLE)
-          this.isPuttingBackBall = false
-        })
+        this.putBackBall()
       } else {
         this.isResettingOffense = true
         this.resetOffense()
@@ -74,6 +72,15 @@ export class CPUTeam extends Team {
     } else {
       this.handleNewDefenseSetup()
     }
+  }
+
+  putBackBall() {
+    this.isPuttingBackBall = true
+    const ballHandler = this.game.ball.playerWithBall
+    ballHandler!.setState(States.LAYUP, () => {
+      ballHandler?.setState(States.IDLE)
+      this.isPuttingBackBall = false
+    })
   }
 
   public getDefensiveAssignmentForPlayer(playerId: string): CourtPlayer | null {
@@ -187,20 +194,17 @@ export class CPUTeam extends Team {
   }
 
   shouldExecutePlay() {
-    return (
-      this.hasPossession() &&
-      !this.isPuttingBackBall &&
-      !this.isResettingOffense &&
-      !this.isTakingShot
-    )
+    return this.hasPossession() && this.isNotPerformingOneOffAction()
+  }
+
+  // Can interrupt the current play in order to do a random one-off action
+  isNotPerformingOneOffAction() {
+    return !this.isPuttingBackBall && !this.isResettingOffense && !this.isTakingShot
   }
 
   shouldTakeShot() {
     const isNotConflictingWithOtherStates =
-      this.hasPossession() &&
-      !this.isPuttingBackBall &&
-      !this.isResettingOffense &&
-      !this.isTakingShot
+      this.hasPossession() && this.isNotPerformingOneOffAction()
     if (!isNotConflictingWithOtherStates) {
       return false
     }
@@ -244,9 +248,51 @@ export class CPUTeam extends Team {
     }
   }
 
+  shouldAttemptSteal() {
+    if (this.game.ball.playerWithBall) {
+      const onBallDefender = this.getOtherTeam().getDefenderForPlayer(this.game.ball.playerWithBall)
+      if (!onBallDefender) {
+        return false
+      }
+      return (
+        !this.hasPossession() &&
+        onBallDefender.getCurrState().key !== States.STEAL &&
+        onBallDefender.getCurrState().key !== States.FALL &&
+        this.stealCooldownExpired
+      )
+    }
+    return false
+  }
+
+  attemptSteal() {
+    if (this.game.ball.playerWithBall) {
+      const onBallDefender = this.getOtherTeam().getDefenderForPlayer(this.game.ball.playerWithBall)
+      if (onBallDefender) {
+        const randNum = Phaser.Math.Between(0, 100)
+        this.stealCooldownExpired = false
+        if (randNum > 85) {
+          onBallDefender.setState(States.STEAL, () => {
+            onBallDefender.setState(States.DEFEND_MAN)
+            Game.instance.time.delayedCall(1000, () => {
+              this.stealCooldownExpired = true
+            })
+          })
+        } else {
+          Game.instance.time.delayedCall(1000, () => {
+            this.stealCooldownExpired = true
+          })
+        }
+      }
+    }
+  }
+
   update() {
     if (Game.instance.isChangingPossession) {
       return
+    }
+
+    if (this.shouldAttemptSteal()) {
+      this.attemptSteal()
     }
 
     if (this.shouldTakeShot()) {

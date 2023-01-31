@@ -50,7 +50,7 @@ export class DribbleMeter {
     if (!this.isCrossingOver) {
       selectedCourtPlayer.setVelocity(0, 0)
     }
-    if (!this.isWithinDribbleCombo) {
+    if (!this.isWithinDribbleCombo && selectedCourtPlayer.getCurrState().key !== States.FUMBLE) {
       const suffix = this.team.side === Side.PLAYER ? 'player' : 'cpu'
       selectedCourtPlayer.sprite.setFlipX(selectedCourtPlayer.handWithBall === Hand.LEFT)
       selectedCourtPlayer.sprite.anims.play(`dribble-front-${suffix}`, true)
@@ -135,7 +135,8 @@ export class DribbleMeter {
 
   dropDefender(selectedCourtPlayer: CourtPlayer) {
     const defender = this.team.getDefenderForPlayer(selectedCourtPlayer)
-    if (defender) {
+    const randNum = Phaser.Math.Between(0, 100) > 90
+    if (defender && defender.getCurrState().key !== States.STEAL && randNum) {
       defender.setState(States.FALL)
       Game.instance.time.delayedCall(1000, () => {
         defender.setState(States.IDLE)

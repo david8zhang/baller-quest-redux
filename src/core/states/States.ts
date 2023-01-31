@@ -19,4 +19,5 @@ export enum States {
   FUMBLE = 'Fumble',
   FALL = 'Fall',
   STEAL = 'Steal',
+  CROSSOVER = 'Crossover',
 }

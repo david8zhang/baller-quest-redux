@@ -37,9 +37,8 @@ export class CPUCourtPlayer extends CourtPlayer {
       !this.isBlockingOrContesting() &&
       this.getCurrState().key !== States.FUMBLE &&
       this.getCurrState().key !== States.FALL &&
-      !cpuTeam.isPuttingBackBall &&
-      !cpuTeam.isResettingOffense &&
-      !cpuTeam.isTakingShot
+      this.getCurrState().key !== States.STEAL &&
+      cpuTeam.isNotPerformingOneOffAction()
     )
   }
 

@@ -6,10 +6,6 @@ import Game from '~/scenes/Game'
 import { State } from '../StateMachine'
 import { States } from '../States'
 
-export interface StealStateConfig {
-  onStealCallback: Function
-}
-
 export class StealState extends State {
   public stealFailed: boolean = false
 
