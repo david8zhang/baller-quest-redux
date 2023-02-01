@@ -5,6 +5,7 @@ import Game from './scenes/Game'
 import { GameOver } from './scenes/GameOver'
 import { Preload } from './scenes/Preload'
 import { Start } from './scenes/Start'
+import OutlinePipelinePlugin from 'phaser3-rex-plugins/plugins/outlinepipeline-plugin'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -20,6 +21,15 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   dom: {
     createContainer: true,
+  },
+  plugins: {
+    global: [
+      {
+        key: 'rexOutlinePipeline',
+        plugin: OutlinePipelinePlugin,
+        start: true,
+      },
+    ],
   },
   pixelArt: true,
   scale: {

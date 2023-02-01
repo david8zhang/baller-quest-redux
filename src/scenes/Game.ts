@@ -31,6 +31,7 @@ export default class Game extends Phaser.Scene {
   public shotClock!: ShotClock
   private static _instance: Game
 
+  public postFxPlugin: any
   public ignoreDepthSortingNames = ['hoop', 'rim', 'shooting', 'ball', 'court', 'highlight', 'ui']
 
   constructor() {
@@ -50,7 +51,12 @@ export default class Game extends Phaser.Scene {
     this.scoreTracker.increaseScore(numPoints, side)
   }
 
+  initPlugins() {
+    this.postFxPlugin = this.plugins.get('rexOutlinePipeline')
+  }
+
   create() {
+    this.initPlugins()
     createPlayerAnims(this.anims)
     createNetAnims(this.anims)
     this.timer = new Timer(this, () => {

@@ -16,6 +16,9 @@ export class DribbleMeter {
   public isCrossingOver: boolean = false
   public stopDribblingEvent: Phaser.Time.TimerEvent | null = null
 
+  public dribbleArrows: Phaser.GameObjects.Image[] = []
+  public pressedDribbleArrowIndex: number = 0
+
   constructor(team: PlayerTeam) {
     this.team = team
     this.keyC = Game.instance.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C)
@@ -26,9 +29,8 @@ export class DribbleMeter {
       callback: () => {
         if (this.keyC.isDown) {
           this.onDribbleStart()
-          this.isDribbleButtonPressed = true
         } else {
-          this.isDribbleButtonPressed = false
+          this.onDribbleEnd()
         }
       },
     })
@@ -45,16 +47,53 @@ export class DribbleMeter {
     })
   }
 
+  displayDribbleMoveArrows() {
+    if (this.dribbleArrows.length == 0) {
+      const numArrows = 5
+      const arrowDirections = ['arrowUp', 'arrowLeft', 'arrowRight', 'arrowDown']
+      const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+      let spaceBetweenArrows = 25
+      let xPos = selectedCourtPlayer.x - 49
+      let yPos = selectedCourtPlayer.y + selectedCourtPlayer.sprite.displayHeight / 2 + 10
+      for (let i = 0; i < numArrows; i++) {
+        const randomArrow = arrowDirections[Phaser.Math.Between(0, arrowDirections.length - 1)]
+        const arrow = Game.instance.add
+          .sprite(xPos, yPos, randomArrow)
+          .setScale(0.5)
+          .setData('arrowType', randomArrow.toLowerCase())
+        Game.instance.postFxPlugin.add(arrow, {
+          thickness: 2,
+          outlineColor: 0x000000,
+        })
+        this.dribbleArrows.push(arrow)
+        xPos += spaceBetweenArrows
+      }
+    }
+  }
+
+  hideDribbleArrows() {
+    this.pressedDribbleArrowIndex = 0
+    this.dribbleArrows.forEach((arrow) => {
+      arrow.destroy()
+    })
+    this.dribbleArrows = []
+  }
+
+  onDribbleEnd() {
+    this.isDribbleButtonPressed = false
+    this.hideDribbleArrows()
+  }
+
   onDribbleStart() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-    if (!this.isCrossingOver) {
-      selectedCourtPlayer.setVelocity(0, 0)
-    }
+    selectedCourtPlayer.setVelocity(0, 0)
+
     if (!this.isWithinDribbleCombo && selectedCourtPlayer.getCurrState().key !== States.FUMBLE) {
-      const suffix = this.team.side === Side.PLAYER ? 'player' : 'cpu'
-      selectedCourtPlayer.sprite.setFlipX(selectedCourtPlayer.handWithBall === Hand.LEFT)
-      selectedCourtPlayer.sprite.anims.play(`dribble-front-${suffix}`, true)
+      selectedCourtPlayer.sprite.anims.play('dribble-intense-player', true)
     }
+
+    this.isDribbleButtonPressed = true
+    this.displayDribbleMoveArrows()
   }
 
   handleAnimationComplete(e) {
@@ -81,10 +120,20 @@ export class DribbleMeter {
 
   handleDribbleMove(keyCode: string) {
     if (this.isDribbleButtonPressed) {
-      if (this.isSprintButtonPressed) {
-        this.performCrossover(keyCode)
-      } else {
-        this.switchHandDribble(keyCode)
+      if (this.pressedDribbleArrowIndex < this.dribbleArrows.length) {
+        let arrowToPress = this.dribbleArrows[this.pressedDribbleArrowIndex]
+        if (arrowToPress.getData('arrowType') === keyCode.toLowerCase()) {
+          arrowToPress.setTintFill(0x00ff00)
+          Game.instance.tweens.add({
+            targets: [arrowToPress],
+            alpha: {
+              from: 1,
+              to: 0,
+            },
+            duration: 150,
+          })
+          this.pressedDribbleArrowIndex++
+        }
       }
     }
   }

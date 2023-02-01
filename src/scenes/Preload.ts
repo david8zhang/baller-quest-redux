@@ -25,6 +25,7 @@ export class Preload extends Phaser.Scene {
     this.loadScreenAnimations()
     this.loadFumbleAnimations()
     this.loadCrossoverAnimations()
+    this.loadUIImages()
   }
 
   loadCrossoverAnimations() {
@@ -50,6 +51,13 @@ export class Preload extends Phaser.Scene {
       'animations/dribble/crossover/player/crossover-escape-player.png',
       'animations/dribble/crossover/player/crossover-escape-player.json'
     )
+  }
+
+  loadUIImages() {
+    this.load.image('arrowLeft', 'ui/arrowLeft.png')
+    this.load.image('arrowRight', 'ui/arrowRight.png')
+    this.load.image('arrowUp', 'ui/arrowUp.png')
+    this.load.image('arrowDown', 'ui/arrowDown.png')
   }
 
   loadFumbleAnimations() {
@@ -201,15 +209,9 @@ export class Preload extends Phaser.Scene {
     )
 
     this.load.atlas(
-      'dribble-switch-hand-cpu',
-      'animations/dribble/dribble-switch-hand/dribble-switch-hand-cpu.png',
-      'animations/dribble/dribble-switch-hand/dribble-switch-hand-cpu.json'
-    )
-
-    this.load.atlas(
-      'dribble-switch-hand-player',
-      'animations/dribble/dribble-switch-hand/dribble-switch-hand-player.png',
-      'animations/dribble/dribble-switch-hand/dribble-switch-hand-player.json'
+      'dribble-intense-player',
+      'animations/dribble/dribble-intense/dribble-intense-player.png',
+      'animations/dribble/dribble-intense/dribble-intense-player.json'
     )
   }
 
