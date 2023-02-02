@@ -3,16 +3,16 @@ import { Ball } from '~/core/Ball'
 import { DEFAULT_FONT, Side, SORT_ORDER, WINDOW_HEIGHT, WINDOW_WIDTH } from '~/core/Constants'
 import { Court } from '~/core/Court'
 import { CourtPlayer } from '~/core/CourtPlayer'
-import { createPlayerAnims } from '~/core/CourtPlayerAnims'
+import { createPlayerAnims } from '~/core/animations/CourtPlayerAnims'
 import { CPUTeam } from '~/core/cpu/CPUTeam'
 import { Cursor } from '~/core/Cursor'
 import { Hoop } from '~/core/Hoop'
-import { createNetAnims } from '~/core/NetAnims'
 import { PlayerTeam } from '~/core/player/PlayerTeam'
 import { ScoreTracker } from '~/core/ScoreTracker'
 import { ShotClock } from '~/core/ShotClock'
 import { States } from '~/core/states/States'
 import { Timer } from '~/core/Timer'
+import { createNetAnims } from '~/core/animations/NetAnims'
 
 export default class Game extends Phaser.Scene {
   public timer!: Timer

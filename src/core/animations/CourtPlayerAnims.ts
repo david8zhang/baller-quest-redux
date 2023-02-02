@@ -1,5 +1,15 @@
 export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => {
   anims.create({
+    key: 'aura',
+    frames: anims.generateFrameNames('aura', {
+      frames: [0, 1, 2, 3, 2, 1],
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 12,
+  })
+
+  anims.create({
     key: 'idle-front-player',
     frames: anims.generateFrameNames('idle-front-player', {
       start: 0,

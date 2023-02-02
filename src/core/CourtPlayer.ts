@@ -89,6 +89,7 @@ export class CourtPlayer {
 
   public graphics: Phaser.GameObjects.Graphics
   public handWithBall = Hand.RIGHT
+  public auraSprite: Phaser.GameObjects.Sprite
 
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
@@ -114,6 +115,12 @@ export class CourtPlayer {
 
     this.raycastIntersectRect = new Phaser.Geom.Rectangle(this.sprite.x, this.sprite.y, 48, 64)
     this.playerOverlapRect = new Phaser.Geom.Rectangle(this.sprite.x, this.sprite.y, 32, 32)
+
+    this.auraSprite = Game.instance.add
+      .sprite(100, 100, 'aura')
+      .setScale(3)
+      .setAlpha(0.75)
+      .setVisible(false)
 
     this.team = team
     this.stateMachine = new StateMachine(
@@ -338,6 +345,7 @@ export class CourtPlayer {
   }
 
   public update() {
+    this.auraSprite.setPosition(this.sprite.x, this.sprite.y).setDepth(this.sprite.depth - 1)
     this.raycastIntersectRect.setPosition(
       this.sprite.x - this.raycastIntersectRect.width / 2,
       this.sprite.y - 15

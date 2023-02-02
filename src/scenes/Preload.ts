@@ -26,6 +26,11 @@ export class Preload extends Phaser.Scene {
     this.loadFumbleAnimations()
     this.loadCrossoverAnimations()
     this.loadUIImages()
+    this.loadAuraAnimations()
+  }
+
+  loadAuraAnimations() {
+    this.load.atlas('aura', 'animations/aura/aura.png', 'animations/aura/aura.json')
   }
 
   loadCrossoverAnimations() {

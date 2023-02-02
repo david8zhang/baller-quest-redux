@@ -12,12 +12,12 @@ export class DribbleMeter {
   public isSprintButtonPressed: boolean = false
   public isDribbleButtonPressed: boolean = false
   public isWithinDribbleCombo: boolean = false
-  public isCurrentlySwitchingHand: boolean = false
   public isCrossingOver: boolean = false
   public stopDribblingEvent: Phaser.Time.TimerEvent | null = null
 
   public dribbleArrows: Phaser.GameObjects.Image[] = []
   public pressedDribbleArrowIndex: number = 0
+  public dribbleComboSuccess: boolean = false
 
   constructor(team: PlayerTeam) {
     this.team = team
@@ -44,6 +44,24 @@ export class DribbleMeter {
           this.isSprintButtonPressed = false
         }
       },
+    })
+    this.setupKeyboardListener()
+  }
+
+  setupKeyboardListener() {
+    Game.instance.input.keyboard.on('keydown', (e) => {
+      switch (e.code) {
+        case 'KeyX': {
+          if (
+            this.dribbleComboSuccess &&
+            this.isDribbleButtonPressed &&
+            this.team.hasPossession()
+          ) {
+            this.performCrossover()
+            break
+          }
+        }
+      }
     })
   }
 
@@ -82,11 +100,16 @@ export class DribbleMeter {
   onDribbleEnd() {
     this.isDribbleButtonPressed = false
     this.hideDribbleArrows()
+    const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    selectedCourtPlayer.auraSprite.setVisible(false)
   }
 
   onDribbleStart() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-    selectedCourtPlayer.setVelocity(0, 0)
+
+    if (!this.isCrossingOver) {
+      selectedCourtPlayer.setVelocity(0, 0)
+    }
 
     if (!this.isWithinDribbleCombo && selectedCourtPlayer.getCurrState().key !== States.FUMBLE) {
       selectedCourtPlayer.sprite.anims.play('dribble-intense-player', true)
@@ -97,17 +120,14 @@ export class DribbleMeter {
   }
 
   handleAnimationComplete(e) {
-    if (e.key === 'dribble-switch-hand-player') {
-      this.isCurrentlySwitchingHand = false
-      this.stopDribblingEvent = Game.instance.time.delayedCall(250, () => {
-        if (!this.isCrossingOver) {
-          this.isWithinDribbleCombo = false
-        }
-      })
+    if (e.key === 'dribble-intense-player') {
+      this.isWithinDribbleCombo = false
+      this.dribbleComboSuccess = false
     }
     if (e.key === 'crossover-escape-player') {
       this.isCrossingOver = false
       this.isWithinDribbleCombo = false
+      this.dribbleComboSuccess = false
     }
   }
 
@@ -116,6 +136,24 @@ export class DribbleMeter {
       this.isCrossingOver = false
       this.isWithinDribbleCombo = false
     }
+  }
+
+  onDribbleComboSuccess() {
+    const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    selectedCourtPlayer.auraSprite
+      .setPosition(selectedCourtPlayer.x, selectedCourtPlayer.y)
+      .setVisible(true)
+      .setDepth(selectedCourtPlayer.sprite.depth - 1)
+    selectedCourtPlayer.auraSprite.play('aura')
+    this.dribbleComboSuccess = true
+    Game.instance.time.delayedCall(1500, () => {
+      this.dribbleComboSuccess = false
+    })
+  }
+
+  onDribbleComboFailed() {
+    this.pressedDribbleArrowIndex = 0
+    this.hideDribbleArrows()
   }
 
   handleDribbleMove(keyCode: string) {
@@ -131,32 +169,36 @@ export class DribbleMeter {
               to: 0,
             },
             duration: 150,
+            onComplete: () => {
+              if (this.pressedDribbleArrowIndex === this.dribbleArrows.length) {
+                this.onDribbleComboSuccess()
+              }
+            },
           })
           this.pressedDribbleArrowIndex++
+        } else {
+          arrowToPress.setTintFill(0xff0000)
+          Game.instance.tweens.add({
+            targets: [arrowToPress],
+            alpha: {
+              from: 1,
+              to: 0,
+            },
+            duration: 150,
+            onComplete: () => {
+              this.onDribbleComboFailed()
+            },
+          })
         }
       }
     }
   }
 
-  performCrossover(keycode: string) {
-    const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+  performCrossover() {
+    const direction = Phaser.Math.Between(0, 1) === 0 ? Direction.LEFT : Direction.RIGHT
     this.isWithinDribbleCombo = true
-    switch (keycode) {
-      case 'ArrowLeft': {
-        if (selectedCourtPlayer.handWithBall == Hand.RIGHT) {
-          this.isCrossingOver = true
-          this.crossover(Direction.LEFT)
-        }
-        break
-      }
-      case 'ArrowRight': {
-        if (selectedCourtPlayer.handWithBall === Hand.LEFT) {
-          this.isCrossingOver = true
-          this.crossover(Direction.RIGHT)
-        }
-        break
-      }
-    }
+    this.isCrossingOver = true
+    this.crossover(direction)
   }
 
   crossover(direction: Direction) {
@@ -184,8 +226,7 @@ export class DribbleMeter {
 
   dropDefender(selectedCourtPlayer: CourtPlayer) {
     const defender = this.team.getDefenderForPlayer(selectedCourtPlayer)
-    const randNum = Phaser.Math.Between(0, 100) > 90
-    if (defender && defender.getCurrState().key !== States.STEAL && randNum) {
+    if (defender && defender.getCurrState().key !== States.STEAL) {
       defender.setState(States.FALL)
       Game.instance.time.delayedCall(1000, () => {
         defender.setState(States.IDLE)
@@ -201,53 +242,5 @@ export class DribbleMeter {
         selectedCourtPlayer.sprite.setVelocity(-xVel * 1.5, -20)
       })
     })
-  }
-
-  switchHandDribble(keyCode: string) {
-    if (this.isDribbleButtonPressed && !this.isCurrentlySwitchingHand && !this.isCrossingOver) {
-      this.isWithinDribbleCombo = true
-      if (this.stopDribblingEvent) {
-        this.stopDribblingEvent.paused = true
-        this.stopDribblingEvent.destroy()
-        this.stopDribblingEvent = null
-      }
-      const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-      switch (keyCode) {
-        case 'ArrowLeft': {
-          if (selectedCourtPlayer.handWithBall === Hand.RIGHT) {
-            this.isCurrentlySwitchingHand = true
-            selectedCourtPlayer.handWithBall = Hand.LEFT
-            selectedCourtPlayer.sprite.setFlipX(false)
-            selectedCourtPlayer.sprite.play('dribble-switch-hand-player', true)
-          } else {
-            if (!this.stopDribblingEvent) {
-              this.stopDribblingEvent = Game.instance.time.delayedCall(250, () => {
-                if (!this.isCrossingOver) {
-                  this.isWithinDribbleCombo = false
-                }
-              })
-            }
-          }
-          break
-        }
-        case 'ArrowRight': {
-          if (selectedCourtPlayer.handWithBall === Hand.LEFT) {
-            this.isCurrentlySwitchingHand = true
-            selectedCourtPlayer.handWithBall = Hand.RIGHT
-            selectedCourtPlayer.sprite.setFlipX(true)
-            selectedCourtPlayer.sprite.play('dribble-switch-hand-player', true)
-          } else {
-            if (!this.stopDribblingEvent) {
-              this.stopDribblingEvent = Game.instance.time.delayedCall(250, () => {
-                if (!this.isCrossingOver) {
-                  this.isWithinDribbleCombo = false
-                }
-              })
-            }
-          }
-          break
-        }
-      }
-    }
   }
 }
