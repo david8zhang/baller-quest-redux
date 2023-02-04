@@ -18,7 +18,7 @@ export class FallState extends State {
         currPlayer.sprite.setTexture(`fumble-${suffix}-fall`)
         Game.instance.time.delayedCall(150, () => {
           currPlayer.sprite.setTexture(`fumble-${suffix}-end`)
-          Game.instance.time.delayedCall(300, () => {
+          Game.instance.time.delayedCall(750, () => {
             currPlayer.sprite.setTexture(`fumble-${suffix}-fall`)
             Game.instance.time.delayedCall(150, () => {
               currPlayer.sprite.setTexture(`fumble-${suffix}-start`)

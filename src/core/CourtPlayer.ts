@@ -121,6 +121,7 @@ export class CourtPlayer {
       .setScale(3)
       .setAlpha(0.75)
       .setVisible(false)
+      .setName('ui')
 
     this.team = team
     this.stateMachine = new StateMachine(

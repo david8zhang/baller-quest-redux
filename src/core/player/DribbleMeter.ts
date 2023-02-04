@@ -18,6 +18,7 @@ export class DribbleMeter {
   public dribbleArrows: Phaser.GameObjects.Image[] = []
   public pressedDribbleArrowIndex: number = 0
   public dribbleComboSuccess: boolean = false
+  public dribbleComboTimeoutEvent: Phaser.Time.TimerEvent | null = null
 
   constructor(team: PlayerTeam) {
     this.team = team
@@ -98,7 +99,9 @@ export class DribbleMeter {
   }
 
   onDribbleEnd() {
+    this.isWithinDribbleCombo = false
     this.isDribbleButtonPressed = false
+    this.dribbleComboSuccess = false
     this.hideDribbleArrows()
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
     selectedCourtPlayer.auraSprite.setVisible(false)
@@ -106,28 +109,29 @@ export class DribbleMeter {
 
   onDribbleStart() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-
-    if (!this.isCrossingOver) {
-      selectedCourtPlayer.setVelocity(0, 0)
-    }
-
-    if (!this.isWithinDribbleCombo && selectedCourtPlayer.getCurrState().key !== States.FUMBLE) {
+    if (
+      !this.isWithinDribbleCombo &&
+      selectedCourtPlayer.getCurrState().key !== States.FUMBLE &&
+      this.team.hasPossession()
+    ) {
       selectedCourtPlayer.sprite.anims.play('dribble-intense-player', true)
     }
-
     this.isDribbleButtonPressed = true
-    this.displayDribbleMoveArrows()
+    if (!this.isCrossingOver) {
+      selectedCourtPlayer.setVelocity(0, 0)
+      if (!this.dribbleComboSuccess) {
+        this.displayDribbleMoveArrows()
+      }
+    }
   }
 
   handleAnimationComplete(e) {
-    if (e.key === 'dribble-intense-player') {
-      this.isWithinDribbleCombo = false
-      this.dribbleComboSuccess = false
-    }
     if (e.key === 'crossover-escape-player') {
       this.isCrossingOver = false
       this.isWithinDribbleCombo = false
       this.dribbleComboSuccess = false
+      const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+      selectedCourtPlayer.auraSprite.setVisible(false)
     }
   }
 
@@ -139,6 +143,7 @@ export class DribbleMeter {
   }
 
   onDribbleComboSuccess() {
+    this.pressedDribbleArrowIndex = 0
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
     selectedCourtPlayer.auraSprite
       .setPosition(selectedCourtPlayer.x, selectedCourtPlayer.y)
@@ -146,7 +151,9 @@ export class DribbleMeter {
       .setDepth(selectedCourtPlayer.sprite.depth - 1)
     selectedCourtPlayer.auraSprite.play('aura')
     this.dribbleComboSuccess = true
-    Game.instance.time.delayedCall(1500, () => {
+    this.hideDribbleArrows()
+    this.dribbleComboTimeoutEvent = Game.instance.time.delayedCall(1500, () => {
+      selectedCourtPlayer.auraSprite.setVisible(false)
       this.dribbleComboSuccess = false
     })
   }
@@ -157,7 +164,7 @@ export class DribbleMeter {
   }
 
   handleDribbleMove(keyCode: string) {
-    if (this.isDribbleButtonPressed) {
+    if (this.isDribbleButtonPressed && !this.isCrossingOver) {
       if (this.pressedDribbleArrowIndex < this.dribbleArrows.length) {
         let arrowToPress = this.dribbleArrows[this.pressedDribbleArrowIndex]
         if (arrowToPress.getData('arrowType') === keyCode.toLowerCase()) {
@@ -169,13 +176,11 @@ export class DribbleMeter {
               to: 0,
             },
             duration: 150,
-            onComplete: () => {
-              if (this.pressedDribbleArrowIndex === this.dribbleArrows.length) {
-                this.onDribbleComboSuccess()
-              }
-            },
           })
           this.pressedDribbleArrowIndex++
+          if (this.pressedDribbleArrowIndex === this.dribbleArrows.length) {
+            this.onDribbleComboSuccess()
+          }
         } else {
           arrowToPress.setTintFill(0xff0000)
           Game.instance.tweens.add({
@@ -195,10 +200,18 @@ export class DribbleMeter {
   }
 
   performCrossover() {
-    const direction = Phaser.Math.Between(0, 1) === 0 ? Direction.LEFT : Direction.RIGHT
-    this.isWithinDribbleCombo = true
-    this.isCrossingOver = true
-    this.crossover(direction)
+    if (this.dribbleComboTimeoutEvent) {
+      this.dribbleComboTimeoutEvent.paused = true
+      this.dribbleComboTimeoutEvent.destroy()
+      this.dribbleComboTimeoutEvent = null
+    }
+
+    if (!this.isCrossingOver) {
+      const direction = Phaser.Math.Between(0, 1) === 0 ? Direction.LEFT : Direction.RIGHT
+      this.isWithinDribbleCombo = true
+      this.isCrossingOver = true
+      this.crossover(direction)
+    }
   }
 
   crossover(direction: Direction) {
@@ -228,7 +241,7 @@ export class DribbleMeter {
     const defender = this.team.getDefenderForPlayer(selectedCourtPlayer)
     if (defender && defender.getCurrState().key !== States.STEAL) {
       defender.setState(States.FALL)
-      Game.instance.time.delayedCall(1000, () => {
+      Game.instance.time.delayedCall(1250, () => {
         defender.setState(States.IDLE)
       })
     }
