@@ -12,3 +12,4 @@
 ## Bugs
 
 - Layup during shot clock expiration causes the game to crash
+- After CPU passes ball to teammate and hits a 3 pointer, game crashes

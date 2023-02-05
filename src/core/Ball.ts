@@ -104,6 +104,10 @@ export class Ball {
           this.ballState === BallState.MADE_THREE_POINT_SHOT
         ) {
           const points = this.ballState === BallState.MADE_THREE_POINT_SHOT ? 3 : 2
+          if (!this.prevPlayerWithBall) {
+            console.log('WENT HERE!', this)
+            console.log(this.playerWithBall)
+          }
           Game.instance.onScore(this.prevPlayerWithBall!.side, points)
           this.ballState = BallState.POST_MADE_SHOT
           this.game.handleChangePossession(this.prevPlayerWithBall!.side)

@@ -119,7 +119,7 @@ export class CourtPlayer {
     this.auraSprite = Game.instance.add
       .sprite(100, 100, 'aura')
       .setScale(3)
-      .setAlpha(0.75)
+      .setAlpha(0.5)
       .setVisible(false)
       .setName('ui')
 

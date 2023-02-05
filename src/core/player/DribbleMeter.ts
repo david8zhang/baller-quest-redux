@@ -1,5 +1,6 @@
 import Game from '~/scenes/Game'
-import { Direction, Side } from '../Constants'
+import { BallState } from '../Ball'
+import { createArc, Direction, Side } from '../Constants'
 import { CourtPlayer, Hand } from '../CourtPlayer'
 import { States } from '../states/States'
 import { PlayerTeam } from './PlayerTeam'
@@ -18,6 +19,7 @@ export class DribbleMeter {
   public dribbleArrows: Phaser.GameObjects.Image[] = []
   public pressedDribbleArrowIndex: number = 0
   public dribbleComboSuccess: boolean = false
+  public dribbleComboFailed: boolean = false
   public dribbleComboTimeoutEvent: Phaser.Time.TimerEvent | null = null
 
   constructor(team: PlayerTeam) {
@@ -109,11 +111,10 @@ export class DribbleMeter {
 
   onDribbleStart() {
     const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
-    if (
-      !this.isWithinDribbleCombo &&
-      selectedCourtPlayer.getCurrState().key !== States.FUMBLE &&
-      this.team.hasPossession()
-    ) {
+    if (selectedCourtPlayer.getCurrState().key === States.FUMBLE || !this.team.hasPossession()) {
+      return
+    }
+    if (!this.isWithinDribbleCombo) {
       selectedCourtPlayer.sprite.anims.play('dribble-intense-player', true)
     }
     this.isDribbleButtonPressed = true
@@ -161,10 +162,41 @@ export class DribbleMeter {
   onDribbleComboFailed() {
     this.pressedDribbleArrowIndex = 0
     this.hideDribbleArrows()
+    const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    this.launchBallBackwardsAfterFumble(selectedCourtPlayer)
+  }
+
+  launchBallBackwardsAfterFumble(ballHandler: CourtPlayer) {
+    ballHandler.setState(States.FUMBLE)
+    Game.instance.cameras.main.shake(150, 0.005)
+    const xDiff = Phaser.Math.Between(0, 1) == 0 ? 32 : -32
+    const point = {
+      x: ballHandler.sprite.x + xDiff,
+      y: ballHandler.sprite.y + ballHandler.sprite.displayHeight,
+    }
+    const ball = Game.instance.ball
+    ball.sprite.setDepth(ballHandler.sprite.depth + 1)
+    ball.blockShotFloor.setPosition(
+      point.x,
+      Math.max(point.y, Game.instance.court.behindBackboardWallSprite.y + 25)
+    )
+    ball.blockShotFloorCollider.active = true
+    ball.show()
+    const stealDeflectDuration = 0.5
+    ballHandler.losePossessionOfBall()
+    ball.giveUpPossession()
+    createArc(ball.sprite, point, stealDeflectDuration)
+    Game.instance.time.delayedCall(stealDeflectDuration * 1000, () => {
+      ball.ballState = BallState.STOLEN
+    })
+    Game.instance.time.delayedCall(stealDeflectDuration * 2000, () => {
+      this.dribbleComboFailed = false
+      ballHandler.setState(States.IDLE)
+    })
   }
 
   handleDribbleMove(keyCode: string) {
-    if (this.isDribbleButtonPressed && !this.isCrossingOver) {
+    if (this.isDribbleButtonPressed && !this.isCrossingOver && !this.dribbleComboFailed) {
       if (this.pressedDribbleArrowIndex < this.dribbleArrows.length) {
         let arrowToPress = this.dribbleArrows[this.pressedDribbleArrowIndex]
         if (arrowToPress.getData('arrowType') === keyCode.toLowerCase()) {
@@ -182,6 +214,7 @@ export class DribbleMeter {
             this.onDribbleComboSuccess()
           }
         } else {
+          this.dribbleComboFailed = true
           arrowToPress.setTintFill(0xff0000)
           Game.instance.tweens.add({
             targets: [arrowToPress],
@@ -220,7 +253,7 @@ export class DribbleMeter {
     selectedCourtPlayer.sprite.anims.stop()
     selectedCourtPlayer.sprite.setFlipX(direction === Direction.RIGHT)
     selectedCourtPlayer.sprite.setTexture('crossover-player-start')
-    selectedCourtPlayer.sprite.setVelocity(initialXVelocity, -10)
+    selectedCourtPlayer.sprite.setVelocity(initialXVelocity, -20)
     Game.instance.time.delayedCall(250, () => {
       selectedCourtPlayer.sprite.setTexture('crossover-player-transition-1')
       selectedCourtPlayer.sprite.setVelocity(0, 0)
@@ -248,11 +281,11 @@ export class DribbleMeter {
   }
 
   burstSpeed(selectedCourtPlayer: CourtPlayer, xVel: number) {
-    selectedCourtPlayer.sprite.setVelocity(-xVel * 3, -20)
+    selectedCourtPlayer.sprite.setVelocity(-xVel * 3, -100)
     Game.instance.time.delayedCall(120, () => {
-      selectedCourtPlayer.sprite.setVelocity(-xVel * 2, -20)
+      selectedCourtPlayer.sprite.setVelocity(-xVel * 2, -100)
       Game.instance.time.delayedCall(50, () => {
-        selectedCourtPlayer.sprite.setVelocity(-xVel * 1.5, -20)
+        selectedCourtPlayer.sprite.setVelocity(-xVel * 1.5, -100)
       })
     })
   }
