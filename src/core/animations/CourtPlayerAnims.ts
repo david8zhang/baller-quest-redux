@@ -10,6 +10,17 @@ export const createPlayerAnims = (anims: Phaser.Animations.AnimationManager) => 
   })
 
   anims.create({
+    key: 'sprint-side-player',
+    frames: anims.generateFrameNames('sprint-side-player', {
+      start: 0,
+      end: 5,
+      suffix: '.png',
+    }),
+    repeat: -1,
+    frameRate: 6,
+  })
+
+  anims.create({
     key: 'idle-front-player',
     frames: anims.generateFrameNames('idle-front-player', {
       start: 0,

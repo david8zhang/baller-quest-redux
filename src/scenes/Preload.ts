@@ -27,6 +27,15 @@ export class Preload extends Phaser.Scene {
     this.loadCrossoverAnimations()
     this.loadUIImages()
     this.loadAuraAnimations()
+    this.loadSprintAnimations()
+  }
+
+  loadSprintAnimations() {
+    this.load.atlas(
+      'sprint-side-player',
+      'animations/run/sprint-with-ball-side/player-sprint-side.png',
+      'animations/run/sprint-with-ball-side/player-sprint-side.json'
+    )
   }
 
   loadAuraAnimations() {

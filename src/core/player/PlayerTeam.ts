@@ -57,6 +57,10 @@ export class PlayerTeam extends Team {
     return this.dribbleMeter.isDribbleButtonPressed
   }
 
+  public get isSprinting() {
+    return this.sprintMeter.isSprinting
+  }
+
   shouldDunk() {
     return this.sprintMeter.isSprinting
   }

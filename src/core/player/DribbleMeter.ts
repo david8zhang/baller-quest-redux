@@ -168,7 +168,6 @@ export class DribbleMeter {
 
   launchBallBackwardsAfterFumble(ballHandler: CourtPlayer) {
     ballHandler.setState(States.FUMBLE)
-    Game.instance.cameras.main.shake(150, 0.005)
     const xDiff = Phaser.Math.Between(0, 1) == 0 ? 32 : -32
     const point = {
       x: ballHandler.sprite.x + xDiff,

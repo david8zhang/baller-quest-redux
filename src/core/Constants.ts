@@ -372,6 +372,9 @@ export const ONBALL_ANIMS = {
     [Direction.LEFT]: 'run-with-ball-side',
     [Direction.RIGHT]: 'run-with-ball-side',
   },
+  sprint: {
+    [Direction.LEFT]: 'sprint-side',
+  },
 }
 
 export const getClosestPlayer = (src: CourtPlayer, courtPlayers: CourtPlayer[]): CourtPlayer => {

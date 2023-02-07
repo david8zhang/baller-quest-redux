@@ -2,6 +2,7 @@ import Game from '~/scenes/Game'
 import { BallState } from './Ball'
 import {
   DEFAULT_FONT,
+  Direction,
   DUNK_LIKELIHOOD_ATTRIBUTE_MAPPING,
   getDistanceBetween,
   LAYUP_DISTANCE,
@@ -37,6 +38,7 @@ import { States } from './states/States'
 import { Team } from './Team'
 import { StealState } from './states/defense/StealState'
 import { FallState } from './states/defense/FallState'
+import { PlayerTeam } from './player/PlayerTeam'
 
 export enum Hand {
   RIGHT = 'RIGHT',
@@ -526,24 +528,46 @@ export class CourtPlayer {
     }
   }
 
+  getAnimationToPlay(isUp: boolean, isDefense: boolean) {
+    if (isUp) {
+      if (this.hasPossession) {
+        return ONBALL_ANIMS.run.up
+      } else {
+        if (isDefense) {
+          return OFFBALL_ANIMS.defend.up
+        } else {
+          return OFFBALL_ANIMS.run.up
+        }
+      }
+    } else {
+      if (this.hasPossession) {
+        if (this.team.side === Side.PLAYER) {
+          const team = this.team as PlayerTeam
+          if (team.isSprinting) {
+            return ONBALL_ANIMS.sprint.left
+          }
+        }
+        return ONBALL_ANIMS.run.left
+      } else {
+        if (isDefense) {
+          return OFFBALL_ANIMS.defend.left
+        } else {
+          return OFFBALL_ANIMS.run.left
+        }
+      }
+    }
+  }
+
   playRunAnimationForVelocity(xVelocity: number, yVelocity: number, isDefense: boolean) {
     if (Math.abs(xVelocity) >= Math.abs(yVelocity)) {
       this.sprite.setFlipX(xVelocity > 0)
-      const animToPlay = this.hasPossession
-        ? ONBALL_ANIMS.run.left
-        : isDefense
-        ? OFFBALL_ANIMS.defend.left
-        : OFFBALL_ANIMS.run.left
+      const animToPlay = this.getAnimationToPlay(false, isDefense)
       if (this.sprite.anims.getName() !== animToPlay) {
         const suffix = this.side === Side.CPU ? 'cpu' : 'player'
         this.sprite.play(`${animToPlay}-${suffix}`, true)
       }
     } else if (Math.abs(yVelocity) > Math.abs(xVelocity)) {
-      const animToPlay = this.hasPossession
-        ? ONBALL_ANIMS.run.up
-        : isDefense
-        ? OFFBALL_ANIMS.defend.up
-        : OFFBALL_ANIMS.run.up
+      const animToPlay = this.getAnimationToPlay(true, isDefense)
       if (this.sprite.anims.getName() !== animToPlay) {
         const suffix = this.side === Side.CPU ? 'cpu' : 'player'
         this.sprite.play(`${animToPlay}-${suffix}`, true)
