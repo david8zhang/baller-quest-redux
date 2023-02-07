@@ -270,12 +270,15 @@ export class DribbleMeter {
   }
 
   dropDefender(selectedCourtPlayer: CourtPlayer) {
-    const defender = this.team.getDefenderForPlayer(selectedCourtPlayer)
-    if (defender && defender.getCurrState().key !== States.STEAL) {
-      defender.setState(States.FALL)
-      Game.instance.time.delayedCall(1250, () => {
-        defender.setState(States.IDLE)
-      })
+    const randNum = Phaser.Math.Between(0, 100)
+    if (randNum > 75) {
+      const defender = this.team.getDefenderForPlayer(selectedCourtPlayer)
+      if (defender && defender.getCurrState().key !== States.STEAL) {
+        defender.setState(States.FALL)
+        Game.instance.time.delayedCall(1250, () => {
+          defender.setState(States.IDLE)
+        })
+      }
     }
   }
 
