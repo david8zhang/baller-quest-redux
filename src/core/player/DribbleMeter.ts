@@ -280,17 +280,21 @@ export class DribbleMeter {
     selectedCourtPlayer.sprite.setFlipX(direction === Direction.RIGHT)
     selectedCourtPlayer.sprite.setTexture('crossover-player-start')
     selectedCourtPlayer.sprite.setVelocity(initialXVelocity, -20)
-    Game.instance.time.delayedCall(250, () => {
-      selectedCourtPlayer.sprite.setTexture('crossover-player-transition-1')
-      selectedCourtPlayer.sprite.setVelocity(0, 0)
-      Game.instance.time.delayedCall(150, () => {
-        selectedCourtPlayer.sprite.setTexture('crossover-player-transition-2')
-        Game.instance.time.delayedCall(50, () => {
-          this.dropDefender(selectedCourtPlayer)
-          selectedCourtPlayer.handWithBall = direction === Direction.RIGHT ? Hand.RIGHT : Hand.LEFT
-          selectedCourtPlayer.sprite.setTexture('crossover-player-finish')
-          this.burstSpeed(selectedCourtPlayer, initialXVelocity)
-          selectedCourtPlayer.sprite.anims.play('crossover-escape-player')
+    Game.instance.time.delayedCall(100, () => {
+      selectedCourtPlayer.sprite.setVelocity(initialXVelocity * 0.5, -20)
+      selectedCourtPlayer.sprite.setTexture('crossover-player-start-2')
+      Game.instance.time.delayedCall(300, () => {
+        selectedCourtPlayer.sprite.setTexture('crossover-player-transition-1')
+        Game.instance.time.delayedCall(150, () => {
+          selectedCourtPlayer.sprite.setTexture('crossover-player-transition-2')
+          Game.instance.time.delayedCall(100, () => {
+            this.dropDefender(selectedCourtPlayer)
+            selectedCourtPlayer.handWithBall =
+              direction === Direction.RIGHT ? Hand.RIGHT : Hand.LEFT
+            selectedCourtPlayer.sprite.setTexture('crossover-player-finish')
+            this.burstSpeed(selectedCourtPlayer, initialXVelocity)
+            selectedCourtPlayer.sprite.anims.play('crossover-escape-player')
+          })
         })
       })
     })

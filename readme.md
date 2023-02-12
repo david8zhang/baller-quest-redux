@@ -4,7 +4,6 @@
 
 ## TODO:
 
-- Dribble moves
 - Post Up + Fadeaway moves
 
 ### Stretch Goals

@@ -58,6 +58,10 @@ export class Preload extends Phaser.Scene {
       'animations/dribble/crossover/player/crossover-player-start.png'
     )
     this.load.image(
+      'crossover-player-start-2',
+      'animations/dribble/crossover/player/crossover-player-start-2.png'
+    )
+    this.load.image(
       'crossover-player-transition-1',
       'animations/dribble/crossover/player/crossover-player-transition-1.png'
     )
