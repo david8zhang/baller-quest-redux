@@ -3,6 +3,7 @@ import { BallState } from '../Ball'
 import { createArc, Direction, Side } from '../Constants'
 import { CourtPlayer, Hand } from '../CourtPlayer'
 import { States } from '../states/States'
+import { PlayerCourtPlayer } from './PlayerCourtPlayer'
 import { PlayerTeam } from './PlayerTeam'
 
 export class DribbleMeter {
@@ -14,6 +15,7 @@ export class DribbleMeter {
   public isDribbleButtonPressed: boolean = false
   public isWithinDribbleCombo: boolean = false
   public isCrossingOver: boolean = false
+  public isStepBack: boolean = false
   public stopDribblingEvent: Phaser.Time.TimerEvent | null = null
 
   public dribbleArrows: Phaser.GameObjects.Image[] = []
@@ -53,19 +55,40 @@ export class DribbleMeter {
 
   setupKeyboardListener() {
     Game.instance.input.keyboard.on('keydown', (e) => {
-      switch (e.code) {
-        case 'KeyX': {
-          if (
-            this.dribbleComboSuccess &&
-            this.isDribbleButtonPressed &&
-            this.team.hasPossession()
-          ) {
+      const canPerformSpecialMove =
+        this.dribbleComboSuccess && this.isDribbleButtonPressed && this.team.hasPossession()
+      if (canPerformSpecialMove) {
+        switch (e.code) {
+          case 'KeyX': {
             this.performCrossover()
+            break
+          }
+          case 'KeyZ': {
+            this.performStepBack()
             break
           }
         }
       }
     })
+  }
+
+  performStepBack() {
+    if (this.dribbleComboTimeoutEvent) {
+      this.dribbleComboTimeoutEvent.paused = true
+      this.dribbleComboTimeoutEvent.destroy()
+      this.dribbleComboTimeoutEvent = null
+    }
+
+    if (!this.isStepBack) {
+      const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+      const direction =
+        selectedCourtPlayer.sprite.x > Game.instance.hoop.rimSprite.x
+          ? Direction.RIGHT
+          : Direction.LEFT
+      this.isWithinDribbleCombo = true
+      this.isStepBack = true
+      this.stepBack(direction)
+    }
   }
 
   displayDribbleMoveArrows() {
@@ -118,7 +141,7 @@ export class DribbleMeter {
       selectedCourtPlayer.sprite.anims.play('dribble-intense-player', true)
     }
     this.isDribbleButtonPressed = true
-    if (!this.isCrossingOver) {
+    if (!this.isCrossingOver && !this.isStepBack) {
       selectedCourtPlayer.setVelocity(0, 0)
       if (!this.dribbleComboSuccess) {
         this.displayDribbleMoveArrows()
@@ -137,10 +160,14 @@ export class DribbleMeter {
   }
 
   handleAnimationStart(e) {
-    if (e.key !== 'dribble-switch-hand-player' && e.key !== 'crossover-escape-player') {
+    if (this.shouldEndDribbleCombo(e)) {
       this.isCrossingOver = false
       this.isWithinDribbleCombo = false
     }
+  }
+
+  shouldEndDribbleCombo(e) {
+    return e.key !== 'crossover-escape-player' && !this.isStepBack
   }
 
   onDribbleComboSuccess() {
@@ -264,6 +291,48 @@ export class DribbleMeter {
           selectedCourtPlayer.sprite.setTexture('crossover-player-finish')
           this.burstSpeed(selectedCourtPlayer, initialXVelocity)
           selectedCourtPlayer.sprite.anims.play('crossover-escape-player')
+        })
+      })
+    })
+  }
+
+  stepBack(direction: Direction) {
+    const selectedCourtPlayer = this.team.getSelectedCourtPlayer()
+    const initialXVelocity = direction === Direction.RIGHT ? 150 : -150
+    selectedCourtPlayer.sprite.anims.stop()
+    selectedCourtPlayer.sprite.setFlipX(direction === Direction.RIGHT)
+    selectedCourtPlayer.sprite.setTexture('step-back-player-0')
+    selectedCourtPlayer.sprite.setVelocity(initialXVelocity, 150)
+
+    const onStepBackEnd = () => {
+      const playerCourtPlayer = selectedCourtPlayer as PlayerCourtPlayer
+      playerCourtPlayer.isPlayerCommandOverride = true
+      selectedCourtPlayer.setState(States.SHOOTING, () => {
+        this.isStepBack = false
+        this.isWithinDribbleCombo = false
+        this.dribbleComboSuccess = false
+        selectedCourtPlayer.auraSprite.setVisible(false)
+        playerCourtPlayer.isPlayerCommandOverride = false
+        playerCourtPlayer.setState(States.PLAYER_CONTROL)
+      })
+    }
+
+    Game.instance.time.delayedCall(100, () => {
+      selectedCourtPlayer.sprite.setTexture('step-back-player-1')
+      Game.instance.time.delayedCall(150, () => {
+        selectedCourtPlayer.sprite.setVelocity(initialXVelocity, 200)
+        selectedCourtPlayer.sprite.setTexture('step-back-player-2')
+        Game.instance.time.delayedCall(150, () => {
+          selectedCourtPlayer.sprite.setVelocity(initialXVelocity, 350)
+          selectedCourtPlayer.sprite.setTexture('step-back-player-3')
+          Game.instance.time.delayedCall(150, () => {
+            this.dropDefender(selectedCourtPlayer)
+            selectedCourtPlayer.sprite.setTexture('step-back-player-4')
+            selectedCourtPlayer.sprite.setVelocity(0, 0)
+            Game.instance.time.delayedCall(250, () => {
+              onStepBackEnd()
+            })
+          })
         })
       })
     })

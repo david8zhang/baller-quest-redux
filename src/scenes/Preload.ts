@@ -28,6 +28,16 @@ export class Preload extends Phaser.Scene {
     this.loadUIImages()
     this.loadAuraAnimations()
     this.loadSprintAnimations()
+    this.loadStepBackAnimations()
+  }
+
+  loadStepBackAnimations() {
+    for (let i = 0; i <= 4; i++) {
+      this.load.image(
+        `step-back-player-${i}`,
+        `animations/dribble/step-back/player/step-back-player-${i}.png`
+      )
+    }
   }
 
   loadSprintAnimations() {
