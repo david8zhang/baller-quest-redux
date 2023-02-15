@@ -33,6 +33,7 @@ export class Ball {
   public ballStateText: Phaser.GameObjects.Text
   public isRebounding: boolean = false
   public reboundPoint: { x: number; y: number } | null = null
+  public isPlayingSound: boolean = false
 
   // Floor for ball to bounce on when shot is blocked
   public blockShotFloor!: Phaser.Physics.Arcade.Sprite
@@ -103,6 +104,7 @@ export class Ball {
           this.ballState === BallState.MADE_TWO_POINT_SHOT ||
           this.ballState === BallState.MADE_THREE_POINT_SHOT
         ) {
+          this.isPlayingSound = false
           const points = this.ballState === BallState.MADE_THREE_POINT_SHOT ? 3 : 2
           if (!this.prevPlayerWithBall) {
             console.log('WENT HERE!', this)
@@ -135,6 +137,11 @@ export class Ball {
           if (this.ballState === BallState.MADE_TWO_POINT_SHOT) {
             direction = this.sprite.body.velocity.x > 0 ? 'right' : 'left'
           }
+
+          if (!this.isPlayingSound) {
+            this.isPlayingSound = true
+            this.game.sound.play('swish')
+          }
           this.game.hoop.rimSprite.play(`net-swish-${direction}`, true)
           this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.8)
           this.sprite.setVelocityY(this.sprite.body.velocity.y * 0.9)
@@ -143,7 +150,7 @@ export class Ball {
             this.game.handleMatchFinished()
             return
           }
-
+          this.game.sound.play('miss')
           // Rebound
           this.isRebounding = true
           this.ballState = BallState.LOOSE

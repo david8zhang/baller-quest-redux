@@ -56,6 +56,8 @@ export default class Game extends Phaser.Scene {
   }
 
   create() {
+    this.sound.pauseOnBlur = false
+    this.sound.stopAll()
     this.initPlugins()
     createPlayerAnims(this.anims)
     createNetAnims(this.anims)

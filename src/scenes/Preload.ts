@@ -29,6 +29,14 @@ export class Preload extends Phaser.Scene {
     this.loadAuraAnimations()
     this.loadSprintAnimations()
     this.loadStepBackAnimations()
+    this.loadSounds()
+  }
+
+  loadSounds() {
+    this.load.audio('swish', 'sfx/swish.mp3')
+    this.load.audio('dribble', 'sfx/dribble-single.mp3')
+    this.load.audio('miss', 'sfx/miss.wav')
+    this.load.audio('bgm', 'sfx/bgm.mp3')
   }
 
   loadStepBackAnimations() {

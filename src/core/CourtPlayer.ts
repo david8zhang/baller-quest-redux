@@ -181,6 +181,30 @@ export class CourtPlayer {
     this.sprite.on('animationstart', (e) => {
       this.team.handleAnimationStart(e)
     })
+
+    this.sprite.on('animationupdate', (anim, frame, gameObject) => {
+      this.handleOnAnimUpdate(anim, frame, gameObject)
+    })
+  }
+
+  handleOnAnimUpdate(anim, frame, gameObject) {
+    if (this.game.ball.playerWithBall === this) {
+      if (anim.key.includes('dribble-front')) {
+        if (frame.index === 2) {
+          this.game.sound.play('dribble')
+        }
+      }
+      if (anim.key.includes('run-with-ball-side') || anim.key.includes('sprint-side')) {
+        if (frame.index === 2 || frame.index === 5) {
+          this.game.sound.play('dribble')
+        }
+      }
+      if (anim.key.includes('run-with-ball-front')) {
+        if (frame.index === 1) {
+          this.game.sound.play('dribble')
+        }
+      }
+    }
   }
 
   getOffSpeedFromAttr() {

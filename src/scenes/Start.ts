@@ -56,5 +56,9 @@ export class Start extends Phaser.Scene {
       .on('click', () => {
         this.scene.start('game')
       })
+
+    // this.sound.play('bgm', {
+    //   loop: true,
+    // })
   }
 }
