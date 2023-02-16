@@ -24,6 +24,7 @@ export class StealState extends State {
         team,
         () => {
           if (this.didStealSucceed(currPlayer, ballHandler)) {
+            Game.instance.sound.play('steal', { volume: 0.5 })
             this.launchBallBackwardsAfterSteal(currPlayer, ballHandler)
           } else {
             this.stealFailed = true

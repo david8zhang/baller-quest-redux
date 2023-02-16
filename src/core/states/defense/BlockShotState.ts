@@ -31,6 +31,7 @@ export class BlockShotState extends State {
       )
       createArc(currPlayer.sprite, lineToShooter.getPoint(0.5), jumpTime)
       Game.instance.time.delayedCall(jumpTime * 485, () => {
+        Game.instance.sound.play('block')
         Game.instance.ball.ballState = BallState.BLOCKED
         currPlayer.sprite.setTexture(`block-front-swing-${suffix}`)
         this.launchBallBackwardsAfterBlock(currPlayer, shooter)

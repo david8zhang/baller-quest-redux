@@ -284,6 +284,7 @@ export class DribbleMeter {
       selectedCourtPlayer.sprite.setVelocity(initialXVelocity * 0.5, -20)
       selectedCourtPlayer.sprite.setTexture('crossover-player-start-2')
       Game.instance.time.delayedCall(300, () => {
+        Game.instance.sound.play('dribble', { volume: 0.5 })
         selectedCourtPlayer.sprite.setTexture('crossover-player-transition-1')
         Game.instance.time.delayedCall(150, () => {
           selectedCourtPlayer.sprite.setTexture('crossover-player-transition-2')

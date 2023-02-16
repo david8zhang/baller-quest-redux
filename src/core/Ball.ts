@@ -99,6 +99,7 @@ export class Ball {
       this.game.hoop.floorSprite,
       this.sprite,
       () => {
+        this.game.sound.play('dribble', { volume: 0.5 })
         if (
           this.ballState === BallState.DUNK ||
           this.ballState === BallState.MADE_TWO_POINT_SHOT ||
@@ -140,7 +141,7 @@ export class Ball {
 
           if (!this.isPlayingSound) {
             this.isPlayingSound = true
-            this.game.sound.play('swish')
+            this.game.sound.play('swish', { volume: 0.5 })
           }
           this.game.hoop.rimSprite.play(`net-swish-${direction}`, true)
           this.sprite.setVelocityX(this.sprite.body.velocity.x * 0.8)
@@ -150,7 +151,7 @@ export class Ball {
             this.game.handleMatchFinished()
             return
           }
-          this.game.sound.play('miss')
+          this.game.sound.play('miss', { volume: 0.5 })
           // Rebound
           this.isRebounding = true
           this.ballState = BallState.LOOSE

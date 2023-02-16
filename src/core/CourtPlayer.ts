@@ -93,6 +93,8 @@ export class CourtPlayer {
   public handWithBall = Hand.RIGHT
   public auraSprite: Phaser.GameObjects.Sprite
 
+  public didPlayShoesSFXOnPrevFrame: boolean = false
+
   constructor(game: Game, config: CourtPlayerConfig) {
     this.game = game
     const { position, side, tint, playerId, team } = config
@@ -188,20 +190,38 @@ export class CourtPlayer {
   }
 
   handleOnAnimUpdate(anim, frame, gameObject) {
+    if (anim.key.includes('run')) {
+      if (this.didPlayShoesSFXOnPrevFrame) {
+        this.didPlayShoesSFXOnPrevFrame = false
+      } else {
+        const randNum = Phaser.Math.Between(0, 4)
+        if (randNum === 4) {
+          const shoesSfx = ['shoes1', 'shoes2', 'shoes3', 'shoes4']
+          const sfxToPlay = shoesSfx[Phaser.Math.Between(0, shoesSfx.length - 1)]
+          this.game.sound.play(sfxToPlay, { volume: 0.5 })
+        }
+      }
+    }
+
     if (this.game.ball.playerWithBall === this) {
       if (anim.key.includes('dribble-front')) {
         if (frame.index === 2) {
-          this.game.sound.play('dribble')
+          this.game.sound.play('dribble', { volume: 0.5 })
         }
       }
       if (anim.key.includes('run-with-ball-side') || anim.key.includes('sprint-side')) {
         if (frame.index === 2 || frame.index === 5) {
-          this.game.sound.play('dribble')
+          this.game.sound.play('dribble', { volume: 0.5 })
         }
       }
       if (anim.key.includes('run-with-ball-front')) {
         if (frame.index === 1) {
-          this.game.sound.play('dribble')
+          this.game.sound.play('dribble', { volume: 0.5 })
+        }
+      }
+      if (anim.key.includes('dribble-intense')) {
+        if (frame.index === 3 || frame.index === 6) {
+          this.game.sound.play('dribble', { volume: 0.5 })
         }
       }
     }

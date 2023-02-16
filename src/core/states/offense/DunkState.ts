@@ -33,6 +33,8 @@ export class DunkState extends State {
 
     Game.instance.time.delayedCall(975 * jumpDuration, () => {
       Game.instance.cameras.main.shake(150, 0.005)
+      Game.instance.sound.play('dunk', { volume: 0.5 })
+      Game.instance.sound.play('miss', { volume: 0.5 })
       currPlayer.sprite.setVelocity(0, 0)
       currPlayer.sprite.setGravityY(0)
       currPlayer.hasPossession = false
